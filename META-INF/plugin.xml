@@ -1,0 +1,24 @@
+<idea-plugin version="2">
+    <id>FrozenIdea</id>
+    <name>Frozen Idea</name>
+    <description>ICE framework support.</description>
+    <version>0.0.0.1</version>
+    <vendor>xBlackCat</vendor>
+    <idea-version since-build="111.1"/>
+    <depends>com.intellij.modules.lang</depends>
+    <change-notes><![CDATA[
+            First revision: Only syntax highlighting
+        ]]>
+    </change-notes>
+
+    <application-components>
+        <component>
+            <implementation-class>org.xblackcat.frozenice.FrozenIdea</implementation-class>
+        </component>
+    </application-components>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
+        <lang.syntaxHighlighterFactory key="SLICE" implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
+    </extensions>
+</idea-plugin>
