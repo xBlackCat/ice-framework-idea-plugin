@@ -20,5 +20,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
         <lang.syntaxHighlighterFactory key="SLICE" implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
+        <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.IceParserDefinition"/>
     </extensions>
 </idea-plugin>
