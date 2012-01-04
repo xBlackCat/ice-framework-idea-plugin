@@ -80,6 +80,8 @@ MACROS_LINE="#"[^\r\n]*
 
 <YYINITIAL> {IDENTIFIER} { return SliceTokenTypes.IDENTIFIER; }
 
+<YYINITIAL> "<" { return SliceTokenTypes.LT; }
+<YYINITIAL> ">" { return SliceTokenTypes.GT; }
 <YYINITIAL> "("   { return SliceTokenTypes.LPARENTH; }
 <YYINITIAL> ")"   { return SliceTokenTypes.RPARENTH; }
 <YYINITIAL> "{"   { return SliceTokenTypes.LBRACE; }

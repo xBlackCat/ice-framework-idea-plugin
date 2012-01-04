@@ -45,6 +45,8 @@ public interface SliceTokenTypes extends TokenType {
     IElementType KEYWORD_OUT = new SliceElementType("Ice.Keyword.out");
     IElementType KEYWORD_VOID = new SliceElementType("Ice.Keyword.void");
 
+    IElementType GT = new SliceElementType("GT");
+    IElementType LT = new SliceElementType("LT");
     IElementType LPARENTH = new SliceElementType("LPARENTH");
     IElementType RPARENTH = new SliceElementType("RPARENTH");
     IElementType LBRACE = new SliceElementType("LBRACE");

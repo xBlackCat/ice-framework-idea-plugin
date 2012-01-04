@@ -14,7 +14,7 @@ public class IceFileType extends LanguageFileType {
     public static final IceFileType INSTANCE = new IceFileType();
 
     private static final Icon ICON = IconLoader.getIcon("/fileTypes/ice_file.png");
-    private static final String DEFAULT_EXTENSION = "java";
+    private static final String DEFAULT_EXTENSION = "ice";
 
     protected IceFileType() {
         super(SliceLanguage.INSTANCE);
