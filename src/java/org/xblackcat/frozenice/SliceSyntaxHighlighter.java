@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
+import org.xblackcat.frozenice.psi.SliceTokenTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class SliceSyntaxHighlighter extends SyntaxHighlighterBase {
 
         keys1.put(SliceTokenTypes.C_STYLE_COMMENT, SyntaxHighlighterColors.JAVA_BLOCK_COMMENT);
         keys1.put(SliceTokenTypes.END_OF_LINE_COMMENT, SyntaxHighlighterColors.LINE_COMMENT);
-        keys1.put(SliceTokenTypes.MACROS_LINE, SyntaxHighlighterColors.DOC_COMMENT);
+        keys1.put(SliceTokenTypes.MACROS_LINE, SyntaxHighlighterColors.DOC_COMMENT_MARKUP);
 
         keys1.put(SliceTokenTypes.LPARENTH, SyntaxHighlighterColors.PARENTHS);
         keys1.put(SliceTokenTypes.RPARENTH, SyntaxHighlighterColors.PARENTHS);

@@ -1,4 +1,4 @@
-package org.xblackcat.frozenice;
+package org.xblackcat.frozenice.psi;
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
