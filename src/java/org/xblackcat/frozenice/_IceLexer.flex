@@ -2,7 +2,7 @@
 package org.xblackcat.frozenice;
 
 import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.*;
+import org.xblackcat.frozenice.psi.SliceTokenTypes;
 import com.intellij.psi.tree.IElementType;
 
 @SuppressWarnings({"ALL"})
@@ -35,7 +35,7 @@ IDENTIFIER=\\?[:jletter:] [:jletterdigit:]*
 C_STYLE_COMMENT=("/*"[^"*"]{COMMENT_TAIL})|"/*"
 COMMENT_TAIL=([^"*"]*("*"+[^"*""/"])?)*("*"+"/")?
 END_OF_LINE_COMMENT="/""/"[^\r\n]*
-MACROS_LINE="#"[^\r\n]*
+MACROS_LINE="#"[:jletter:][^\r\n]*
 
 %%
 

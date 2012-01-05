@@ -1,7 +1,8 @@
-package org.xblackcat.frozenice;
+package org.xblackcat.frozenice.psi;
 
 import com.intellij.lang.Language;
 import com.intellij.psi.tree.IElementType;
+import org.xblackcat.frozenice.SliceLanguage;
 
 /**
  * 04.01.12 12:23

@@ -2,7 +2,6 @@ package org.xblackcat.frozenice;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
-import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
 import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
@@ -11,11 +10,14 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.tree.ElementType;
-import com.intellij.psi.impl.source.tree.JavaElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
+import org.xblackcat.frozenice.psi.IcePsiFile;
+import org.xblackcat.frozenice.psi.IcePsiParser;
+import org.xblackcat.frozenice.psi.IceStubElementType;
+import org.xblackcat.frozenice.psi.SliceElementTypes;
 
 /**
  * 04.01.12 16:31
@@ -31,14 +33,7 @@ public class IceParserDefinition implements ParserDefinition {
 
     @Override
     public PsiParser createParser(Project project) {
-        return new PsiParser() {
-            @NotNull
-            @Override
-            public ASTNode parse(IElementType root, PsiBuilder builder) {
-                // TODO: implement
-                return null;
-            }
-        };
+        return new IcePsiParser();
     }
 
     @Override
@@ -61,14 +56,18 @@ public class IceParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public TokenSet getStringLiteralElements() {
-        return TokenSet.create(JavaElementType.LITERAL_EXPRESSION);
+        return TokenSet.EMPTY;
     }
 
     @NotNull
     @Override
     public PsiElement createElement(ASTNode node) {
-        return null;
-    }
+        final IElementType type = node.getElementType();
+        if (type instanceof IceStubElementType) {
+          return ((IceStubElementType)type).createPsi(node);
+        }
+
+        throw new IllegalStateException("Incorrect node for IceParserDefinition: " + node + " (" + type + ")");    }
 
     @Override
     public PsiFile createFile(FileViewProvider viewProvider) {
@@ -79,4 +78,5 @@ public class IceParserDefinition implements ParserDefinition {
     public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
         return SpaceRequirements.MAY;
     }
+
 }
