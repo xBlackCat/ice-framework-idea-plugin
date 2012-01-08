@@ -16,11 +16,12 @@ public class IcePsiParser implements PsiParser {
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
         final PsiBuilder.Marker rootMarker = builder.mark();
+
+        final IceParser parser = new IceParser(builder);
         while (!builder.eof()) {
-            String tokenText = builder.getTokenText();
-            IElementType tokenType = builder.getTokenType();
-            builder.advanceLexer();
+            parser.parseBlock();
         }
+
         rootMarker.done(root);
         return builder.getTreeBuilt();
     }

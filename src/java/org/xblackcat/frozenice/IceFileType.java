@@ -1,9 +1,9 @@
 package org.xblackcat.frozenice;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.xblackcat.frozenice.util.Icons;
 
 import javax.swing.*;
 
@@ -13,7 +13,6 @@ import javax.swing.*;
 public class IceFileType extends LanguageFileType {
     public static final IceFileType INSTANCE = new IceFileType();
 
-    private static final Icon ICON = IconLoader.getIcon("/fileTypes/ice_file.png");
     private static final String DEFAULT_EXTENSION = "ice";
 
     protected IceFileType() {
@@ -40,7 +39,7 @@ public class IceFileType extends LanguageFileType {
 
     @Override
     public Icon getIcon() {
-        return ICON;
+        return Icons.FILE_ICON;
     }
 
     @Override

@@ -16,8 +16,8 @@ import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.psi.IcePsiFile;
 import org.xblackcat.frozenice.psi.IcePsiParser;
-import org.xblackcat.frozenice.psi.IceStubElementType;
 import org.xblackcat.frozenice.psi.SliceElementTypes;
+import org.xblackcat.frozenice.psi.SliceStubElementType;
 
 /**
  * 04.01.12 16:31
@@ -63,11 +63,12 @@ public class IceParserDefinition implements ParserDefinition {
     @Override
     public PsiElement createElement(ASTNode node) {
         final IElementType type = node.getElementType();
-        if (type instanceof IceStubElementType) {
-          return ((IceStubElementType)type).createPsi(node);
+        if (type instanceof SliceStubElementType) {
+            return ((SliceStubElementType) type).createPsi(node);
         }
 
-        throw new IllegalStateException("Incorrect node for IceParserDefinition: " + node + " (" + type + ")");    }
+        throw new IllegalStateException("Incorrect node for IceParserDefinition: " + node + " (" + type + ")");
+    }
 
     @Override
     public PsiFile createFile(FileViewProvider viewProvider) {
