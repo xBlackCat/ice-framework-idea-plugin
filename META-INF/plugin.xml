@@ -18,6 +18,8 @@
     </application-components>
 
     <extensions defaultExtensionNs="com.intellij">
+        <frameworkSupport implementation="org.xblackcat.frozenice.config.IceFacetSupportProvider"/>
+        <facetType implementation="org.xblackcat.frozenice.config.IceFacetType"/>
         <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
         <lang.syntaxHighlighterFactory key="SLICE" implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.IceParserDefinition"/>

@@ -45,17 +45,53 @@ public interface SliceTokenTypes extends TokenType {
     IElementType KEYWORD_OUT = new SliceElementType("Ice.Keyword.out");
     IElementType KEYWORD_VOID = new SliceElementType("Ice.Keyword.void");
 
+    /**
+     * &gt;
+     */
     IElementType GT = new SliceElementType("GT");
+    /**
+     * &lt;
+     */
     IElementType LT = new SliceElementType("LT");
+    /**
+     * (
+     */
     IElementType LPARENTH = new SliceElementType("LPARENTH");
+    /**
+     * )
+     */
     IElementType RPARENTH = new SliceElementType("RPARENTH");
+    /**
+     * {
+     */
     IElementType LBRACE = new SliceElementType("LBRACE");
+    /**
+     * }
+     */
     IElementType RBRACE = new SliceElementType("RBRACE");
+    /**
+     * [
+     */
     IElementType LBRACKET = new SliceElementType("LBRACKET");
+    /**
+     * ]
+     */
     IElementType RBRACKET = new SliceElementType("RBRACKET");
+    /**
+     * ,
+     */
     IElementType COMMA = new SliceElementType("COMMA");
+    /**
+     * .
+     */
     IElementType DOT = new SliceElementType("DOT");
+    /**
+     * ;
+     */
     IElementType SEMICOLON = new SliceElementType("SEMICOLON");
+    /**
+     * ...
+     */
     IElementType ELLIPSIS = new SliceElementType("ELLIPSIS");
 
 

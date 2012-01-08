@@ -2,8 +2,8 @@
 package org.xblackcat.frozenice;
 
 import com.intellij.lexer.FlexLexer;
-import org.xblackcat.frozenice.psi.SliceTokenTypes;
 import com.intellij.psi.tree.IElementType;
+import org.xblackcat.frozenice.psi.SliceTokenTypes;
 
 @SuppressWarnings({"ALL"})
 %%

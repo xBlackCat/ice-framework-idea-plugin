@@ -9,6 +9,6 @@ import com.intellij.psi.impl.source.tree.FileElement;
  */
 public class IceFileElement extends FileElement {
     public IceFileElement(CharSequence text) {
-        super(IceStubElementTypes.ICE_FILE, text);
+        super(SliceElementTypes.FILE_ELEMENT_TYPE, text);
     }
 }
