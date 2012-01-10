@@ -17,4 +17,6 @@ public abstract class SliceStubElementType extends IElementType {
     }
 
     public abstract PsiElement createPsi(ASTNode node);
+
+
 }

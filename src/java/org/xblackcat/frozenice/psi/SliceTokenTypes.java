@@ -93,6 +93,10 @@ public interface SliceTokenTypes extends TokenType {
      * ...
      */
     IElementType ELLIPSIS = new SliceElementType("ELLIPSIS");
+    /**
+     * =
+     */
+    IElementType EQUAL = new SliceElementType("EQUAL");
 
 
     TokenSet KEYWORD_BIT_SET = TokenSet.create(KEYWORD_BOOL, KEYWORD_EXCEPTION, KEYWORD_INTERFACE, KEYWORD_SEQUENCE,
