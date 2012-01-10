@@ -92,6 +92,7 @@ MACROS_LINE="#"[:jletter:][^\r\n]*
 <YYINITIAL> ","   { return SliceTokenTypes.COMMA; }
 <YYINITIAL> "..." { return SliceTokenTypes.ELLIPSIS; }
 <YYINITIAL> "."   { return SliceTokenTypes.DOT; }
+<YYINITIAL> "="   { return SliceTokenTypes.EQUAL; }
 
 <YYINITIAL> . { return SliceTokenTypes.BAD_CHARACTER; }
 

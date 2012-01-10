@@ -47,6 +47,18 @@ public interface SliceElementTypes extends SliceTokenTypes {
             return new SliceStubPsiElement(node);
         }
     };
+    IElementType ICE_CLASS_INTERFACE_LIST = new SliceStubElementType("Ice.ImplementList_declaration") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+    IElementType ICE_CLASS_SUPER_CLASS = new SliceStubElementType("Ice.SuperClass_declaration") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
     IElementType ICE_CLASS_METHOD_DECLARATION = new SliceStubElementType("Ice.Method_declaration") {
         @Override
         public PsiElement createPsi(ASTNode node) {
@@ -54,6 +66,12 @@ public interface SliceElementTypes extends SliceTokenTypes {
         }
     };
     IElementType ICE_ENUM_CONSTANT = new SliceStubElementType("Ice.Enum_constant") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+    IElementType ICE_EXCEPTION = new SliceStubElementType("Ice.Exception") {
         @Override
         public PsiElement createPsi(ASTNode node) {
             return new SliceStubPsiElement(node);
