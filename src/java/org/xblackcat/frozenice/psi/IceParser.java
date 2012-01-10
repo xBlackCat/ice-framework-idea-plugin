@@ -24,6 +24,7 @@ public class IceParser {
 
     public IceParser(PsiBuilder builder) {
         this.builder = builder;
+        builder.setDebugMode(true);
     }
 
 
@@ -36,17 +37,20 @@ public class IceParser {
 
         IElementType type = null;
         while (!eof()) {
-            if (Checker.isCommentToken(token())) {
+            final IElementType token = token();
+
+            if (Checker.isCommentToken(token)) {
+                type = SliceElementTypes.END_OF_LINE_COMMENT;
                 advance();
                 continue;
             }
 
-            if (Checker.isMacroDefinition(token())) {
+            if (Checker.isMacroDefinition(token)) {
+                type = SliceElementTypes.ICE_MACROS;
                 parseMacros();
                 continue;
             }
 
-            final IElementType token = token();
             if (Checker.isModuleToken(token)) {
                 type = SliceElementTypes.ICE_MODULE;
 
@@ -71,8 +75,6 @@ public class IceParser {
                     // TODO: implement
                     skipBlock();
                 }
-            } else {
-                block.error(IceErrorMessages.message("unexpected.token"));
             }
             break;
         }
@@ -80,7 +82,8 @@ public class IceParser {
         if (type != null) {
             block.done(type);
         } else {
-            block.drop();
+            advance();
+            block.error(IceErrorMessages.message("unexpected.token"));
         }
     }
 
@@ -213,6 +216,8 @@ public class IceParser {
             parseClassBody(moduleName, false);
         }
 
+        advance();
+
         if (token() == SliceTokenTypes.SEMICOLON) {
             advance();
         } else {
@@ -230,11 +235,15 @@ public class IceParser {
         }
 
         if (token() == SliceTokenTypes.IDENTIFIER) {
-            if (!dataTypeExists(moduleName, tokenText())) {
-                mark().error(IceErrorMessages.message("invalid.datatype"));
-            }
+            final PsiBuilder.Marker mark = mark();
+            String typeName = tokenText();
 
             advance();
+            if (!dataTypeExists(moduleName, typeName)) {
+                mark.error(IceErrorMessages.message("invalid.datatype"));
+            } else {
+                mark.drop();
+            }
         } else if (Checker.isTypeKeyword(token())) {
             advance();
         } else {
@@ -255,17 +264,20 @@ public class IceParser {
             type = null;
         }
 
-        while (!eof() && token() != SliceTokenTypes.SEMICOLON) {
+        while (!eof() && token() != SliceTokenTypes.SEMICOLON  && token() != SliceTokenTypes.RBRACE) {
             advance();
         }
 
-        advance();
-
         if (type != null) {
             line.done(type);
+            advance();
         } else {
             line.error(IceErrorMessages.message("invalid.declaration"));
+            if (name == null) {
+                advance();
+            }
         }
+
     }
 
     private void parseInterface(String moduleName) {
@@ -354,7 +366,7 @@ public class IceParser {
             moduleName = tokenText();
             advance();
         } else {
-            moduleName = "";
+            moduleName = null;
             mark().error(errorMessage);
         }
         return moduleName;
