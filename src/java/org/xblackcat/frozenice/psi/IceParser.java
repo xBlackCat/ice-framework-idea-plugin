@@ -105,20 +105,31 @@ public class IceParser {
     }
 
     private void parseModule(String modulePrefix) {
+        final PsiBuilder.Marker moduleError = mark();
         // We already set a mark ICE_MODULE
         advance();
 
         String moduleName = readIdentifier(IceErrorMessages.message("identifier.required"));
 
+        final PsiBuilder.Marker moduleErrorEnd = mark();
         if (token() == SliceTokenTypes.LBRACE) {
             advance();
         } else {
             mark().error(IceErrorMessages.message("left.brace.is.required"));
         }
 
+        final String fullModuleName = modulePrefix + "." + moduleName;
+
         while (!eof() && token() != SliceTokenTypes.RBRACE) {
-            parseBlock(false, modulePrefix + "." + moduleName);
+            parseBlock(false, fullModuleName);
         }
+
+        if (forwardDeclarations.containsKey(fullModuleName) && !forwardDeclarations.get(fullModuleName).isEmpty()) {
+            moduleError.errorBefore(IceErrorMessages.message("missed.declarations"), moduleErrorEnd);
+        } else {
+            moduleError.drop();
+        }
+        moduleErrorEnd.drop();
 
         advance();
 
@@ -147,6 +158,8 @@ public class IceParser {
             // Forward declaration
             if (isClassForwardDeclared(moduleName, className)) {
                 classNameMark.error(IceErrorMessages.message("already.defined"));
+            } else {
+                classNameMark.drop();
             }
 
             forwardDeclareName(moduleName, className);
@@ -159,7 +172,7 @@ public class IceParser {
             classNameMark.drop();
         }
 
-        storeInterface(moduleName, className);
+        storeClassName(moduleName, className);
         if (token() == SliceTokenTypes.KEYWORD_EXTENDS) {
             // Read extends declaration
             advance();
@@ -298,6 +311,8 @@ public class IceParser {
             // Forward declaration
             if (isClassForwardDeclared(moduleName, interfaceName)) {
                 interfaceNameMark.error(IceErrorMessages.message("already.defined"));
+            } else {
+                interfaceNameMark.drop();
             }
 
             forwardDeclareName(moduleName, interfaceName);
@@ -388,7 +403,7 @@ public class IceParser {
     }
 
     private boolean dataTypeExists(String moduleName, String name) {
-        return isClassDeclared(moduleName, name) || isInterfaceDeclared(moduleName, name);
+        return isClassDeclared(moduleName, name) || isInterfaceDeclared(moduleName, name) || isClassForwardDeclared(moduleName, name);
     }
 
     private void forwardDeclareName(String moduleName, String className) {
