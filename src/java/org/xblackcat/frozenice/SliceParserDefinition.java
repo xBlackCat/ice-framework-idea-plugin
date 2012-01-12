@@ -15,8 +15,8 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.psi.IcePsiFile;
-import org.xblackcat.frozenice.psi.IcePsiParser;
 import org.xblackcat.frozenice.psi.SliceElementTypes;
+import org.xblackcat.frozenice.psi.SlicePsiParser;
 import org.xblackcat.frozenice.psi.SliceStubElementType;
 
 /**
@@ -24,7 +24,7 @@ import org.xblackcat.frozenice.psi.SliceStubElementType;
  *
  * @author xBlackCat
  */
-public class IceParserDefinition implements ParserDefinition {
+public class SliceParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
@@ -33,7 +33,7 @@ public class IceParserDefinition implements ParserDefinition {
 
     @Override
     public PsiParser createParser(Project project) {
-        return new IcePsiParser();
+        return new SlicePsiParser();
     }
 
     @Override
@@ -67,7 +67,7 @@ public class IceParserDefinition implements ParserDefinition {
             return ((SliceStubElementType) type).createPsi(node);
         }
 
-        throw new IllegalStateException("Incorrect node for IceParserDefinition: " + node + " (" + type + ")");
+        throw new IllegalStateException("Incorrect node for SliceParserDefinition: " + node + " (" + type + ")");
     }
 
     @Override
