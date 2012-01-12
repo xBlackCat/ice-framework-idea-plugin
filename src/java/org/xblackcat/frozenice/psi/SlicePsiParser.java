@@ -11,13 +11,13 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author xBlackCat
  */
-public class IcePsiParser implements PsiParser {
+public class SlicePsiParser implements PsiParser {
     @NotNull
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
         final PsiBuilder.Marker rootMarker = builder.mark();
 
-        final IceParser parser = new IceParser(builder);
+        final SliceParser parser = new SliceParser(builder);
         while (!builder.eof()) {
             parser.parseBlock();
         }

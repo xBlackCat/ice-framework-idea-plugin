@@ -15,14 +15,14 @@ import java.util.Set;
  *
  * @author xBlackCat
  */
-public class IceParser {
+public class SliceParser {
     private final Map<String, Set<String>> validInterfaces = new HashMap<String, Set<String>>();
     private final Map<String, Set<String>> validClasses = new HashMap<String, Set<String>>();
     private final Map<String, Set<String>> forwardDeclarations = new HashMap<String, Set<String>>();
 
     private final PsiBuilder builder;
 
-    public IceParser(PsiBuilder builder) {
+    public SliceParser(PsiBuilder builder) {
         this.builder = builder;
         builder.setDebugMode(true);
     }

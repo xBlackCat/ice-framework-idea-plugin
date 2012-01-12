@@ -22,6 +22,6 @@
         <facetType implementation="org.xblackcat.frozenice.config.IceFacetType"/>
         <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
         <lang.syntaxHighlighterFactory key="SLICE" implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
-        <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.IceParserDefinition"/>
+        <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.SliceParserDefinition"/>
     </extensions>
 </idea-plugin>
