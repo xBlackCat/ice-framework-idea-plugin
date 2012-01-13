@@ -10,6 +10,7 @@ import javax.swing.*;
  * @author xBlackCat
  */
 public interface Icons {
+    Icon FACET_ICON_32 = IconLoader.getIcon("/icons/facet-32.png");
     Icon FACET_ICON = IconLoader.getIcon("/icons/facet.png");
     Icon FILE_ICON = IconLoader.getIcon("/icons/file.png");
 }
