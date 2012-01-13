@@ -240,6 +240,8 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                                     if (version != null) {
                                         Messages.showInfoMessage(project, "Found ZeroC framework. Version: " + version, "ZeroC Framework is found");
                                     }
+
+                                    setModified(true);
                                 } else {
                                     Messages.showWarningDialog(project, "Selected folder is not ZeroC ICE framework home directory", "ICE not found");
                                 }
@@ -254,10 +256,20 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
         }
 
         void reset() {
+            IceConfig config = plugin.getConfig();
+
+            if (config != null) {
+                selectedFolder = config.getFrameworkHome();
+                if (selectedFolder != null) {
+                    iceHomeFolder.setText(selectedFolder.getUrl());
+                }
+            }
+            
             setModified(false);
         }
 
         void apply() {
+            plugin.setConfig(new IceConfig(selectedFolder));
             setModified(false);
 
             UISettings.getInstance().fireUISettingsChanged();
