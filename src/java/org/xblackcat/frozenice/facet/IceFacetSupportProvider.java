@@ -1,4 +1,4 @@
-package org.xblackcat.frozenice.config;
+package org.xblackcat.frozenice.facet;
 
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportConfigurable;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
@@ -6,6 +6,7 @@ import com.intellij.ide.util.frameworkSupport.FrameworkSupportProvider;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.UnknownModuleType;
 import org.jetbrains.annotations.NotNull;
+import org.xblackcat.frozenice.config.IceFrameworkSupportConfigurable;
 import org.xblackcat.frozenice.util.Icons;
 
 import javax.swing.*;

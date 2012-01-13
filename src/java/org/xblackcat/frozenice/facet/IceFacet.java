@@ -1,4 +1,4 @@
-package org.xblackcat.frozenice.config;
+package org.xblackcat.frozenice.facet;
 
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetTypeId;
