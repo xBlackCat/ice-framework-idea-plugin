@@ -1,8 +1,10 @@
 package org.xblackcat.frozenice.facet;
 
+import com.intellij.facet.FacetManager;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportConfigurable;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportProvider;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.UnknownModuleType;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +32,11 @@ public class IceFacetSupportProvider extends FrameworkSupportProvider {
     @Override
     public boolean isEnabledForModuleType(@NotNull ModuleType moduleType) {
         return !(moduleType instanceof UnknownModuleType);
+    }
+
+    @Override
+    public boolean isSupportAlreadyAdded(@NotNull Module module) {
+        return FacetManager.getInstance(module).getFacetByType(IceFacet.ID) != null;
     }
 
     @Override
