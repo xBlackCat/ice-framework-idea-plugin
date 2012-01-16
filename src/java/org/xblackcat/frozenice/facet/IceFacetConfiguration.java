@@ -29,7 +29,15 @@ import java.awt.event.ActionListener;
  *
  * @author xBlackCat
  */
-@State(name = "IceFacetConfiguration", storages = {@Storage(id = "default", file = "$MODULE_FILE$")})
+@State(
+        name = "IceFacetConfiguration",
+        storages = {
+                @Storage(
+                        id = "default",
+                        file = "$MODULE_FILE$"
+                )
+        }
+)
 public class IceFacetConfiguration implements FacetConfiguration, PersistentStateComponent<Element> {
     private Config config = new Config(false, null);
 
@@ -48,9 +56,9 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
 
     @Override
     public Element getState() {
-        final Element root = new Element("ice-facet-config");
+        Element root = new Element("ice-facet-config");
 
-        final Element output = new Element("output");
+        Element output = new Element("output");
         root.addContent(output);
         output.setAttribute("cleanOnBuild", Boolean.toString(config.isCleanOutput()));
         output.setText(config.getOutputDirString());
@@ -70,6 +78,10 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
 
             config = new Config(cleanOutput, file);
         }
+    }
+
+    public Config getConfig() {
+        return config;
     }
 
     public static class Config {
@@ -155,6 +167,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                     );
                     if (files.length != 0) {
                         selectedFolder = files[0];
+                        outputFolder.setText(selectedFolder.getPresentableName());
                     }
                 }
             });
