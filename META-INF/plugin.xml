@@ -6,9 +6,10 @@
     <vendor>xBlackCat</vendor>
     <idea-version since-build="111.1"/>
     <depends>com.intellij.modules.lang</depends>
-    <change-notes><![CDATA[
-            First revision: Only syntax highlighting
-        ]]>
+    <change-notes><![CDATA[<ul>
+            <li><b>0.0.0.1</b> - First revision: Only syntax highlighting</li>
+            <li><b>0.0.0.2</b> - Slice2Java translation was added.</li>
+            </ul>]]>
     </change-notes>
 
     <project-components>
@@ -22,7 +23,8 @@
         <frameworkSupport implementation="org.xblackcat.frozenice.facet.IceFacetSupportProvider"/>
         <facetType implementation="org.xblackcat.frozenice.facet.IceFacetType"/>
         <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
-        <lang.syntaxHighlighterFactory key="SLICE" implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory key="SLICE"
+                                       implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.SliceParserDefinition"/>
     </extensions>
 </idea-plugin>

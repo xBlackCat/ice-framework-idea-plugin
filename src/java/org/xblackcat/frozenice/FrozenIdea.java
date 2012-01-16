@@ -1,6 +1,8 @@
 package org.xblackcat.frozenice;
 
+import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.components.*;
+import com.intellij.openapi.project.Project;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.config.IceConfig;
@@ -24,15 +26,25 @@ import org.xblackcat.frozenice.config.IceConfig;
 )
 public class FrozenIdea implements BaseComponent, PersistentStateComponent<Element>, ProjectComponent {
     private IceConfig iceConfig;
+    private final Project project;
 
-    public FrozenIdea() {
+    private Slice2Xxx translator;
+
+    public FrozenIdea(Project project) {
+        this.project = project;
     }
 
     public void initComponent() {
+        translator = new Slice2Xxx();
+        final CompilerManager compilerManager = CompilerManager.getInstance(project);
+        compilerManager.addCompiler(translator);
+        compilerManager.addCompilableFileType(IceFileType.INSTANCE);
     }
 
     public void disposeComponent() {
-        // TODO: insert component disposal logic here
+        final CompilerManager compilerManager = CompilerManager.getInstance(project);
+        compilerManager.removeCompilableFileType(IceFileType.INSTANCE);
+        compilerManager.removeCompiler(translator);
     }
 
     @NotNull
