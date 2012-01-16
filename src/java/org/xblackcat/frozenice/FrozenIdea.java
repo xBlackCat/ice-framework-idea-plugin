@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.config.IceConfig;
+import org.xblackcat.frozenice.processor.Slice2Xxx;
 
 /**
  * @author xBlackCat

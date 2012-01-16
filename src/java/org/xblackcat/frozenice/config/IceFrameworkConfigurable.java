@@ -13,13 +13,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.FixedSizeButton;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.IdeBorderFactory;
 import org.apache.sanselan.util.IOUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.FrozenIdea;
+import org.xblackcat.frozenice.util.Constants;
 import org.xblackcat.frozenice.util.Icons;
 
 import javax.swing.*;
@@ -189,15 +189,14 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
 
                                 if (checkingFolder.isDirectory()) {
                                     // Find executable files
-                                    String translatorName = SystemInfo.isWindows ? "slice2java.exe" : "slice2java";
                                     VirtualFile translatorFile;
-                                    if ((translatorFile = check(checkingFolder, translatorName)) == null) {
+                                    if ((translatorFile = check(checkingFolder, Constants.JAVA_TRANSLATOR_NAME)) == null) {
                                         checkingFolder = checkingFolder.getParent();
 
                                         if (checkingFolder == null) {
                                             return;
                                         } else {
-                                            translatorFile = check(checkingFolder, translatorName);
+                                            translatorFile = check(checkingFolder, Constants.JAVA_TRANSLATOR_NAME);
                                             if (translatorFile == null || !translatorFile.isValid() || translatorFile.isDirectory()) {
                                                 checkingFolder = null;
                                                 return;

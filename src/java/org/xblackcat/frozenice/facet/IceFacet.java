@@ -10,7 +10,7 @@ import com.intellij.openapi.module.Module;
  * @author xBlackCat
  */
 public class IceFacet extends Facet<IceFacetConfiguration> {
-    public static final FacetTypeId<IceFacet> ID = new FacetTypeId<IceFacet>("Ice");
+    public static final FacetTypeId<IceFacet> ID = new FacetTypeId<IceFacet>("ice");
     public static final IceFacetType TYPE = new IceFacetType();
 
     public IceFacet(
