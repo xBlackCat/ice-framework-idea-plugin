@@ -38,7 +38,7 @@ import java.awt.event.ActionListener;
                 )
         }
 )
-public class IceFacetConfiguration implements FacetConfiguration, PersistentStateComponent<Element> {
+public class IceFacetConfiguration implements FacetConfiguration, PersistentStateComponent<IceFacetConfiguration.Config> {
     private Config config = new Config(false, null);
 
     @Override
@@ -55,28 +55,14 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
     }
 
     @Override
-    public Element getState() {
-        Element root = new Element("ice-facet-config");
-
-        Element output = new Element("output");
-        root.addContent(output);
-        output.setAttribute("cleanOnBuild", Boolean.toString(config.isCleanOutput()));
-        output.setText(config.getOutputDirString());
-
-        return root;
+    public IceFacetConfiguration.Config getState() {
+        return config;
     }
 
     @Override
-    public void loadState(Element state) {
-        Element el = state.getChild("output");
-
-        if (el != null) {
-            boolean cleanOutput = Boolean.parseBoolean(el.getAttributeValue("cleanOnBuild"));
-            String url = el.getTextTrim();
-
-            final VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(url);
-
-            config = new Config(cleanOutput, file);
+    public void loadState(IceFacetConfiguration.Config state) {
+        if (state != null) {
+            config = state;
         }
     }
 
@@ -85,15 +71,23 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
     }
 
     public static class Config {
-        private final VirtualFile outputDir;
-        private final boolean cleanOutput;
+        transient public VirtualFile outputDir;
+        public boolean cleanOutput;
+        public String outputDirPath;
+
+        public Config() {
+        }
 
         public Config(boolean cleanOutput, VirtualFile outputDir) {
             this.cleanOutput = cleanOutput;
             this.outputDir = outputDir;
+            outputDirPath = outputDir == null ? null : outputDir.getUrl();
         }
 
         public VirtualFile getOutputDir() {
+            if (outputDirPath != null && outputDir == null) {
+                outputDir = VirtualFileManager.getInstance().findFileByUrl(outputDirPath);
+            }
             return outputDir;
         }
 
@@ -157,6 +151,9 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
 
             settingsPane.add(cleanOnBuildCheckBox, BorderLayout.SOUTH);
 
+            // TODO: make visible after implementing
+            cleanOnBuildCheckBox.setVisible(false);
+
             TextFieldWithBrowseButton.MyDoClickAction.addTo(browseDirectoryButton, outputFolder);
             browseDirectoryButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -188,7 +185,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
         @Override
         public boolean isModified() {
             Config newConfig = getConfig();
-            return config.equals(newConfig);
+            return !config.equals(newConfig);
         }
 
         private Config getConfig() {
