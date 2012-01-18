@@ -131,8 +131,15 @@ public class Slice2Xxx implements SourceGeneratingCompiler {
                     continue;
                 }
 
-                IceGenerationItem generationItem = new IceGenerationItem(context.getModuleByFile(file), file, fileIndex.isInTestSourceContent(file));
-                items.add(generationItem);
+                final Module moduleByFile = context.getModuleByFile(file);
+                if (moduleByFile != null) {
+                    IceFacet iceFacet = FacetManager.getInstance(moduleByFile).getFacetByType(IceFacet.ID);
+
+                    if (iceFacet != null) {
+                        IceGenerationItem generationItem = new IceGenerationItem(moduleByFile, file, fileIndex.isInTestSourceContent(file));
+                        items.add(generationItem);
+                    }
+                }
             }
 
             return items.toArray(new GenerationItem[items.size()]);
