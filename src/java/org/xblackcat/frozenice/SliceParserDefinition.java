@@ -1,6 +1,7 @@
 package org.xblackcat.frozenice;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.LanguageUtil;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiParser;
 import com.intellij.lexer.FlexAdapter;
@@ -72,12 +73,13 @@ public class SliceParserDefinition implements ParserDefinition {
 
     @Override
     public PsiFile createFile(FileViewProvider viewProvider) {
-        return new IcePsiFile(viewProvider, SliceLanguage.INSTANCE);
+        return new IcePsiFile(viewProvider);
     }
 
     @Override
     public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
-        return SpaceRequirements.MAY;
+        final Lexer lexer = createLexer(left.getPsi().getProject());
+        return LanguageUtil.canStickTokensTogetherByLexer(left, right, lexer);
     }
 
 }
