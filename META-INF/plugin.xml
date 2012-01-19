@@ -19,12 +19,16 @@
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
+
         <projectConfigurable instance="org.xblackcat.frozenice.config.IceFrameworkConfigurable" id="frozenidea"/>
+
         <frameworkSupport implementation="org.xblackcat.frozenice.facet.IceFacetSupportProvider"/>
         <facetType implementation="org.xblackcat.frozenice.facet.IceFacetType"/>
-        <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
+
         <lang.syntaxHighlighterFactory key="SLICE"
                                        implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.SliceParserDefinition"/>
+        <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenice.SliceBraceMatcher"/>
     </extensions>
 </idea-plugin>
