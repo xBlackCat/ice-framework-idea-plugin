@@ -6,9 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenice.util.IceErrorMessages;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 06.01.12 11:48
@@ -16,10 +14,8 @@ import java.util.Set;
  * @author xBlackCat
  */
 public class SliceParser {
-    private final Map<String, Set<String>> validInterfaces = new HashMap<String, Set<String>>();
-    private final Map<String, Set<String>> validClasses = new HashMap<String, Set<String>>();
-    private final Map<String, Map<String, Set<String>>> validEnums = new HashMap<String, Map<String, Set<String>>>();
-    private final Map<String, Set<String>> forwardDeclarations = new HashMap<String, Set<String>>();
+    private final Map<String, Map<String, ElementType>> validTypes = new HashMap<String, Map<String, ElementType>>();
+    private final Map<String, Map<String, ElementType>> forwardDeclarations = new HashMap<String, Map<String, ElementType>>();
 
     private final PsiBuilder builder;
 
@@ -72,8 +68,7 @@ public class SliceParser {
                 } else if (Checker.isExceptionToken(token)) {
                     type = SliceElementTypes.ICE_EXCEPTION;
 
-                    // TODO: implement
-                    skipBlock();
+                    parseException(modulePrefix);
                 }
             }
             break;
@@ -124,23 +119,25 @@ public class SliceParser {
         boolean dropErrorMark = true;
         String enumName = readIdentifier(IceErrorMessages.message("identifier.required"));
         if (enumName != null) {
-            if (isInterfaceDeclared(modulePrefix, enumName) ||
-                    isEnumDeclared(modulePrefix, enumName) && !isClassForwardDeclared(modulePrefix, enumName) ||
-                    isClassDeclared(modulePrefix, enumName)) {
+            if (isTypeDeclared(modulePrefix, enumName, null) &&
+                    !isForwardDeclared(modulePrefix, enumName, ElementType.Enum)) {
                 classNameMark.error(IceErrorMessages.message("already.defined"));
+                dropErrorMark = false;
+            } else if (Checker.isKeywordString(enumName)) {
+                classNameMark.error(IceErrorMessages.message("reserved.word"));
                 dropErrorMark = false;
             }
         }
 
         if (token() == SliceTokenTypes.SEMICOLON) {
             // Forward declaration
-            if (isClassForwardDeclared(modulePrefix, enumName)) {
+            if (isForwardDeclared(modulePrefix, enumName, ElementType.Enum)) {
                 classNameMark.error(IceErrorMessages.message("already.defined"));
             } else {
                 classNameMark.drop();
             }
 
-            forwardDeclareName(modulePrefix, enumName);
+            forwardDeclareName(modulePrefix, enumName, ElementType.Enum);
 
             advance();
             return;
@@ -150,7 +147,7 @@ public class SliceParser {
             classNameMark.drop();
         }
 
-        Set<String> values = storeEnumName(modulePrefix, enumName);
+        storeName(modulePrefix, enumName, ElementType.Enum);
         if (token() == SliceTokenTypes.LBRACE) {
             advance();
         } else {
@@ -158,7 +155,7 @@ public class SliceParser {
         }
 
         while (!eof() && token() != SliceTokenTypes.RBRACE) {
-            parseEnumValues(modulePrefix, values);
+            parseEnumValues(modulePrefix);
         }
 
         checkBlockEnd();
@@ -201,23 +198,25 @@ public class SliceParser {
         boolean dropErrorMark = true;
         String className = readIdentifier(IceErrorMessages.message("identifier.required"));
         if (className != null) {
-            if (isInterfaceDeclared(moduleName, className) ||
-                    isEnumDeclared(moduleName, className) ||
-                    isClassDeclared(moduleName, className) && !isClassForwardDeclared(moduleName, className)) {
+            if (isTypeDeclared(moduleName, className, null) &&
+                    !isForwardDeclared(moduleName, className, ElementType.Class)) {
                 classNameMark.error(IceErrorMessages.message("already.defined"));
+                dropErrorMark = false;
+            } else if (Checker.isKeywordString(className)) {
+                classNameMark.error(IceErrorMessages.message("reserved.word"));
                 dropErrorMark = false;
             }
         }
 
         if (token() == SliceTokenTypes.SEMICOLON) {
             // Forward declaration
-            if (isClassForwardDeclared(moduleName, className)) {
+            if (isForwardDeclared(moduleName, className, ElementType.Class)) {
                 classNameMark.error(IceErrorMessages.message("already.defined"));
             } else {
                 classNameMark.drop();
             }
 
-            forwardDeclareName(moduleName, className);
+            forwardDeclareName(moduleName, className, ElementType.Class);
 
             advance();
             return;
@@ -227,7 +226,7 @@ public class SliceParser {
             classNameMark.drop();
         }
 
-        storeClassName(moduleName, className);
+        storeName(moduleName, className, ElementType.Class);
         if (token() == SliceTokenTypes.KEYWORD_EXTENDS) {
             // Read extends declaration
             advance();
@@ -236,10 +235,11 @@ public class SliceParser {
             final PsiBuilder.Marker extendingClassNameMark = mark();
             String extendingClassName = readIdentifier(IceErrorMessages.message("superclass.name.required"));
 
-            if (!isClassDeclared(moduleName, extendingClassName)) {
-                extendingClassNameMark.error(IceErrorMessages.message("invalid.class"));
-            } else {
+            if (isTypeDeclared(moduleName, extendingClassName, ElementType.Class) ||
+                    isForwardDeclared(moduleName, extendingClassName, ElementType.Class)) {
                 extendingClassNameMark.drop();
+            } else {
+                extendingClassNameMark.error(IceErrorMessages.message("invalid.class"));
             }
 
             superClass.done(SliceElementTypes.ICE_CLASS_SUPER_CLASS);
@@ -255,10 +255,12 @@ public class SliceParser {
                 final PsiBuilder.Marker implMark = mark();
                 String implementingInterfaceName = readIdentifier(IceErrorMessages.message("superclass.name.required"));
 
-                if (implementingInterfaceName != null && !isInterfaceDeclared(moduleName, implementingInterfaceName)) {
-                    implMark.error(IceErrorMessages.message("invalid.interface"));
-                } else {
+                if (implementingInterfaceName == null ||
+                        isTypeDeclared(moduleName, implementingInterfaceName, ElementType.Interface) ||
+                        isForwardDeclared(moduleName, implementingInterfaceName, ElementType.Interface)) {
                     implMark.drop();
+                } else {
+                    implMark.error(IceErrorMessages.message("invalid.interface"));
                 }
 
                 advance();
@@ -301,7 +303,7 @@ public class SliceParser {
         }
     }
 
-    private void parseEnumValues(String moduleName, Set<String> valueSet) {
+    private void parseEnumValues(String moduleName) {
         final PsiBuilder.Marker line = mark();
         boolean expectComa = false;
 
@@ -324,7 +326,7 @@ public class SliceParser {
                 if (dataTypeExists(moduleName, enumValue)) {
                     mark.error(IceErrorMessages.message("name.is.already.used"));
                 } else {
-                    valueSet.add(enumValue);
+//                    valueSet.add(enumValue);
                     mark.done(SliceElementTypes.ICE_ENUM_CONSTANT);
                 }
             } else if (Checker.isKeyword(token())) {
@@ -400,9 +402,8 @@ public class SliceParser {
         String interfaceName = readIdentifier(IceErrorMessages.message("identifier.required"));
 
         if (interfaceName != null) {
-            if (isInterfaceDeclared(moduleName, interfaceName) && !isClassForwardDeclared(moduleName, interfaceName) ||
-                    isEnumDeclared(moduleName, interfaceName) ||
-                    isClassDeclared(moduleName, interfaceName)) {
+            if (isTypeDeclared(moduleName, interfaceName, null) &&
+                    !isForwardDeclared(moduleName, interfaceName, ElementType.Interface)) {
                 interfaceNameMark.error("already.defined");
                 dropErrorMark = false;
             }
@@ -410,13 +411,13 @@ public class SliceParser {
 
         if (token() == SliceTokenTypes.SEMICOLON) {
             // Forward declaration
-            if (isClassForwardDeclared(moduleName, interfaceName)) {
+            if (isForwardDeclared(moduleName, interfaceName, ElementType.Interface)) {
                 interfaceNameMark.error(IceErrorMessages.message("already.defined"));
             } else {
                 interfaceNameMark.drop();
             }
 
-            forwardDeclareName(moduleName, interfaceName);
+            forwardDeclareName(moduleName, interfaceName, ElementType.Class);
 
             advance();
             return;
@@ -426,7 +427,7 @@ public class SliceParser {
             interfaceNameMark.drop();
         }
 
-        storeInterface(moduleName, interfaceName);
+        storeName(moduleName, interfaceName, ElementType.Interface);
         if (token() == SliceTokenTypes.KEYWORD_EXTENDS) {
             // Read extends declaration
             advance();
@@ -437,8 +438,7 @@ public class SliceParser {
                 String implementingInterfaceName = readIdentifier(IceErrorMessages.message("superclass.name.required"));
 
                 if (implementingInterfaceName != null &&
-                        (!isInterfaceDeclared(moduleName, implementingInterfaceName) || isClassDeclared(moduleName, implementingInterfaceName))
-                        ) {
+                        !isTypeDeclared(moduleName, implementingInterfaceName, ElementType.Interface)) {
                     implInt.error(IceErrorMessages.message("invalid.interface"));
                 } else {
                     implInt.drop();
@@ -469,6 +469,74 @@ public class SliceParser {
         checkBlockEnd();
     }
 
+    private void parseException(String moduleName) {
+        advance();
+        final PsiBuilder.Marker exceptionNameMark = mark();
+        boolean dropErrorMark = true;
+        String exceptionName = readIdentifier(IceErrorMessages.message("identifier.required"));
+
+        if (exceptionName != null) {
+            if (isTypeDeclared(moduleName, exceptionName, null) &&
+                    !isForwardDeclared(moduleName, exceptionName, ElementType.Exception)) {
+                exceptionNameMark.error("already.defined");
+                dropErrorMark = false;
+            }
+        }
+
+        if (token() == SliceTokenTypes.SEMICOLON) {
+            // Forward declaration
+            if (isForwardDeclared(moduleName, exceptionName, ElementType.Exception)) {
+                exceptionNameMark.error(IceErrorMessages.message("already.defined"));
+            } else {
+                exceptionNameMark.drop();
+            }
+
+            forwardDeclareName(moduleName, exceptionName, ElementType.Class);
+
+            advance();
+            return;
+        }
+
+        if (dropErrorMark) {
+            exceptionNameMark.drop();
+        }
+
+        storeName(moduleName, exceptionName, ElementType.Exception);
+        if (token() == SliceTokenTypes.KEYWORD_EXTENDS) {
+            // Read extends declaration
+            advance();
+            final PsiBuilder.Marker superExceptions = mark();
+
+            final PsiBuilder.Marker superClass = mark();
+            String implementingExceptionName = readIdentifier(IceErrorMessages.message("superclass.name.required"));
+
+            if (implementingExceptionName == null ||
+                    isTypeDeclared(moduleName, implementingExceptionName, ElementType.Exception) &&
+                            isForwardDeclared(moduleName, exceptionName, ElementType.Exception)
+                    ) {
+                superClass.drop();
+            } else {
+                superClass.error(IceErrorMessages.message("invalid.exception"));
+            }
+
+
+            superExceptions.done(SliceElementTypes.ICE_CLASS_SUPER_CLASS);
+            advance();
+        }
+
+        if (token() == SliceTokenTypes.LBRACE) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("left.brace.is.required"));
+        }
+
+        while (!eof() && token() != SliceTokenTypes.RBRACE) {
+            parseClassBody(moduleName, false);
+        }
+
+        checkBlockEnd();
+    }
+
     private String readIdentifier(String errorMessage) {
         String identifier;
 
@@ -482,106 +550,61 @@ public class SliceParser {
         return identifier;
     }
 
-    private boolean isClassDeclared(String moduleName, String className) {
-        final Set<String> names = validClasses.get(moduleName);
-        return names != null && names.contains(className);
+    private boolean isTypeDeclared(String moduleName, String className, @Nullable ElementType type) {
+        final Map<String, ElementType> names = validTypes.get(moduleName);
+        if (names == null) {
+            return false;
+        }
+
+        if (type == null) {
+            return names.containsKey(className);
+        } else {
+            return names.get(className) == type;
+        }
     }
 
-    private boolean isInterfaceDeclared(String moduleName, String interfaceName) {
-        final Set<String> names = validInterfaces.get(moduleName);
-        return names != null && names.contains(interfaceName);
-    }
-
-    private boolean isEnumDeclared(String moduleName, String enumName) {
-        final Map<String, Set<String>> names = validEnums.get(moduleName);
-        return names != null && names.keySet().contains(enumName);
-    }
-
-    private boolean isClassForwardDeclared(String moduleName, String className) {
-        final Set<String> names = forwardDeclarations.get(moduleName);
-        return names != null && names.contains(className);
+    private boolean isForwardDeclared(String moduleName, String className, ElementType type) {
+        final Map<String, ElementType> names = forwardDeclarations.get(moduleName);
+        return names != null && names.get(className) == type;
     }
 
     private boolean dataTypeExists(String moduleName, String name) {
-        return isClassDeclared(moduleName, name) ||
-                isInterfaceDeclared(moduleName, name) ||
-                isEnumDeclared(moduleName, name) ||
+        return isTypeDeclared(moduleName, name, null) ||
                 Checker.isKeywordString(name);
     }
 
-    private void forwardDeclareName(String moduleName, String className) {
+    private void forwardDeclareName(String moduleName, String className, ElementType type) {
         if (className == null || className.length() == 0) {
             return;
         }
 
-        final Set<String> names = forwardDeclarations.get(moduleName);
+        final Map<String, ElementType> names = forwardDeclarations.get(moduleName);
         if (names == null) {
-            Set<String> nameList = new HashSet<String>();
-            nameList.add(className);
+            Map<String, ElementType> nameList = new HashMap<String, ElementType>();
+            nameList.put(className, type);
             forwardDeclarations.put(moduleName, nameList);
         } else {
-            names.add(className);
+            names.put(className, type);
         }
     }
 
-    private Set<String> storeEnumName(String modulePrefix, String enumName) {
-        if (enumName == null || enumName.length() == 0) {
-            return new HashSet<String>();
-        }
-
-        final Map<String, Set<String>> enums = validEnums.get(modulePrefix);
-        if (enums == null) {
-            Map<String, Set<String>> enumVal = new HashMap<String, Set<String>>();
-            final HashSet<String> values = new HashSet<String>();
-            enumVal.put(enumName, values);
-
-            validEnums.put(modulePrefix, enumVal);
-            return values;
-        } else {
-            final HashSet<String> values = new HashSet<String>();
-            enums.put(enumName, values);
-
-            return values;
-        }
-    }
-
-    private void storeClassName(String moduleName, String className) {
+    private void storeName(String moduleName, String className, ElementType type) {
         if (className == null || className.length() == 0) {
             return;
         }
 
-        final Set<String> names = validClasses.get(moduleName);
+        Map<String, ElementType> names = validTypes.get(moduleName);
         if (names == null) {
-            Set<String> nameList = new HashSet<String>();
-            nameList.add(className);
-            validClasses.put(moduleName, nameList);
-        } else {
-            names.add(className);
+            names = new HashMap<String, ElementType>();
+            validTypes.put(moduleName, names);
         }
 
-        final Set<String> list = forwardDeclarations.get(moduleName);
+        names.put(className, type);
+
+        final Map<String, ElementType> list = forwardDeclarations.get(moduleName);
         if (list != null) {
-            list.remove(className);
-        }
-    }
-
-    private void storeInterface(String moduleName, String interfaceName) {
-        if (interfaceName == null || interfaceName.length() == 0) {
-            return;
-        }
-
-        final Set<String> names = validInterfaces.get(moduleName);
-        if (names == null) {
-            Set<String> nameList = new HashSet<String>();
-            nameList.add(interfaceName);
-            validInterfaces.put(moduleName, nameList);
-        } else {
-            names.add(interfaceName);
-        }
-
-        final Set<String> list = forwardDeclarations.get(moduleName);
-        if (list != null) {
-            list.remove(interfaceName);
+            final ElementType wasType = list.remove(className);
+            assert wasType == type;
         }
     }
 
@@ -618,5 +641,13 @@ public class SliceParser {
 
     private void advance() {
         builder.advanceLexer();
+    }
+
+    private static enum ElementType {
+        Class,
+        Interface,
+        Enum,
+        Exception,
+        DataType
     }
 }
