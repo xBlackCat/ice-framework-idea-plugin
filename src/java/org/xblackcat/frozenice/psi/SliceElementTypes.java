@@ -41,6 +41,12 @@ public interface SliceElementTypes extends SliceTokenTypes {
             return new SliceStubPsiElement(node);
         }
     };
+    IElementType ICE_ENUM_CONSTANT_LIST = new SliceStubElementType("Ice.Enum_constant_list") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
     IElementType ICE_CLASS_FIELD_DECLARATION = new SliceStubElementType("Ice.Field_declaration") {
         @Override
         public PsiElement createPsi(ASTNode node) {
@@ -89,4 +95,5 @@ public interface SliceElementTypes extends SliceTokenTypes {
             return new SliceStubPsiElement(node);
         }
     };
+
 }

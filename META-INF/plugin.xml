@@ -30,5 +30,6 @@
                                        implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.SliceParserDefinition"/>
         <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenice.SliceBraceMatcher"/>
+        <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenice.SliceFoldingBuilder"/>
     </extensions>
 </idea-plugin>

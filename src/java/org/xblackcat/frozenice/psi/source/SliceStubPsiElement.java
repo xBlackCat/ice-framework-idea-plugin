@@ -48,4 +48,9 @@ public class SliceStubPsiElement<T extends StubElement> extends StubBasedPsiElem
     public String getName() {
         return getNode().getElementType().toString();
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

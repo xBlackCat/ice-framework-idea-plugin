@@ -18,6 +18,7 @@ import java.util.Set;
 public class SliceParser {
     private final Map<String, Set<String>> validInterfaces = new HashMap<String, Set<String>>();
     private final Map<String, Set<String>> validClasses = new HashMap<String, Set<String>>();
+    private final Map<String, Map<String, Set<String>>> validEnums = new HashMap<String, Map<String, Set<String>>>();
     private final Map<String, Set<String>> forwardDeclarations = new HashMap<String, Set<String>>();
 
     private final PsiBuilder builder;
@@ -67,8 +68,7 @@ public class SliceParser {
                 } else if (Checker.isEnumToken(token)) {
                     type = SliceElementTypes.ICE_ENUM;
 
-                    // TODO: implement
-                    skipBlock();
+                    parseEnum(modulePrefix);
                 } else if (Checker.isExceptionToken(token)) {
                     type = SliceElementTypes.ICE_EXCEPTION;
 
@@ -89,19 +89,79 @@ public class SliceParser {
 
     private void skipBlock() {
         int bracesCount = 0;
+        boolean meetsLBrace = false;
         while (!eof()) {
             if (token() == SliceTokenTypes.RBRACE) {
                 --bracesCount;
-                if (bracesCount < 0) {
+                if (meetsLBrace) {
+                    if (bracesCount <= 0) {
+                        advance();
+                        break;
+                    }
+                } else if (bracesCount < 0) {
                     break;
                 }
             }
             if (token() == SliceTokenTypes.LBRACE) {
                 ++bracesCount;
+                meetsLBrace = true;
             }
 
             advance();
         }
+
+        if (token() == SliceTokenTypes.SEMICOLON) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("semicolon.is.required"));
+        }
+    }
+
+    private void parseEnum(String modulePrefix) {
+        advance();
+
+        final PsiBuilder.Marker classNameMark = mark();
+        boolean dropErrorMark = true;
+        String enumName = readIdentifier(IceErrorMessages.message("identifier.required"));
+        if (enumName != null) {
+            if (isInterfaceDeclared(modulePrefix, enumName) ||
+                    isEnumDeclared(modulePrefix, enumName) && !isClassForwardDeclared(modulePrefix, enumName) ||
+                    isClassDeclared(modulePrefix, enumName)) {
+                classNameMark.error(IceErrorMessages.message("already.defined"));
+                dropErrorMark = false;
+            }
+        }
+
+        if (token() == SliceTokenTypes.SEMICOLON) {
+            // Forward declaration
+            if (isClassForwardDeclared(modulePrefix, enumName)) {
+                classNameMark.error(IceErrorMessages.message("already.defined"));
+            } else {
+                classNameMark.drop();
+            }
+
+            forwardDeclareName(modulePrefix, enumName);
+
+            advance();
+            return;
+        }
+
+        if (dropErrorMark) {
+            classNameMark.drop();
+        }
+
+        Set<String> values = storeEnumName(modulePrefix, enumName);
+        if (token() == SliceTokenTypes.LBRACE) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("left.brace.is.required"));
+        }
+
+        while (!eof() && token() != SliceTokenTypes.RBRACE) {
+            parseEnumValues(modulePrefix, values);
+        }
+
+        checkBlockEnd();
     }
 
     private void parseModule(String modulePrefix) {
@@ -131,13 +191,7 @@ public class SliceParser {
         }
         moduleErrorEnd.drop();
 
-        advance();
-
-        if (token() == SliceTokenTypes.SEMICOLON) {
-            advance();
-        } else {
-            mark().error(IceErrorMessages.message("semicolon.is.required"));
-        }
+        checkBlockEnd();
     }
 
     private void parseClass(String moduleName) {
@@ -148,6 +202,7 @@ public class SliceParser {
         String className = readIdentifier(IceErrorMessages.message("identifier.required"));
         if (className != null) {
             if (isInterfaceDeclared(moduleName, className) ||
+                    isEnumDeclared(moduleName, className) ||
                     isClassDeclared(moduleName, className) && !isClassForwardDeclared(moduleName, className)) {
                 classNameMark.error(IceErrorMessages.message("already.defined"));
                 dropErrorMark = false;
@@ -229,13 +284,58 @@ public class SliceParser {
             parseClassBody(moduleName, false);
         }
 
-        advance();
+        checkBlockEnd();
+    }
+
+    private void checkBlockEnd() {
+        if (token() == SliceElementTypes.RBRACE) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("right.brace.is.required"));
+        }
 
         if (token() == SliceTokenTypes.SEMICOLON) {
             advance();
         } else {
             mark().error(IceErrorMessages.message("semicolon.is.required"));
         }
+    }
+
+    private void parseEnumValues(String moduleName, Set<String> valueSet) {
+        final PsiBuilder.Marker line = mark();
+        boolean expectComa = false;
+
+        while (!eof() && token() != SliceTokenTypes.SEMICOLON && token() != SliceTokenTypes.RBRACE) {
+            if (expectComa) {
+                if (token() != SliceTokenTypes.COMMA) {
+                    mark().error(IceErrorMessages.message("coma.is.required"));
+                } else {
+                    advance();
+                }
+            } else {
+                expectComa = true;
+            }
+
+            final PsiBuilder.Marker mark = mark();
+            if (token() == SliceTokenTypes.IDENTIFIER) {
+                String enumValue = tokenText();
+
+                advance();
+                if (dataTypeExists(moduleName, enumValue)) {
+                    mark.error(IceErrorMessages.message("name.is.already.used"));
+                } else {
+                    valueSet.add(enumValue);
+                    mark.done(SliceElementTypes.ICE_ENUM_CONSTANT);
+                }
+            } else if (Checker.isKeyword(token())) {
+                advance();
+                mark.error(IceErrorMessages.message("name.is.already.used"));
+            } else {
+                mark().error(IceErrorMessages.message("identifier.required"));
+            }
+        }
+
+        line.done(SliceElementTypes.ICE_ENUM_CONSTANT_LIST);
     }
 
     private void parseClassBody(String moduleName, boolean onlyMethods) {
@@ -277,7 +377,7 @@ public class SliceParser {
             type = null;
         }
 
-        while (!eof() && token() != SliceTokenTypes.SEMICOLON  && token() != SliceTokenTypes.RBRACE) {
+        while (!eof() && token() != SliceTokenTypes.SEMICOLON && token() != SliceTokenTypes.RBRACE) {
             advance();
         }
 
@@ -301,6 +401,7 @@ public class SliceParser {
 
         if (interfaceName != null) {
             if (isInterfaceDeclared(moduleName, interfaceName) && !isClassForwardDeclared(moduleName, interfaceName) ||
+                    isEnumDeclared(moduleName, interfaceName) ||
                     isClassDeclared(moduleName, interfaceName)) {
                 interfaceNameMark.error("already.defined");
                 dropErrorMark = false;
@@ -325,7 +426,7 @@ public class SliceParser {
             interfaceNameMark.drop();
         }
 
-
+        storeInterface(moduleName, interfaceName);
         if (token() == SliceTokenTypes.KEYWORD_EXTENDS) {
             // Read extends declaration
             advance();
@@ -365,26 +466,20 @@ public class SliceParser {
             parseClassBody(moduleName, true);
         }
 
-        advance();
-
-        if (token() == SliceTokenTypes.SEMICOLON) {
-            advance();
-        } else {
-            mark().error(IceErrorMessages.message("semicolon.is.required"));
-        }
+        checkBlockEnd();
     }
 
     private String readIdentifier(String errorMessage) {
-        String moduleName;
+        String identifier;
 
         if (token() == SliceTokenTypes.IDENTIFIER) {
-            moduleName = tokenText();
+            identifier = tokenText();
             advance();
         } else {
-            moduleName = null;
+            identifier = null;
             mark().error(errorMessage);
         }
-        return moduleName;
+        return identifier;
     }
 
     private boolean isClassDeclared(String moduleName, String className) {
@@ -397,13 +492,21 @@ public class SliceParser {
         return names != null && names.contains(interfaceName);
     }
 
+    private boolean isEnumDeclared(String moduleName, String enumName) {
+        final Map<String, Set<String>> names = validEnums.get(moduleName);
+        return names != null && names.keySet().contains(enumName);
+    }
+
     private boolean isClassForwardDeclared(String moduleName, String className) {
         final Set<String> names = forwardDeclarations.get(moduleName);
         return names != null && names.contains(className);
     }
 
     private boolean dataTypeExists(String moduleName, String name) {
-        return isClassDeclared(moduleName, name) || isInterfaceDeclared(moduleName, name) || isClassForwardDeclared(moduleName, name);
+        return isClassDeclared(moduleName, name) ||
+                isInterfaceDeclared(moduleName, name) ||
+                isEnumDeclared(moduleName, name) ||
+                Checker.isKeywordString(name);
     }
 
     private void forwardDeclareName(String moduleName, String className) {
@@ -418,6 +521,27 @@ public class SliceParser {
             forwardDeclarations.put(moduleName, nameList);
         } else {
             names.add(className);
+        }
+    }
+
+    private Set<String> storeEnumName(String modulePrefix, String enumName) {
+        if (enumName == null || enumName.length() == 0) {
+            return new HashSet<String>();
+        }
+
+        final Map<String, Set<String>> enums = validEnums.get(modulePrefix);
+        if (enums == null) {
+            Map<String, Set<String>> enumVal = new HashMap<String, Set<String>>();
+            final HashSet<String> values = new HashSet<String>();
+            enumVal.put(enumName, values);
+
+            validEnums.put(modulePrefix, enumVal);
+            return values;
+        } else {
+            final HashSet<String> values = new HashSet<String>();
+            enums.put(enumName, values);
+
+            return values;
         }
     }
 
