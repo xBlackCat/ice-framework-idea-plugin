@@ -1,11 +1,11 @@
 package org.xblackcat.frozenice.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
-import com.intellij.lang.Language;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.IceFileType;
+import org.xblackcat.frozenice.SliceLanguage;
 
 /**
  * 04.01.12 16:36
@@ -13,8 +13,8 @@ import org.xblackcat.frozenice.IceFileType;
  * @author xBlackCat
  */
 public class IcePsiFile extends PsiFileBase {
-    public IcePsiFile(@NotNull FileViewProvider viewProvider, @NotNull Language language) {
-        super(viewProvider, language);
+    public IcePsiFile(@NotNull FileViewProvider viewProvider) {
+        super(viewProvider, SliceLanguage.INSTANCE);
     }
 
     @NotNull
