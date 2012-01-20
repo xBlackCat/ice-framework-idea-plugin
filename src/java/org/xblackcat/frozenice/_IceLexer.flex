@@ -39,6 +39,28 @@ MACROS_LINE="#"[:jletter:][^\r\n]*
 ESCAPE_SEQUENCE=\\[^\n\r]
 STRING_LITERAL=\"([^\\\"\r\n]|{ESCAPE_SEQUENCE})*\"
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////      integers and floats     /////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+integerLiteral = ({decimalNumeral}|{hexNumeral}|{octalNumeral})(L|l)?
+decimalNumeral = 0|{nonZeroDigit}{digit}*
+hexNumeral = 0x{hexDigit}+
+octalNumeral = 0{octalDigit}+
+digit = [0-9]
+nonZeroDigit = [1-9]
+octalDigit = [0-7]
+hexDigit = [0-9A-Fa-f]
+
+floatingPointLiteral = {digit}+"."{digit}*{exponentPart}?{floatType}?|"."{digit}+{exponentPart}?{floatType}?|{digit}+{exponentPart}{floatType}?|{digit}+{exponentPart}?{floatType}
+
+exponentPart = (E|e)("+"|"-")?{digit}+
+floatType = F|f|D|d
+
+digit = [0-9]
+octalDigit = [0-7]
+
 %%
 
 <YYINITIAL> {WHITE_SPACE_CHAR}+ { return SliceTokenTypes.WHITE_SPACE; }
@@ -48,6 +70,9 @@ STRING_LITERAL=\"([^\\\"\r\n]|{ESCAPE_SEQUENCE})*\"
 <YYINITIAL> {END_OF_LINE_COMMENT} { return SliceTokenTypes.END_OF_LINE_COMMENT; }
 
 <YYINITIAL> {STRING_LITERAL} { return SliceTokenTypes.STRING_LITERAL; }
+
+<YYINITIAL> {floatingPointLiteral} { return SliceTokenTypes.FLOAT_VALUE; }
+<YYINITIAL> {integerLiteral} { return SliceTokenTypes.INTEGER_VALUE; }
 
 <YYINITIAL> "true" { return SliceTokenTypes.KEYWORD_TRUE; }
 <YYINITIAL> "false" { return SliceTokenTypes.KEYWORD_FALSE; }

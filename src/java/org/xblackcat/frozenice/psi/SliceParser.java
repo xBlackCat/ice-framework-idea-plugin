@@ -6,7 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenice.util.IceErrorMessages;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 06.01.12 11:48
@@ -16,6 +18,9 @@ import java.util.Map;
 public class SliceParser {
     private final Map<String, Map<String, ElementType>> validTypes = new HashMap<String, Map<String, ElementType>>();
     private final Map<String, Map<String, ElementType>> forwardDeclarations = new HashMap<String, Map<String, ElementType>>();
+
+    private final Map<String, Map<String, Set<String>>> enumConstants = new HashMap<String, Map<String, Set<String>>>();
+    private final Map<String, Set<String>> constants = new HashMap<String, Set<String>>();
 
     private final PsiBuilder builder;
 
@@ -28,7 +33,7 @@ public class SliceParser {
         parseBlock(true, "");
     }
 
-    public void parseBlock(boolean topLevel, String modulePrefix) {
+    public void parseBlock(boolean topLevel, String moduleName) {
         final PsiBuilder.Marker block = mark();
 
         IElementType type = null;
@@ -50,36 +55,40 @@ public class SliceParser {
             if (Checker.isModuleToken(token)) {
                 type = SliceElementTypes.ICE_MODULE;
 
-                parseModule(modulePrefix);
+                parseModule(moduleName);
             } else if (!topLevel) {
                 if (Checker.isClassToken(token)) {
                     type = SliceElementTypes.ICE_CLASS;
 
-                    parseClass(modulePrefix);
+                    parseClass(moduleName);
                 } else if (Checker.isInterfaceToken(token)) {
                     type = SliceElementTypes.ICE_INTERFACE;
 
-                    parseInterface(modulePrefix);
+                    parseInterface(moduleName);
                 } else if (Checker.isEnumToken(token)) {
                     type = SliceElementTypes.ICE_ENUM;
 
-                    parseEnum(modulePrefix);
+                    parseEnum(moduleName);
                 } else if (Checker.isExceptionToken(token)) {
                     type = SliceElementTypes.ICE_EXCEPTION;
 
-                    parseException(modulePrefix);
+                    parseException(moduleName);
                 } else if (token == SliceTokenTypes.KEYWORD_SEQUENCE) {
                     type = SliceElementTypes.ICE_TYPE_SEQUENCE;
 
-                    parseSequence(modulePrefix);
+                    parseSequence(moduleName);
                 } else if (token == SliceTokenTypes.KEYWORD_STRUCT) {
                     type = SliceElementTypes.ICE_STRUCT;
 
-                    parseStruct(modulePrefix);
+                    parseStruct(moduleName);
                 } else if (token == SliceTokenTypes.KEYWORD_DICTIONARY) {
                     type = SliceElementTypes.ICE_TYPE_DICTIONARY;
 
-                    parseDictionary(modulePrefix);
+                    parseDictionary(moduleName);
+                } else if (token == SliceTokenTypes.KEYWORD_CONST) {
+                    type = SliceElementTypes.ICE_CONSTANT;
+
+                    parseConstant(moduleName);
                 }
             }
             break;
@@ -93,15 +102,123 @@ public class SliceParser {
         }
     }
 
-    private void parseEnum(String modulePrefix) {
+    private void parseConstant(String moduleName) {
+        boolean declarationValid = true;
+
+        final PsiBuilder.Marker constantDeclarationMark = mark();
+        advance();
+
+        final PsiBuilder.Marker dataTypeMark = mark();
+        IElementType typeToken = token();
+        String typeTokenText = tokenText();
+        if (Checker.isTypeKeyword(typeToken) && typeToken != SliceTokenTypes.KEYWORD_VOID) {
+            advance();
+            dataTypeMark.drop();
+        } else if (typeToken == SliceTokenTypes.IDENTIFIER) {
+            advance();
+            if (isTypeDeclared(moduleName, typeTokenText, ElementType.Enum)) {
+                dataTypeMark.drop();
+            } else {
+                typeToken = null;
+                dataTypeMark.error("invalid.datatype");
+            }
+        } else {
+            typeToken = null;
+            dataTypeMark.error("invalid.datatype");
+        }
+
+        final PsiBuilder.Marker constNameMark = mark();
+        String constantName = readIdentifier();
+        Set<String> moduleConstants = constants.get(moduleName);
+        if (moduleConstants == null) {
+            constants.put(moduleName, moduleConstants = new HashSet<String>());
+        }
+        if (moduleConstants.contains(constantName)) {
+            constNameMark.error(IceErrorMessages.message("already.defined"));
+        } else {
+            constNameMark.drop();
+        }
+
+        if (token() == SliceTokenTypes.EQUAL) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("equal.expected"));
+        }
+
+        // Check validity types
+        if (typeToken == SliceTokenTypes.KEYWORD_INT ||
+                typeToken == SliceTokenTypes.KEYWORD_BYTE ||
+                typeToken == SliceTokenTypes.KEYWORD_LONG ||
+                typeToken == SliceTokenTypes.KEYWORD_SHORT
+                ) {
+            if (token() == SliceTokenTypes.INTEGER_VALUE) {
+                advance();
+            } else {
+                declarationValid = false;
+            }
+        } else if (typeToken == SliceTokenTypes.KEYWORD_FLOAT ||
+                typeToken == SliceTokenTypes.KEYWORD_DOUBLE
+                ) {
+            if (token() == SliceTokenTypes.FLOAT_VALUE || token() == SliceTokenTypes.FLOAT_VALUE) {
+                advance();
+            } else {
+                declarationValid = false;
+            }
+        } else if (typeToken == SliceTokenTypes.KEYWORD_STRING) {
+            if (token() == SliceTokenTypes.STRING_LITERAL) {
+                advance();
+            } else {
+                declarationValid = false;
+            }
+        } else if (typeToken == SliceTokenTypes.KEYWORD_BOOL) {
+            if (token() == SliceTokenTypes.KEYWORD_TRUE ||
+                    token() == SliceTokenTypes.KEYWORD_FALSE) {
+                advance();
+            } else {
+                declarationValid = false;
+            }
+        } else if (typeToken == SliceTokenTypes.IDENTIFIER) {
+            // Enum
+            if (token() == SliceTokenTypes.IDENTIFIER) {
+                final String enumValue = tokenText();
+
+                advance();
+                final Map<String, Set<String>> enums = enumConstants.get(moduleName);
+                if (enums == null || !enums.containsKey(typeTokenText) || !enums.get(typeTokenText).contains(enumValue)) {
+                    declarationValid = false;
+                }
+            } else {
+                declarationValid = false;
+            }
+        }
+        if (!declarationValid) {
+            if (token() != SliceTokenTypes.SEMICOLON) {
+                advance();
+            }
+        }
+
+        if (token() == SliceTokenTypes.SEMICOLON) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("semicolon.is.required"));
+        }
+
+        if (declarationValid) {
+            constantDeclarationMark.drop();
+        } else {
+            constantDeclarationMark.error(IceErrorMessages.message("invalid.constant.declaration"));
+        }
+    }
+
+    private void parseEnum(String moduleName) {
         advance();
 
         final PsiBuilder.Marker enumNameMark = mark();
         boolean dropErrorMark = true;
         String enumName = readIdentifier();
         if (enumName != null) {
-            if (isTypeDeclared(modulePrefix, enumName, null) &&
-                    !isForwardDeclared(modulePrefix, enumName, ElementType.Enum)) {
+            if (isTypeDeclared(moduleName, enumName, null) &&
+                    !isForwardDeclared(moduleName, enumName, ElementType.Enum)) {
                 enumNameMark.error(IceErrorMessages.message("already.defined"));
                 dropErrorMark = false;
             } else if (Checker.isKeywordString(enumName)) {
@@ -112,13 +229,13 @@ public class SliceParser {
 
         if (token() == SliceTokenTypes.SEMICOLON) {
             // Forward declaration
-            if (isForwardDeclared(modulePrefix, enumName, ElementType.Enum)) {
+            if (isForwardDeclared(moduleName, enumName, ElementType.Enum)) {
                 enumNameMark.error(IceErrorMessages.message("already.defined"));
             } else {
                 enumNameMark.drop();
             }
 
-            forwardDeclareName(modulePrefix, enumName, ElementType.Enum);
+            forwardDeclareName(moduleName, enumName, ElementType.Enum);
 
             advance();
             return;
@@ -128,16 +245,24 @@ public class SliceParser {
             enumNameMark.drop();
         }
 
-        storeName(modulePrefix, enumName, ElementType.Enum);
+        storeName(moduleName, enumName, ElementType.Enum);
         if (token() == SliceTokenTypes.LBRACE) {
             advance();
         } else {
             mark().error(IceErrorMessages.message("left.brace.is.required"));
         }
 
+        Set<String> values = new HashSet<String>();
         while (!eof() && token() != SliceTokenTypes.RBRACE) {
-            parseEnumValues(modulePrefix);
+            values.addAll(parseEnumValues(moduleName));
         }
+
+        Map<String, Set<String>> enums = enumConstants.get(moduleName);
+        if (enums == null) {
+            enums = new HashMap<String, Set<String>>();
+            enumConstants.put(moduleName, enums);
+        }
+        enums.put(enumName, values);
 
         checkBlockEnd();
     }
@@ -456,7 +581,9 @@ public class SliceParser {
         }
     }
 
-    private void parseEnumValues(String moduleName) {
+    private Set<String> parseEnumValues(String moduleName) {
+        Set<String> valueSet = new HashSet<String>();
+
         final PsiBuilder.Marker line = mark();
         boolean expectComa = false;
 
@@ -478,8 +605,10 @@ public class SliceParser {
                 advance();
                 if (dataTypeExists(moduleName, enumValue)) {
                     mark.error(IceErrorMessages.message("name.is.already.used"));
+                } else if (valueSet.contains(enumValue)) {
+                    mark.error(IceErrorMessages.message("name.is.already.used"));
                 } else {
-//                    valueSet.add(enumValue);
+                    valueSet.add(enumValue);
                     mark.done(SliceElementTypes.ICE_ENUM_CONSTANT);
                 }
             } else if (Checker.isKeyword(token())) {
@@ -491,6 +620,8 @@ public class SliceParser {
         }
 
         line.done(SliceElementTypes.ICE_ENUM_CONSTANT_LIST);
+
+        return valueSet;
     }
 
     private void parseStructBody(String moduleName) {

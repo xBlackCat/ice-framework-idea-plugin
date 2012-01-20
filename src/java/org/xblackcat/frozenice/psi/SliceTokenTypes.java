@@ -46,6 +46,8 @@ public interface SliceTokenTypes extends TokenType {
     IElementType KEYWORD_VOID = new SliceElementType("Ice.Keyword.void");
 
     IElementType STRING_LITERAL = new SliceElementType("Ice.String");
+    IElementType FLOAT_VALUE = new SliceElementType("Ice.Float");
+    IElementType INTEGER_VALUE = new SliceElementType("Ice.Integer");
 
     /**
      * &gt;
