@@ -17,6 +17,7 @@ public class Checker {
                 token == SliceTokenTypes.KEYWORD_LONG ||
                 token == SliceTokenTypes.KEYWORD_SHORT ||
                 token == SliceTokenTypes.KEYWORD_STRING ||
+                token == SliceTokenTypes.KEYWORD_OBJECT ||
                 token == SliceTokenTypes.KEYWORD_VOID;
     }
 

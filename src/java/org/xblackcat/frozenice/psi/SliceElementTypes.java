@@ -77,13 +77,37 @@ public interface SliceElementTypes extends SliceTokenTypes {
             return new SliceStubPsiElement(node);
         }
     };
+    IElementType ICE_CONSTANT = new SliceStubElementType("Ice.Constant") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
     IElementType ICE_EXCEPTION = new SliceStubElementType("Ice.Exception") {
         @Override
         public PsiElement createPsi(ASTNode node) {
             return new SliceStubPsiElement(node);
         }
     };
-    IElementType ICE_TYPE_DECLARATION = new SliceStubElementType("Ice.Type_declaration") {
+    IElementType ICE_TYPE_DECLARATION = new SliceStubElementType("Ice.Type_dictionary") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+    IElementType ICE_TYPE_SEQUENCE = new SliceStubElementType("Ice.Type_sequence") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+    IElementType ICE_TYPE_DICTIONARY = new SliceStubElementType("Ice.Type_declaration") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+    IElementType ICE_STRUCT = new SliceStubElementType("Ice.Structure") {
         @Override
         public PsiElement createPsi(ASTNode node) {
             return new SliceStubPsiElement(node);
