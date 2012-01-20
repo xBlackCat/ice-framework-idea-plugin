@@ -15,10 +15,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenice.psi.IcePsiFile;
-import org.xblackcat.frozenice.psi.SliceElementTypes;
-import org.xblackcat.frozenice.psi.SlicePsiParser;
-import org.xblackcat.frozenice.psi.SliceStubElementType;
+import org.xblackcat.frozenice.psi.*;
 
 /**
  * 04.01.12 16:31
@@ -57,7 +54,7 @@ public class SliceParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public TokenSet getStringLiteralElements() {
-        return TokenSet.EMPTY;
+        return TokenSet.create(SliceTokenTypes.STRING_LITERAL);
     }
 
     @NotNull

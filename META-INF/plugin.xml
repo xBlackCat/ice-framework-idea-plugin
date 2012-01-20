@@ -9,6 +9,7 @@
     <change-notes><![CDATA[<ul>
             <li><b>0.0.0.1</b> - First revision: Only syntax highlighting</li>
             <li><b>0.0.0.2</b> - Slice2Java translation was added.</li>
+            <li><b>0.0.0.3</b> - More error detections while file parsing.</li>
             </ul>]]>
     </change-notes>
 
