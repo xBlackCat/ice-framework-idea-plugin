@@ -24,7 +24,6 @@ public class SliceParser {
         builder.setDebugMode(true);
     }
 
-
     public void parseBlock() {
         parseBlock(true, "");
     }
@@ -69,6 +68,18 @@ public class SliceParser {
                     type = SliceElementTypes.ICE_EXCEPTION;
 
                     parseException(modulePrefix);
+                } else if (token == SliceTokenTypes.KEYWORD_SEQUENCE) {
+                    type = SliceElementTypes.ICE_TYPE_SEQUENCE;
+
+                    parseSequence(modulePrefix);
+                } else if (token == SliceTokenTypes.KEYWORD_STRUCT) {
+                    type = SliceElementTypes.ICE_STRUCT;
+
+                    parseStruct(modulePrefix);
+                } else if (token == SliceTokenTypes.KEYWORD_DICTIONARY) {
+                    type = SliceElementTypes.ICE_TYPE_DICTIONARY;
+
+                    parseDictionary(modulePrefix);
                 }
             }
             break;
@@ -82,49 +93,19 @@ public class SliceParser {
         }
     }
 
-    private void skipBlock() {
-        int bracesCount = 0;
-        boolean meetsLBrace = false;
-        while (!eof()) {
-            if (token() == SliceTokenTypes.RBRACE) {
-                --bracesCount;
-                if (meetsLBrace) {
-                    if (bracesCount <= 0) {
-                        advance();
-                        break;
-                    }
-                } else if (bracesCount < 0) {
-                    break;
-                }
-            }
-            if (token() == SliceTokenTypes.LBRACE) {
-                ++bracesCount;
-                meetsLBrace = true;
-            }
-
-            advance();
-        }
-
-        if (token() == SliceTokenTypes.SEMICOLON) {
-            advance();
-        } else {
-            mark().error(IceErrorMessages.message("semicolon.is.required"));
-        }
-    }
-
     private void parseEnum(String modulePrefix) {
         advance();
 
-        final PsiBuilder.Marker classNameMark = mark();
+        final PsiBuilder.Marker enumNameMark = mark();
         boolean dropErrorMark = true;
-        String enumName = readIdentifier(IceErrorMessages.message("identifier.required"));
+        String enumName = readIdentifier();
         if (enumName != null) {
             if (isTypeDeclared(modulePrefix, enumName, null) &&
                     !isForwardDeclared(modulePrefix, enumName, ElementType.Enum)) {
-                classNameMark.error(IceErrorMessages.message("already.defined"));
+                enumNameMark.error(IceErrorMessages.message("already.defined"));
                 dropErrorMark = false;
             } else if (Checker.isKeywordString(enumName)) {
-                classNameMark.error(IceErrorMessages.message("reserved.word"));
+                enumNameMark.error(IceErrorMessages.message("reserved.word"));
                 dropErrorMark = false;
             }
         }
@@ -132,9 +113,9 @@ public class SliceParser {
         if (token() == SliceTokenTypes.SEMICOLON) {
             // Forward declaration
             if (isForwardDeclared(modulePrefix, enumName, ElementType.Enum)) {
-                classNameMark.error(IceErrorMessages.message("already.defined"));
+                enumNameMark.error(IceErrorMessages.message("already.defined"));
             } else {
-                classNameMark.drop();
+                enumNameMark.drop();
             }
 
             forwardDeclareName(modulePrefix, enumName, ElementType.Enum);
@@ -144,7 +125,7 @@ public class SliceParser {
         }
 
         if (dropErrorMark) {
-            classNameMark.drop();
+            enumNameMark.drop();
         }
 
         storeName(modulePrefix, enumName, ElementType.Enum);
@@ -166,7 +147,7 @@ public class SliceParser {
         // We already set a mark ICE_MODULE
         advance();
 
-        String moduleName = readIdentifier(IceErrorMessages.message("identifier.required"));
+        String moduleName = readIdentifier();
 
         final PsiBuilder.Marker moduleErrorEnd = mark();
         if (token() == SliceTokenTypes.LBRACE) {
@@ -196,7 +177,7 @@ public class SliceParser {
 
         final PsiBuilder.Marker classNameMark = mark();
         boolean dropErrorMark = true;
-        String className = readIdentifier(IceErrorMessages.message("identifier.required"));
+        String className = readIdentifier();
         if (className != null) {
             if (isTypeDeclared(moduleName, className, null) &&
                     !isForwardDeclared(moduleName, className, ElementType.Class)) {
@@ -289,6 +270,178 @@ public class SliceParser {
         checkBlockEnd();
     }
 
+    private void parseSequence(String moduleName) {
+        advance();
+
+        final PsiBuilder.Marker subTypeMark = mark();
+        boolean subTypeError = false;
+        if (token() == SliceTokenTypes.LT) {
+            advance();
+        } else {
+            subTypeError = true;
+        }
+
+        IElementType token = token();
+        if (Checker.isTypeKeyword(token) && token != SliceTokenTypes.KEYWORD_VOID ||
+                isTypeDeclared(moduleName, tokenText(), null) ||
+                isForwardDeclared(moduleName, tokenText(), null)) {
+            // Store type ?
+            advance();
+        } else {
+            subTypeError = true;
+        }
+
+        if (token() == SliceTokenTypes.GT) {
+            advance();
+        } else {
+            subTypeError = true;
+        }
+
+        if (subTypeError) {
+            subTypeMark.error(IceErrorMessages.message("datatype.expected"));
+        } else {
+            subTypeMark.drop();
+        }
+
+        String sequenceName = readIdentifier();
+        final PsiBuilder.Marker seqNameMark = mark();
+        if (sequenceName != null) {
+            if (isTypeDeclared(moduleName, sequenceName, null) || isForwardDeclared(moduleName, sequenceName, null)) {
+                seqNameMark.error(IceErrorMessages.message("already.defined"));
+            } else {
+                seqNameMark.drop();
+            }
+        } else {
+            seqNameMark.drop();
+        }
+
+        storeName(moduleName, sequenceName, ElementType.Sequence);
+
+        if (token() == SliceTokenTypes.SEMICOLON) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("semicolon.is.required"));
+        }
+    }
+
+    private void parseDictionary(String moduleName) {
+        advance();
+
+        final PsiBuilder.Marker subTypeMark = mark();
+        boolean subTypeError = false;
+        if (token() == SliceTokenTypes.LT) {
+            advance();
+        } else {
+            subTypeError = true;
+        }
+
+        if (Checker.isTypeKeyword(token()) && token() != SliceTokenTypes.KEYWORD_VOID ||
+                isTypeDeclared(moduleName, tokenText(), null) ||
+                isForwardDeclared(moduleName, tokenText(), null)) {
+            // Store type ?
+            advance();
+        } else {
+            subTypeError = true;
+        }
+
+        if (token() == SliceTokenTypes.COMMA) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("coma.is.required"));
+        }
+
+        if (Checker.isTypeKeyword(token()) && token() != SliceTokenTypes.KEYWORD_VOID ||
+                isTypeDeclared(moduleName, tokenText(), null) ||
+                isForwardDeclared(moduleName, tokenText(), null)) {
+            // Store type ?
+            advance();
+        } else {
+            subTypeError = true;
+        }
+
+        if (token() == SliceTokenTypes.GT) {
+            advance();
+        } else {
+            subTypeError = true;
+        }
+
+        if (subTypeError) {
+            subTypeMark.error(IceErrorMessages.message("datatype.expected"));
+        } else {
+            subTypeMark.drop();
+        }
+
+        String dictionaryName = readIdentifier();
+        final PsiBuilder.Marker seqNameMark = mark();
+        if (dictionaryName != null) {
+            if (isTypeDeclared(moduleName, dictionaryName, null) || isForwardDeclared(moduleName, dictionaryName, null)) {
+                seqNameMark.error(IceErrorMessages.message("already.defined"));
+            } else {
+                seqNameMark.drop();
+            }
+        } else {
+            seqNameMark.drop();
+        }
+
+        storeName(moduleName, dictionaryName, ElementType.Dictionary);
+
+        if (token() == SliceTokenTypes.SEMICOLON) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("semicolon.is.required"));
+        }
+    }
+
+    private void parseStruct(String moduleName) {
+        advance();
+
+        final PsiBuilder.Marker structNameMark = mark();
+        boolean dropErrorMark = true;
+        String structName = readIdentifier();
+        if (structName != null) {
+            if (isTypeDeclared(moduleName, structName, null) &&
+                    !isForwardDeclared(moduleName, structName, ElementType.Struct)) {
+                structNameMark.error(IceErrorMessages.message("already.defined"));
+                dropErrorMark = false;
+            } else if (Checker.isKeywordString(structName)) {
+                structNameMark.error(IceErrorMessages.message("reserved.word"));
+                dropErrorMark = false;
+            }
+        }
+
+        if (token() == SliceTokenTypes.SEMICOLON) {
+            // Forward declaration
+            if (isForwardDeclared(moduleName, structName, ElementType.Struct)) {
+                structNameMark.error(IceErrorMessages.message("already.defined"));
+            } else {
+                structNameMark.drop();
+            }
+
+            forwardDeclareName(moduleName, structName, ElementType.Struct);
+
+            advance();
+            return;
+        }
+
+        if (dropErrorMark) {
+            structNameMark.drop();
+        }
+
+        storeName(moduleName, structName, ElementType.Struct);
+
+        if (token() == SliceTokenTypes.LBRACE) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("left.brace.is.required"));
+        }
+
+        while (!eof() && token() != SliceTokenTypes.RBRACE) {
+            parseStructBody(moduleName);
+        }
+
+        checkBlockEnd();
+    }
+
     private void checkBlockEnd() {
         if (token() == SliceElementTypes.RBRACE) {
             advance();
@@ -340,6 +493,50 @@ public class SliceParser {
         line.done(SliceElementTypes.ICE_ENUM_CONSTANT_LIST);
     }
 
+    private void parseStructBody(String moduleName) {
+        IElementType type;
+
+        final PsiBuilder.Marker line = mark();
+
+        if (token() == SliceTokenTypes.IDENTIFIER) {
+            final PsiBuilder.Marker mark = mark();
+            String typeName = tokenText();
+
+            advance();
+            if (!dataTypeExists(moduleName, typeName)) {
+                mark.error(IceErrorMessages.message("invalid.datatype"));
+            } else {
+                mark.drop();
+            }
+        } else if (Checker.isTypeKeyword(token())) {
+            advance();
+        } else {
+            mark().error(IceErrorMessages.message("datatype.expected"));
+        }
+
+        String name = readIdentifier();
+
+        if (token() == SliceTokenTypes.EQUAL || token() == SliceTokenTypes.SEMICOLON) {
+            type = SliceElementTypes.ICE_CLASS_FIELD_DECLARATION;
+        } else {
+            type = null;
+        }
+
+        while (!eof() && token() != SliceTokenTypes.SEMICOLON && token() != SliceTokenTypes.RBRACE) {
+            advance();
+        }
+
+        if (type != null) {
+            line.done(type);
+            advance();
+        } else {
+            line.error(IceErrorMessages.message("invalid.declaration"));
+            if (name == null) {
+                advance();
+            }
+        }
+    }
+
     private void parseClassBody(String moduleName, boolean onlyMethods) {
         IElementType type;
 
@@ -365,7 +562,7 @@ public class SliceParser {
             mark().error(IceErrorMessages.message("datatype.expected"));
         }
 
-        String name = readIdentifier(IceErrorMessages.message("identifier.required"));
+        String name = readIdentifier();
 
         if (token() == SliceTokenTypes.EQUAL || token() == SliceTokenTypes.SEMICOLON) {
             if (onlyMethods) {
@@ -399,7 +596,7 @@ public class SliceParser {
         advance();
         final PsiBuilder.Marker interfaceNameMark = mark();
         boolean dropErrorMark = true;
-        String interfaceName = readIdentifier(IceErrorMessages.message("identifier.required"));
+        String interfaceName = readIdentifier();
 
         if (interfaceName != null) {
             if (isTypeDeclared(moduleName, interfaceName, null) &&
@@ -473,7 +670,7 @@ public class SliceParser {
         advance();
         final PsiBuilder.Marker exceptionNameMark = mark();
         boolean dropErrorMark = true;
-        String exceptionName = readIdentifier(IceErrorMessages.message("identifier.required"));
+        String exceptionName = readIdentifier();
 
         if (exceptionName != null) {
             if (isTypeDeclared(moduleName, exceptionName, null) &&
@@ -537,6 +734,10 @@ public class SliceParser {
         checkBlockEnd();
     }
 
+    private String readIdentifier() {
+        return readIdentifier(IceErrorMessages.message("identifier.required"));
+    }
+
     private String readIdentifier(String errorMessage) {
         String identifier;
 
@@ -550,22 +751,31 @@ public class SliceParser {
         return identifier;
     }
 
-    private boolean isTypeDeclared(String moduleName, String className, @Nullable ElementType type) {
+    private boolean isTypeDeclared(String moduleName, String typeName, @Nullable ElementType type) {
         final Map<String, ElementType> names = validTypes.get(moduleName);
         if (names == null) {
             return false;
         }
 
         if (type == null) {
-            return names.containsKey(className);
+            return names.containsKey(typeName);
         } else {
-            return names.get(className) == type;
+            return names.get(typeName) == type;
         }
     }
 
-    private boolean isForwardDeclared(String moduleName, String className, ElementType type) {
+    private boolean isForwardDeclared(String moduleName, String typeName, @Nullable ElementType type) {
         final Map<String, ElementType> names = forwardDeclarations.get(moduleName);
-        return names != null && names.get(className) == type;
+
+        if (names == null) {
+            return false;
+        }
+
+        if (type == null) {
+            return names.containsKey(typeName);
+        } else {
+            return names.get(typeName) == type;
+        }
     }
 
     private boolean dataTypeExists(String moduleName, String name) {
@@ -648,6 +858,9 @@ public class SliceParser {
         Interface,
         Enum,
         Exception,
+        Struct,
+        Sequence,
+        Dictionary,
         DataType
     }
 }

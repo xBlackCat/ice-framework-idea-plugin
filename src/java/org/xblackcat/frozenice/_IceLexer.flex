@@ -36,6 +36,8 @@ C_STYLE_COMMENT=("/*"[^"*"]{COMMENT_TAIL})|"/*"
 COMMENT_TAIL=([^"*"]*("*"+[^"*""/"])?)*("*"+"/")?
 END_OF_LINE_COMMENT="/""/"[^\r\n]*
 MACROS_LINE="#"[:jletter:][^\r\n]*
+ESCAPE_SEQUENCE=\\[^\n\r]
+STRING_LITERAL=\"([^\\\"\r\n]|{ESCAPE_SEQUENCE})*\"
 
 %%
 
@@ -44,6 +46,8 @@ MACROS_LINE="#"[:jletter:][^\r\n]*
 <YYINITIAL> {MACROS_LINE} { return SliceTokenTypes.MACROS_LINE; }
 <YYINITIAL> {C_STYLE_COMMENT} { return SliceTokenTypes.C_STYLE_COMMENT; }
 <YYINITIAL> {END_OF_LINE_COMMENT} { return SliceTokenTypes.END_OF_LINE_COMMENT; }
+
+<YYINITIAL> {STRING_LITERAL} { return SliceTokenTypes.STRING_LITERAL; }
 
 <YYINITIAL> "true" { return SliceTokenTypes.KEYWORD_TRUE; }
 <YYINITIAL> "false" { return SliceTokenTypes.KEYWORD_FALSE; }
