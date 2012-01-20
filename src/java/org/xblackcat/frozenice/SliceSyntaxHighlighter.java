@@ -28,6 +28,10 @@ public class SliceSyntaxHighlighter extends SyntaxHighlighterBase {
 
         fillMap(keys1, SliceTokenTypes.KEYWORD_BIT_SET, SyntaxHighlighterColors.KEYWORD);
 
+        keys1.put(SliceTokenTypes.STRING_LITERAL, SyntaxHighlighterColors.STRING);
+        keys1.put(SliceTokenTypes.INTEGER_VALUE, SyntaxHighlighterColors.NUMBER);
+        keys1.put(SliceTokenTypes.FLOAT_VALUE, SyntaxHighlighterColors.NUMBER);
+
         keys1.put(SliceTokenTypes.C_STYLE_COMMENT, SyntaxHighlighterColors.JAVA_BLOCK_COMMENT);
         keys1.put(SliceTokenTypes.END_OF_LINE_COMMENT, SyntaxHighlighterColors.LINE_COMMENT);
         keys1.put(SliceTokenTypes.MACROS_LINE, SyntaxHighlighterColors.DOC_COMMENT_MARKUP);

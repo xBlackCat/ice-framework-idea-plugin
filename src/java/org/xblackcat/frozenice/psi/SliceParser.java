@@ -33,7 +33,7 @@ public class SliceParser {
         parseBlock(true, "");
     }
 
-    public void parseBlock(boolean topLevel, String moduleName) {
+    private void parseBlock(boolean topLevel, String moduleName) {
         final PsiBuilder.Marker block = mark();
 
         IElementType type = null;
@@ -142,7 +142,7 @@ public class SliceParser {
         if (token() == SliceTokenTypes.EQUAL) {
             advance();
         } else {
-            mark().error(IceErrorMessages.message("equal.expected"));
+            declarationValid = false;
         }
 
         // Check validity types
