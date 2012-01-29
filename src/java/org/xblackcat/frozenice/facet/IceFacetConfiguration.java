@@ -16,13 +16,19 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.ui.IdeBorderFactory;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
+import org.xblackcat.frozenice.util.IceComponent;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 08.01.12 13:35
@@ -39,7 +45,7 @@ import java.awt.event.ActionListener;
         }
 )
 public class IceFacetConfiguration implements FacetConfiguration, PersistentStateComponent<IceFacetConfiguration.Config> {
-    private Config config = new Config(false, null);
+    private Config config = new Config();
 
     @Override
     public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
@@ -71,32 +77,33 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
     }
 
     public static class Config {
-        transient public VirtualFile outputDir;
         public boolean cleanOutput;
-        public String outputDirPath;
+        public Map<IceComponent, String> outputDirPath = new HashMap<IceComponent, String>();
 
-        public Config() {
-        }
+        transient private Map<IceComponent, VirtualFile> outputDir = new HashMap<IceComponent, VirtualFile>();
 
-        public Config(boolean cleanOutput, VirtualFile outputDir) {
-            this.cleanOutput = cleanOutput;
-            this.outputDir = outputDir;
-            outputDirPath = outputDir == null ? null : outputDir.getUrl();
-        }
-
-        public VirtualFile getOutputDir() {
-            if (outputDirPath != null && outputDir == null) {
-                outputDir = VirtualFileManager.getInstance().findFileByUrl(outputDirPath);
+        public VirtualFile getOutputDir(IceComponent c) {
+            VirtualFile file = outputDir.get(c);
+            if (outputDirPath.get(c) != null && file == null) {
+                file = VirtualFileManager.getInstance().findFileByUrl(outputDirPath.get(c));
+                outputDir.put(c, file);
             }
-            return outputDir;
+            return file;
+        }
+
+        public void setOutputDir(IceComponent c, VirtualFile path) {
+            if (path != null) {
+                outputDir.put(c, path);
+                outputDirPath.put(c, path.getUrl());
+            }
+        }
+
+        public void setCleanOutput(boolean cleanOutput) {
+            this.cleanOutput = cleanOutput;
         }
 
         public boolean isCleanOutput() {
             return cleanOutput;
-        }
-
-        public String getOutputDirString() {
-            return outputDir != null ? outputDir.getUrl() : null;
         }
 
         @Override
@@ -110,7 +117,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
 
             Config config = (Config) o;
 
-            return cleanOutput == config.cleanOutput && (outputDir != null ? outputDir.equals(config.outputDir) : config.outputDir == null);
+            return cleanOutput == config.cleanOutput && outputDir.equals(config.outputDir);
         }
 
         @Override
@@ -118,6 +125,82 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
             int result = outputDir != null ? outputDir.hashCode() : 0;
             result = 31 * result + (cleanOutput ? 1 : 0);
             return result;
+        }
+
+        public Iterable<? extends IceComponent> getConfiguredComponents() {
+            return outputDirPath.keySet();
+        }
+
+        public boolean isValid() {
+            return !outputDir.isEmpty();
+        }
+    }
+
+    private static class TranslatorItemConfig extends JPanel {
+        private final JTextField outputFolder = new JTextField(40);
+        private final JCheckBox compilationEnabled;
+
+        private VirtualFile selectedFolder = null;
+        private FixedSizeButton browseDirectoryButton;
+
+        private TranslatorItemConfig(String name) {
+            super(new BorderLayout(5, 5));
+
+            browseDirectoryButton = new FixedSizeButton(outputFolder);
+
+            compilationEnabled = new JCheckBox(name);
+            add(compilationEnabled, BorderLayout.WEST);
+            add(outputFolder, BorderLayout.CENTER);
+            add(browseDirectoryButton, BorderLayout.EAST);
+
+            outputFolder.setEditable(false);
+
+            compilationEnabled.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    outputFolder.setEnabled(compilationEnabled.isSelected());
+                    browseDirectoryButton.setEnabled(compilationEnabled.isSelected());
+                }
+            });
+
+            Dimension size = new Dimension(80, 2);
+            compilationEnabled.setMinimumSize(size);
+            compilationEnabled.setPreferredSize(size);
+
+            TextFieldWithBrowseButton.MyDoClickAction.addTo(browseDirectoryButton, outputFolder);
+            browseDirectoryButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    final VirtualFile[] files = FileChooser.chooseFiles(
+                            TranslatorItemConfig.this.getParent(),
+                            new FileChooserDescriptor(false, true, false, false, false, false),
+                            selectedFolder
+                    );
+                    if (files.length != 0) {
+                        selectedFolder = files[0];
+                        outputFolder.setText(selectedFolder.getPath());
+                    }
+                }
+            });
+
+        }
+
+        public boolean getCompilationEnabled() {
+            return compilationEnabled.isSelected();
+        }
+
+        public void setCompilationEnabled(boolean b) {
+            compilationEnabled.setSelected(b);
+            browseDirectoryButton.setEnabled(b);
+            outputFolder.setEnabled(b);
+        }
+
+        public VirtualFile getSelectedFolder() {
+            return selectedFolder;
+        }
+
+        public void setSelectedFolder(VirtualFile selectedFolder) {
+            this.selectedFolder = selectedFolder;
+            outputFolder.setText(selectedFolder == null ? null : selectedFolder.getPath());
         }
     }
 
@@ -128,46 +211,37 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
         private final JComponent pane;
 
         private final JCheckBox cleanOnBuildCheckBox = new JCheckBox("Clean output folder before build.");
-        private final JTextField outputFolder = new JTextField(40);
-
-        private VirtualFile selectedFolder = null;
+        private final Map<IceComponent, TranslatorItemConfig> outputFolders = new HashMap<IceComponent, TranslatorItemConfig>();
 
         public IceFacetEditor(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
             this.editorContext = editorContext;
             this.validatorsManager = validatorsManager;
 
-            outputFolder.setEditable(false);
-            FixedSizeButton browseDirectoryButton = new FixedSizeButton(outputFolder);
-            JLabel labelOutputFolder = new JLabel("Generated files result folder.");
 
             pane = new JPanel(new BorderLayout());
-            final JPanel settingsPane = new JPanel(new BorderLayout(5, 5));
+            final JPanel settingsPane = new JPanel(new GridLayout(0, 1, 5, 5));
 
             pane.add(settingsPane, BorderLayout.NORTH);
 
-            settingsPane.add(labelOutputFolder, BorderLayout.WEST);
-            settingsPane.add(outputFolder, BorderLayout.CENTER);
-            settingsPane.add(browseDirectoryButton, BorderLayout.EAST);
+            settingsPane.setBorder(IdeBorderFactory.createTitledBorder("Generated files result folder.", false, false, true));
 
-            settingsPane.add(cleanOnBuildCheckBox, BorderLayout.SOUTH);
+            for (IceComponent c : IceComponent.values()) {
+                VirtualFile outputDir = config.getOutputDir(c);
 
-            // TODO: make visible after implementing
-            cleanOnBuildCheckBox.setVisible(false);
+                TranslatorItemConfig itemConfig = new TranslatorItemConfig(c.name());
 
-            TextFieldWithBrowseButton.MyDoClickAction.addTo(browseDirectoryButton, outputFolder);
-            browseDirectoryButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    final VirtualFile[] files = FileChooser.chooseFiles(
-                            settingsPane,
-                            new FileChooserDescriptor(false, true, false, false, false, false),
-                            selectedFolder
-                    );
-                    if (files.length != 0) {
-                        selectedFolder = files[0];
-                        outputFolder.setText(selectedFolder.getPath());
-                    }
-                }
-            });
+                outputFolders.put(c, itemConfig);
+
+                itemConfig.setSelectedFolder(outputDir);
+                itemConfig.setCompilationEnabled(outputDir != null);
+
+                settingsPane.add(itemConfig);
+            }
+
+//            settingsPane.add(cleanOnBuildCheckBox, BorderLayout.SOUTH);
+//
+//            // TODO: make visible after implementing
+//            cleanOnBuildCheckBox.setVisible(false);
 
         }
 
@@ -189,16 +263,31 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
         }
 
         private Config getConfig() {
-            boolean cleanOutput = cleanOnBuildCheckBox.isSelected();
 
-            return new Config(cleanOutput, selectedFolder);
+            Config cfg = new Config();
+
+            cfg.setCleanOutput(cleanOnBuildCheckBox.isSelected());
+
+            for (Map.Entry<IceComponent, TranslatorItemConfig> item : outputFolders.entrySet()) {
+                TranslatorItemConfig itemConfig = item.getValue();
+                if (itemConfig.getCompilationEnabled()) {
+                    cfg.setOutputDir(item.getKey(), itemConfig.getSelectedFolder());
+                }
+            }
+
+            return cfg;
         }
 
         @Override
         public void reset() {
-            selectedFolder = config.getOutputDir();
             cleanOnBuildCheckBox.setSelected(config.isCleanOutput());
-            outputFolder.setText(config.getOutputDirString());
+
+            for (IceComponent item : config.getConfiguredComponents()) {
+                TranslatorItemConfig itemConfig = outputFolders.get(item);
+
+                itemConfig.setCompilationEnabled(true);
+                itemConfig.setSelectedFolder(config.getOutputDir(item));
+            }
         }
 
         @Override
