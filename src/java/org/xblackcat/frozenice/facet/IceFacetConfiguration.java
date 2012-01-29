@@ -164,7 +164,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                     );
                     if (files.length != 0) {
                         selectedFolder = files[0];
-                        outputFolder.setText(selectedFolder.getPresentableName());
+                        outputFolder.setText(selectedFolder.getPath());
                     }
                 }
             });

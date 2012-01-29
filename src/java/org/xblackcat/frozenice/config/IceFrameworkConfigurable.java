@@ -15,19 +15,18 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.IdeBorderFactory;
-import org.apache.sanselan.util.IOUtils;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.FrozenIdea;
-import org.xblackcat.frozenice.util.Constants;
+import org.xblackcat.frozenice.util.IceChecker;
+import org.xblackcat.frozenice.util.IceComponent;
 import org.xblackcat.frozenice.util.Icons;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.EnumSet;
 
 /**
  * 12.01.12 14:37
@@ -103,7 +102,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
      *
      * @author xBlackCat
      */
-    public class IceFrameworkConfigForm extends JPanel {
+    private class IceFrameworkConfigForm extends JPanel {
         private final FrozenIdea plugin;
         private final JTextField iceHomeFolder;
         private VirtualFile selectedFolder;
@@ -169,62 +168,30 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                             private VirtualFile checkingFolder = files[0];
                             private String version;
 
-                            private VirtualFile check(VirtualFile root, String name) {
-                                VirtualFile bin = root.findChild("bin");
-                                if (bin == null || !bin.isDirectory()) {
-                                    return null;
-                                }
-
-                                VirtualFile config = bin.findChild(name);
-                                if (config == null || !config.isValid()) {
-                                    return null;
-                                }
-
-                                return config;
-                            }
-
                             @Override
                             public void run(@NotNull ProgressIndicator indicator) {
                                 indicator.setIndeterminate(true);
 
                                 if (checkingFolder.isDirectory()) {
                                     // Find executable files
-                                    VirtualFile translatorFile;
-                                    if ((translatorFile = check(checkingFolder, Constants.JAVA_TRANSLATOR_NAME)) == null) {
+                                    EnumSet<IceComponent> installedComponents = IceChecker.getInstalledComponents(checkingFolder);
+                                    if (installedComponents.isEmpty()) {
                                         checkingFolder = checkingFolder.getParent();
 
                                         if (checkingFolder == null) {
                                             return;
                                         } else {
-                                            translatorFile = check(checkingFolder, Constants.JAVA_TRANSLATOR_NAME);
-                                            if (translatorFile == null || !translatorFile.isValid() || translatorFile.isDirectory()) {
+                                            installedComponents = IceChecker.getInstalledComponents(checkingFolder);
+                                            if (installedComponents.isEmpty()) {
                                                 checkingFolder = null;
                                                 return;
                                             }
                                         }
                                     }
 
-                                    // check file version
-                                    try {
-                                        Process process = new ProcessBuilder(translatorFile.getPath(), "-v").start();
-                                        process.waitFor();
-
-                                        InputStream stdOutIS = process.getErrorStream();
-                                        byte[] stdOut;
-                                        try {
-                                            stdOut = IOUtils.getInputStreamBytes(stdOutIS);
-                                            if (stdOut == null || stdOut.length == 0) {
-                                                checkingFolder = null;
-                                                return;
-                                            }
-                                        } finally {
-                                            stdOutIS.close();
-                                        }
-
-                                        version = new String(stdOut);
-                                    } catch (IOException e1) {
-                                        checkingFolder = null;
-                                    } catch (InterruptedException e1) {
+                                    final IceComponent anyComponent = installedComponents.iterator().next();
+                                    version = IceChecker.readVersion(anyComponent, checkingFolder);
+                                    if (version == null) {
                                         checkingFolder = null;
                                     }
                                 }
@@ -234,15 +201,15 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                             public void onSuccess() {
                                 if (checkingFolder != null) {
                                     selectedFolder = checkingFolder;
-                                    iceHomeFolder.setText(selectedFolder.getPresentableUrl());
+                                    iceHomeFolder.setText(selectedFolder.getPath());
 
                                     if (version != null) {
-                                        Messages.showInfoMessage(project, "Found ZeroC framework. Version: " + version, "ZeroC Framework is found");
+                                        Messages.showInfoMessage(project, "Found ZeroC framework. Version: " + version, "ZeroC ICE Framework is found");
                                     }
 
                                     setModified(true);
                                 } else {
-                                    Messages.showWarningDialog(project, "Selected folder is not ZeroC ICE framework home directory", "ICE not found");
+                                    Messages.showWarningDialog(project, "Selected folder is not ZeroC ICE framework home directory", "ZeroC ICE Framework is not found");
                                 }
                             }
                         };
@@ -260,10 +227,10 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
             if (config != null) {
                 selectedFolder = config.getFrameworkHome();
                 if (selectedFolder != null) {
-                    iceHomeFolder.setText(selectedFolder.getUrl());
+                    iceHomeFolder.setText(selectedFolder.getPath());
                 }
             }
-            
+
             setModified(false);
         }
 
