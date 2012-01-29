@@ -10,10 +10,12 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.FrozenIdea;
 import org.xblackcat.frozenice.config.IceConfig;
 import org.xblackcat.frozenice.config.IceFrameworkConfigurable;
+import org.xblackcat.frozenice.util.IceChecker;
 import org.xblackcat.frozenice.util.IceErrorMessages;
 
 import javax.swing.event.HyperlinkEvent;
@@ -49,7 +51,7 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
         }
 
         final IceConfig config = plugin.getConfig();
-        if (config == null) {
+        if (config == null || IceChecker.getInstalledComponents(config.getFrameworkHome()).isEmpty()) {
             final Notification notification = new Notification(
                     "Ice Facet",
                     IceErrorMessages.message("ICE.not.configured"),
@@ -69,8 +71,10 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                     }
             );
             Notifications.Bus.notify(notification, project);
+        } else {
+            final GlobalSearchScope scope = getModule().getModuleWithDependenciesAndLibrariesScope(false);
+
 
         }
-
     }
 }
