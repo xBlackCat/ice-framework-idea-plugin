@@ -1,9 +1,14 @@
 package org.xblackcat.frozenice.util;
 
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.sanselan.util.IOUtils;
+import org.xblackcat.frozenice.FrozenIdea;
+import org.xblackcat.frozenice.config.IceConfig;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.EnumSet;
 
 /**
@@ -15,9 +20,11 @@ public class IceChecker {
     public static EnumSet<IceComponent> getInstalledComponents(VirtualFile home) {
         EnumSet<IceComponent> found = EnumSet.noneOf(IceComponent.class);
 
-        for (IceComponent c : IceComponent.values()) {
-            if (c.isInstalled(home)) {
-                found.add(c);
+        if (home != null && home.isValid()) {
+            for (IceComponent c : IceComponent.values()) {
+                if (c.isInstalled(home)) {
+                    found.add(c);
+                }
             }
         }
 
@@ -55,5 +62,12 @@ public class IceChecker {
         }
 
         return null;
+    }
+
+    public static Collection<IceComponent> getAvailableTranslators(Module module) {
+        FrozenIdea plugin = ServiceManager.getService(module.getProject(), FrozenIdea.class);
+        IceConfig pluginConfig = plugin.getConfig();
+
+        return getInstalledComponents(pluginConfig != null ? pluginConfig.getFrameworkHome() : null);
     }
 }

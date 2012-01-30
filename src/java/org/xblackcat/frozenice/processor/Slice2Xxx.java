@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.FrozenIdea;
 import org.xblackcat.frozenice.IceFileType;
 import org.xblackcat.frozenice.config.IceConfig;
+import org.xblackcat.frozenice.facet.Config;
 import org.xblackcat.frozenice.facet.IceFacet;
 import org.xblackcat.frozenice.facet.IceFacetConfiguration;
 import org.xblackcat.frozenice.util.Constants;
@@ -79,7 +80,7 @@ public class Slice2Xxx implements SourceGeneratingCompiler {
                 IceFacet iceFacet = FacetManager.getInstance(module).getFacetByType(IceFacet.ID);
 
                 assert iceFacet != null;
-                IceFacetConfiguration.Config facetConfig = iceFacet.getConfiguration().getConfig();
+                Config facetConfig = iceFacet.getConfiguration().getConfig();
 
                 for (IceComponent c : facetConfig.getConfiguredComponents()) {
                     folders.add(VfsUtil.virtualToIoFile(facetConfig.getOutputDir(c)));
@@ -207,7 +208,7 @@ public class Slice2Xxx implements SourceGeneratingCompiler {
                         continue;
                     }
 
-                    IceFacetConfiguration.Config facetConfig = iceFacet.getConfiguration().getConfig();
+                    Config facetConfig = iceFacet.getConfiguration().getConfig();
                     if (!facetConfig.isValid()) {
                         context.addMessage(CompilerMessageCategory.ERROR, "Facet output folder is not specified", iceItem.getSource().getUrl(), -1, -1);
                         continue;
