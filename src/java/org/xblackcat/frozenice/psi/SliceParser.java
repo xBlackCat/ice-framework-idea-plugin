@@ -745,7 +745,7 @@ public class SliceParser {
                 interfaceNameMark.drop();
             }
 
-            forwardDeclareName(moduleName, interfaceName, ElementType.Class);
+            forwardDeclareName(moduleName, interfaceName, ElementType.Interface);
 
             advance();
             return;
@@ -781,7 +781,6 @@ public class SliceParser {
 
 
             superInterfaces.done(SliceElementTypes.ICE_CLASS_INTERFACE_LIST);
-            advance();
         }
 
         if (token() == SliceTokenTypes.LBRACE) {
