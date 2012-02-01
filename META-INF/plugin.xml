@@ -9,7 +9,7 @@
     <change-notes><![CDATA[<ul>
             <li><b>0.0.0.1</b> - First revision: Only syntax highlighting</li>
             <li><b>0.0.0.2</b> - Slice2Java translation was added.</li>
-            <li><b>0.0.0.3</b> - More error detections while file parsing. Allow to configure several language.</li>
+            <li><b>0.0.0.3</b> - More error detections while file parsing. Allow to configure translation to several languages. Autodetection of Ice library in module classpath.</li>
             </ul>]]>
     </change-notes>
 
