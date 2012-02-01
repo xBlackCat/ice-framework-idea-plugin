@@ -26,6 +26,21 @@ public enum IceComponent {
 
             return iceLib != null && iceLib.isValid() && !iceLib.isDirectory();
         }
+
+        @Override
+        public VirtualFile getLibraryPath(VirtualFile home) {
+            VirtualFile lib = home.findChild("lib");
+            if (lib == null || !lib.isDirectory()) {
+                return null;
+            }
+
+            VirtualFile jar = lib.findChild("Ice.jar");
+            if (jar == null || !jar.isValid() || jar.isDirectory()) {
+                return null;
+            }
+
+            return jar;
+        }
     },
     Ruby("slice2rb"),
     PHP("slice2php"),
@@ -59,5 +74,9 @@ public enum IceComponent {
 
     public VirtualFile getTranslatorPath(VirtualFile home) {
         return home.findFileByRelativePath("./bin/" + getTranslatorName());
+    }
+
+    public VirtualFile getLibraryPath(VirtualFile home) {
+        return null;
     }
 }
