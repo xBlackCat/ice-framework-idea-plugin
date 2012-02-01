@@ -2,7 +2,7 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.0.2</version>
+    <version>0.0.0.3</version>
     <vendor>xBlackCat</vendor>
     <idea-version since-build="111.1"/>
     <depends>com.intellij.modules.lang</depends>
