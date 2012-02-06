@@ -26,7 +26,7 @@ public class Checker {
     }
 
     static boolean isEnumToken(IElementType token) {
-        return token == SliceElementTypes.KEYWORD_ENUM;
+        return token == SliceTokenTypes.KEYWORD_ENUM;
     }
 
     static boolean isInterfaceToken(IElementType token) {
@@ -43,10 +43,6 @@ public class Checker {
 
     static boolean isMacroDefinition(IElementType token) {
         return token == SliceTokenTypes.MACROS_LINE;
-    }
-
-    static boolean isCommentToken(IElementType token) {
-        return token == SliceTokenTypes.C_STYLE_COMMENT || token == SliceTokenTypes.END_OF_LINE_COMMENT;
     }
 
     static boolean isKeyword(IElementType token) {

@@ -12,7 +12,7 @@ import org.xblackcat.frozenice.psi.source.SliceStubPsiElement;
  *
  * @author xBlackCat
  */
-public interface SliceElementTypes extends SliceTokenTypes {
+public interface SliceElementTypes {
     IFileElementType FILE_ELEMENT_TYPE = new IFileElementType("SLICE", SliceLanguage.INSTANCE);
 
     // Psi Elements definitions
@@ -120,4 +120,36 @@ public interface SliceElementTypes extends SliceTokenTypes {
         }
     };
 
+    IElementType ICE_METADATA = new SliceStubElementType("Ice.MetaData") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+
+    IElementType ICE_METADATA_BEGIN = new SliceStubElementType("Ice.MetaData.Begin") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+
+    IElementType ICE_METADATA_END = new SliceStubElementType("Ice.MetaData.End") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+    IElementType BLOCK_OF_LINE_COMMENTS = new SliceStubElementType("Ice.BlockOfLineComments") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+    IElementType BLOCK_COMMENT = new SliceStubElementType("Ice.BlockComment") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
 }

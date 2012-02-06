@@ -40,15 +40,31 @@ public class SliceParser {
         while (!eof()) {
             final IElementType token = token();
 
-            if (Checker.isCommentToken(token)) {
-                type = SliceElementTypes.END_OF_LINE_COMMENT;
+            if (token == SliceTokenTypes.C_STYLE_COMMENT) {
+                PsiBuilder.Marker commentMark = mark();
                 advance();
+
+                commentMark.done(SliceElementTypes.BLOCK_COMMENT);
+                continue;
+            }
+
+            if (token == SliceTokenTypes.END_OF_LINE_COMMENT) {
+                PsiBuilder.Marker commentMark = mark();
+                do {
+                    advance();
+                } while (token() == SliceTokenTypes.END_OF_LINE_COMMENT);
+
+                commentMark.done(SliceElementTypes.BLOCK_OF_LINE_COMMENTS);
                 continue;
             }
 
             if (Checker.isMacroDefinition(token)) {
-                type = SliceElementTypes.ICE_MACROS;
                 parseMacros();
+                continue;
+            }
+
+            if (token == SliceTokenTypes.LBRACKET) {
+                parseMetadata();
                 continue;
             }
 
@@ -96,9 +112,65 @@ public class SliceParser {
 
         if (type != null) {
             block.done(type);
-        } else {
+        } else if (!eof()) {
             advance();
             block.error(IceErrorMessages.message("unexpected.token"));
+        } else {
+            block.drop();
+        }
+    }
+
+    private void parseMetadata() {
+        PsiBuilder.Marker metadataMark = mark();
+
+        PsiBuilder.Marker startMetadataBlock = mark();
+
+        boolean isGlobal = false;
+
+        advance();
+        if (token() == SliceTokenTypes.LBRACKET) {
+            isGlobal = true;
+            advance();
+        }
+        startMetadataBlock.done(SliceElementTypes.ICE_METADATA_BEGIN);
+
+        if (token() == SliceTokenTypes.STRING_LITERAL) {
+            advance();
+
+            while (token() == SliceTokenTypes.COMMA) {
+                advance();
+
+                if (token() == SliceTokenTypes.STRING_LITERAL) {
+                    advance();
+                } else {
+                    break;
+                }
+            }
+        } else {
+            mark().error(IceErrorMessages.message("empty.metadata"));
+        }
+
+        if (token() == SliceTokenTypes.RBRACKET) {
+            PsiBuilder.Marker closeBraceMark = mark();
+            PsiBuilder.Marker errorClosingBrace = mark();
+            advance();
+
+            if (isGlobal) {
+                if (token() != SliceTokenTypes.RBRACKET) {
+                    errorClosingBrace.error(IceErrorMessages.message("closing.mark.not.matched"));
+                } else {
+                    advance();
+                    errorClosingBrace.drop();
+                }
+            } else {
+                errorClosingBrace.drop();
+            }
+
+            closeBraceMark.done(SliceElementTypes.ICE_METADATA_END);
+
+            metadataMark.done(SliceElementTypes.ICE_METADATA);
+        } else {
+            metadataMark.error(IceErrorMessages.message("invalid.metadata"));
         }
     }
 
@@ -568,7 +640,7 @@ public class SliceParser {
     }
 
     private void checkBlockEnd() {
-        if (token() == SliceElementTypes.RBRACE) {
+        if (token() == SliceTokenTypes.RBRACE) {
             advance();
         } else {
             mark().error(IceErrorMessages.message("right.brace.is.required"));

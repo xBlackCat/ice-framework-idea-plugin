@@ -7,6 +7,7 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenice.psi.SliceElementType;
+import org.xblackcat.frozenice.psi.SliceElementTypes;
 import org.xblackcat.frozenice.psi.SliceTokenTypes;
 
 /**
@@ -18,7 +19,7 @@ public class SliceBraceMatcher implements PairedBraceMatcher {
     public static final BracePair[] BRACES = new BracePair[]{
             new BracePair(SliceTokenTypes.LPARENTH, SliceTokenTypes.RPARENTH, false),
             new BracePair(SliceTokenTypes.LBRACE, SliceTokenTypes.RBRACE, true),
-            new BracePair(SliceTokenTypes.LBRACKET, SliceTokenTypes.RBRACKET, false)
+            new BracePair(SliceElementTypes.ICE_METADATA_BEGIN, SliceElementTypes.ICE_METADATA_END, false)
     };
 
     public int getCodeConstructStart(PsiFile file, int openingBraceOffset) {
