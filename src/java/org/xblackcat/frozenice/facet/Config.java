@@ -6,6 +6,7 @@ import org.xblackcat.frozenice.util.IceComponent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
 * 30.01.12 9:22
@@ -63,7 +64,7 @@ public class Config {
         return result;
     }
 
-    public Iterable<? extends IceComponent> getConfiguredComponents() {
+    public Set<IceComponent> getConfiguredComponents() {
         return outputDirPath.keySet();
     }
 

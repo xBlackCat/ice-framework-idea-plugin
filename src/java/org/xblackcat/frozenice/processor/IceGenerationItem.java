@@ -4,6 +4,7 @@ import com.intellij.openapi.compiler.GeneratingCompiler;
 import com.intellij.openapi.compiler.ValidityState;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.xblackcat.frozenice.facet.IceFacet;
 
 /**
 * 16.01.12 15:32
@@ -13,10 +14,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 class IceGenerationItem implements GeneratingCompiler.GenerationItem {
     private final VirtualFile file;
     private final boolean inTestSourceContent;
-    private final Module module;
+    private final IceFacet facet;
 
-    public IceGenerationItem(Module module, VirtualFile file, boolean inTestSourceContent) {
-        this.module = module;
+    public IceGenerationItem(IceFacet facet, VirtualFile file, boolean inTestSourceContent) {
+        this.facet = facet;
         this.file = file;
         this.inTestSourceContent = inTestSourceContent;
     }
@@ -33,7 +34,11 @@ class IceGenerationItem implements GeneratingCompiler.GenerationItem {
 
     @Override
     public Module getModule() {
-        return module;
+        return facet.getModule();
+    }
+
+    public IceFacet getFacet() {
+        return facet;
     }
 
     @Override
