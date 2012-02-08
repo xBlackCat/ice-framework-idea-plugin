@@ -4,6 +4,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import org.xblackcat.frozenice.util.IceComponent;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +18,7 @@ public class Config {
     public boolean cleanOutput;
     public Map<IceComponent, String> outputDirPath = new HashMap<IceComponent, String>();
 
-    transient private Map<IceComponent, VirtualFile> outputDir = new HashMap<IceComponent, VirtualFile>();
+    transient private Map<IceComponent, VirtualFile> outputDir = new EnumMap<IceComponent, VirtualFile>(IceComponent.class);
 
     public VirtualFile getOutputDir(IceComponent c) {
         VirtualFile file = outputDir.get(c);

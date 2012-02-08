@@ -1,12 +1,12 @@
 package org.xblackcat.frozenice.processor;
 
-import com.intellij.facet.FacetManager;
 import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompilerMessageCategory;
 import com.intellij.openapi.compiler.GeneratingCompiler;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.StreamUtil;
@@ -16,20 +16,19 @@ import org.xblackcat.frozenice.FrozenIdea;
 import org.xblackcat.frozenice.config.IceConfig;
 import org.xblackcat.frozenice.facet.Config;
 import org.xblackcat.frozenice.facet.IceFacet;
-import org.xblackcat.frozenice.util.Constants;
+import org.xblackcat.frozenice.util.IceChecker;
 import org.xblackcat.frozenice.util.IceComponent;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
-* 08.02.12 10:47
-*
-* @author xBlackCat
-*/
+ * 08.02.12 10:47
+ *
+ * @author xBlackCat
+ */
 class GenerateAction implements Computable<GeneratingCompiler.GenerationItem[]> {
     private final CompileContext context;
     private final GeneratingCompiler.GenerationItem[] items;
@@ -53,89 +52,141 @@ class GenerateAction implements Computable<GeneratingCompiler.GenerationItem[]> 
         FrozenIdea plugin = ServiceManager.getService(project, FrozenIdea.class);
         IceConfig pluginConfig = plugin.getConfig();
 
-        final VirtualFile binFolder = pluginConfig.getFrameworkHome().findChild("bin");
-        if (binFolder == null) {
-            context.addMessage(CompilerMessageCategory.ERROR, "Facet home is invalid", null, -1, -1);
-            return Slice2Xxx.NO_ITEMS;
-        }
-        VirtualFile javaTranslator = binFolder.findChild(Constants.JAVA_TRANSLATOR_NAME);
-        if (javaTranslator == null) {
-            context.addMessage(CompilerMessageCategory.ERROR, "Facet home is invalid", null, -1, -1);
-            return Slice2Xxx.NO_ITEMS;
-        }
+        VirtualFile frameworkHome = pluginConfig.getFrameworkHome();
 
-        File javaTranslatorFile = VfsUtil.virtualToIoFile(javaTranslator);
+        Set<IceComponent> installedComponents = IceChecker.getInstalledComponents(frameworkHome);
+
+        if (installedComponents.isEmpty()) {
+            context.addMessage(CompilerMessageCategory.ERROR, "Facet home is invalid", null, -1, -1);
+            return Slice2Xxx.NO_ITEMS;
+        }
 
         List<GeneratingCompiler.GenerationItem> results = new ArrayList<GeneratingCompiler.GenerationItem>(items.length);
-        for (GeneratingCompiler.GenerationItem item : items) {
-            IceGenerationItem iceItem = (IceGenerationItem) item;
-            VirtualFile source = iceItem.getSource();
 
-            if (source != null && source.isValid()) {
-                final IceFacet iceFacet = FacetManager.getInstance(iceItem.getModule()).getFacetByType(IceFacet.ID);
+        Map<IceFacet, List<IceGenerationItem>> group = groupItems(items);
 
-                if (iceFacet == null) {
+        for (Map.Entry<IceFacet, List<IceGenerationItem>> entry : group.entrySet()) {
+            // Prepare translator lists
+
+            IceFacet facet = entry.getKey();
+            Config facetConfig = facet.getConfiguration().getConfig();
+            if (!facetConfig.isValid()) {
+                context.addMessage(CompilerMessageCategory.WARNING, "IceFacet is not configured for module " + facet.getModule().getName() + ".", null, -1, -1);
+
+                continue;
+            }
+
+            List<IceGenerationItem> itemsToProcess = entry.getValue();
+
+            Set<IceComponent> translators = facetConfig.getConfiguredComponents();
+            translators.retainAll(installedComponents);
+
+            if (translators.isEmpty()) {
+                context.addMessage(CompilerMessageCategory.WARNING, "No valid translators found for module " + facet.getModule().getName() + ". Check facet configuration.", null, -1, -1);
+
+                continue;
+            }
+
+            List<File> sourceFiles = new ArrayList<File>();
+
+            // Prepare files list to process:
+            for (IceGenerationItem item : itemsToProcess) {
+                VirtualFile source = item.getSource();
+
+                if (source == null || !source.exists() || !source.isValid()) {
                     continue;
                 }
 
-                Config facetConfig = iceFacet.getConfiguration().getConfig();
-                if (!facetConfig.isValid()) {
-                    context.addMessage(CompilerMessageCategory.ERROR, "Facet output folder is not specified", iceItem.getSource().getUrl(), -1, -1);
+                sourceFiles.add(VfsUtil.virtualToIoFile(source));
+            }
+
+            if (sourceFiles.isEmpty()) {
+                context.addMessage(CompilerMessageCategory.WARNING, "No files found to translate in module " + facet.getModule().getName() + ". Check facet configuration.", null, -1, -1);
+
+                continue;
+            }
+
+            // Translate files
+
+            for (IceComponent c : translators) {
+                VirtualFile outputDir = facetConfig.getOutputDir(c);
+
+                if (outputDir == null) {
+                    context.addMessage(CompilerMessageCategory.WARNING, "Output folder is not specified for " + c.getTranslatorName() + " in module " + facet.getModule().getName() + ". Check facet configuration.", null, -1, -1);
+
                     continue;
                 }
 
-                for (IceComponent c : facetConfig.getConfiguredComponents()) {
-                    VirtualFile outputDir = facetConfig.getOutputDir(c);
+                ModuleRootManager rootManager = ModuleRootManager.getInstance(facet.getModule());
 
-                    if (outputDir == null) {
-                        continue;
-                    }
+                File realOutputDir = VfsUtil.virtualToIoFile(outputDir);
 
-                    File realOutputDir = VfsUtil.virtualToIoFile(outputDir);
-                    File sourceFile = VfsUtil.virtualToIoFile(iceItem.getSource());
+                List<String> command = new ArrayList<String>();
+                command.add(VfsUtil.virtualToIoFile(c.getTranslatorPath(frameworkHome)).getAbsolutePath());
+                command.add("--output-dir");
+                command.add(FileUtil.getRelativePath(projectBaseDir, realOutputDir));
+                for (VirtualFile contentRoot : rootManager.getSourceRoots(true)) {
+                    command.add("-I" + FileUtil.getRelativePath(projectBaseDir, VfsUtil.virtualToIoFile(contentRoot)));
+                }
+                for (VirtualFile contentRoot : rootManager.getContentRoots()) {
+                    command.add("-I" + FileUtil.getRelativePath(projectBaseDir, VfsUtil.virtualToIoFile(contentRoot)));
+                }
+                for (File source : sourceFiles) {
+                    command.add(FileUtil.getRelativePath(projectBaseDir, source));
+                }
 
+                try {
+                    Process process = new ProcessBuilder()
+                            .directory(projectBaseDir)
+                            .command(command)
+                            .redirectErrorStream(true)
+                            .start();
+
+                    InputStream out = process.getInputStream();
                     try {
-                        String sourceFileRelative = FileUtil.getRelativePath(projectBaseDir, realOutputDir);
-                        String[] command = new String[]{
-                                '"' + javaTranslatorFile.getAbsolutePath() + '"',
-                                "--output-dir",
-                                '"' + sourceFileRelative + '"',
-                                '"' + FileUtil.getRelativePath(projectBaseDir, sourceFile) + '"',
-                        };
+                        String result = StreamUtil.readText(out);
+                        int code = 0;
 
-                        Process process = new ProcessBuilder()
-                                .directory(projectBaseDir)
-                                .command(command)
-                                .redirectErrorStream(true)
-                                .start();
-
-                        InputStream out = process.getInputStream();
                         try {
-                            String result = StreamUtil.readText(out);
-                            int code = 0;
-
-                            try {
-                                code = process.waitFor();
-                            } catch (InterruptedException e) {
-                                context.addMessage(CompilerMessageCategory.WARNING, "Translator " + Constants.JAVA_TRANSLATOR_NAME + " was interrupted", null, -1, -1);
-                            }
-                            context.addMessage(CompilerMessageCategory.INFORMATION, result, null, -1, -1);
-                            if (code != 0) {
-                                context.addMessage(CompilerMessageCategory.ERROR, "Failed to translate file " + sourceFileRelative + ". Process returns error code " + code, null, -1, -1);
-                            } else {
-                                results.add(iceItem);
-                            }
-                        } finally {
-                            out.close();
+                            code = process.waitFor();
+                        } catch (InterruptedException e) {
+                            context.addMessage(CompilerMessageCategory.WARNING, "Translator " + c.getTranslatorName() + " was interrupted", null, -1, -1);
                         }
-
-                    } catch (IOException e) {
-                        context.addMessage(CompilerMessageCategory.ERROR, e.getMessage(), source.getUrl(), -1, -1);
+                        context.addMessage(CompilerMessageCategory.INFORMATION, result, null, -1, -1);
+                        if (code != 0) {
+                            context.addMessage(CompilerMessageCategory.ERROR, "Failed to translate files " + c.getTranslatorName() + ". Process returns error code " + code, null, -1, -1);
+                        } else {
+                            results.addAll(itemsToProcess);
+                        }
+                    } finally {
+                        out.close();
                     }
+                } catch (IOException e) {
+                    context.addMessage(CompilerMessageCategory.ERROR, "Failed to translate files with " + c.getTranslatorName() + ". Error: " + e.getMessage(), null, -1, -1);
                 }
             }
         }
 
         return results.toArray(new GeneratingCompiler.GenerationItem[results.size()]);
+    }
+
+    private static Map<IceFacet, List<IceGenerationItem>> groupItems(GeneratingCompiler.GenerationItem[] items) {
+        HashMap<IceFacet, List<IceGenerationItem>> group = new HashMap<IceFacet, List<IceGenerationItem>>();
+
+        for (GeneratingCompiler.GenerationItem item : items) {
+            if (item instanceof IceGenerationItem) {
+                IceGenerationItem i = (IceGenerationItem) item;
+                List<IceGenerationItem> list = group.get(i.getFacet());
+
+                if (list == null) {
+                    list = new ArrayList<IceGenerationItem>();
+                    group.put(i.getFacet(), list);
+                }
+
+                list.add(i);
+            }
+        }
+
+        return group;
     }
 }
