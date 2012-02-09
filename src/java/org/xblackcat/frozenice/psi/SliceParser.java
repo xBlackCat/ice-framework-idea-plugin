@@ -134,14 +134,19 @@ public class SliceParser {
         }
         startMetadataBlock.done(SliceElementTypes.ICE_METADATA_BEGIN);
 
+        PsiBuilder.Marker metadataList = mark();
         if (token() == SliceTokenTypes.STRING_LITERAL) {
+            PsiBuilder.Marker directive = mark();
             advance();
+            directive.done(SliceElementTypes.ICE_METADATA_ELEMENT);
 
             while (token() == SliceTokenTypes.COMMA) {
                 advance();
 
                 if (token() == SliceTokenTypes.STRING_LITERAL) {
+                    directive = mark();
                     advance();
+                    directive.done(SliceElementTypes.ICE_METADATA_ELEMENT);
                 } else {
                     break;
                 }
@@ -149,6 +154,7 @@ public class SliceParser {
         } else {
             mark().error(IceErrorMessages.message("empty.metadata"));
         }
+        metadataList.done(SliceElementTypes.ICE_METADATA_LIST);
 
         if (token() == SliceTokenTypes.RBRACKET) {
             PsiBuilder.Marker closeBraceMark = mark();

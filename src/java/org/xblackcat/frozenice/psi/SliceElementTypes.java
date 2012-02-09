@@ -152,4 +152,16 @@ public interface SliceElementTypes {
             return new SliceStubPsiElement(node);
         }
     };
+    IElementType ICE_METADATA_LIST = new SliceStubElementType("Ice.MetaData_list") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
+    IElementType ICE_METADATA_ELEMENT = new SliceStubElementType("Ice.MetaData_element") {
+        @Override
+        public PsiElement createPsi(ASTNode node) {
+            return new SliceStubPsiElement(node);
+        }
+    };
 }

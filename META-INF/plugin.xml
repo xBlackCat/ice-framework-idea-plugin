@@ -35,6 +35,8 @@
         <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceFoldingBuilder"/>
 
         <lang.commenter language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceCommenter"/>
+
         <!--<completion.contributor language="SLICE" implementationClass="org.xblackcat.frozenice.completion.SliceCompletionContributor" id="sliceBasic"/>-->
+        <completion.contributor language="SLICE" implementationClass="org.xblackcat.frozenice.completion.SliceMetadataCompletionContributor" id="sliceMetadata"/>
     </extensions>
 </idea-plugin>
