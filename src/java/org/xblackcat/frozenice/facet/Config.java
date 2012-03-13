@@ -70,6 +70,6 @@ public class Config {
     }
 
     public boolean isValid() {
-        return !outputDir.isEmpty();
+        return !outputDirPath.isEmpty();
     }
 }

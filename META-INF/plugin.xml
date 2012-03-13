@@ -2,8 +2,11 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.0.4</version>
-    <vendor>xBlackCat</vendor>
+    <version>0.0.0.5</version>
+    <vendor email="xblackcat@gmail.com"
+            url="http://code.google.com/p/ice-framework-idea-plugin/"
+            logo="/icons/facet-32.png"
+            >xBlackCat</vendor>
     <idea-version since-build="111.1"/>
     <depends>com.intellij.modules.lang</depends>
     <change-notes><![CDATA[<ul>
@@ -11,6 +14,7 @@
             <li><b>0.0.0.2</b> - Slice2Java translation was added.</li>
             <li><b>0.0.0.3</b> - More error detections while file parsing. Allow to configure translation to several languages. Autodetection of Ice library in module classpath.</li>
             <li><b>0.0.0.4</b> - Search source files for #include directive in content and source roots. Added line/block commenter.</li>
+            <li><b>0.0.0.5</b> - FIX: configuration check bug prevent compilation start
             </ul>]]>
     </change-notes>
 

@@ -2,6 +2,9 @@ package org.xblackcat.frozenice.processor;
 
 import com.intellij.compiler.impl.CompilerUtil;
 import com.intellij.facet.FacetManager;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.compiler.*;
@@ -14,8 +17,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.facet.Config;
 import org.xblackcat.frozenice.facet.IceFacet;
-import org.xblackcat.frozenice.facet.IceFacetConfiguration;
 import org.xblackcat.frozenice.util.IceComponent;
+import org.xblackcat.frozenice.util.IceErrorMessages;
 
 import java.io.DataInput;
 import java.io.File;
@@ -75,7 +78,10 @@ public class Slice2Xxx implements SourceGeneratingCompiler {
                 Config facetConfig = iceFacet.getConfiguration().getConfig();
 
                 for (IceComponent c : facetConfig.getConfiguredComponents()) {
-                    folders.add(VfsUtil.virtualToIoFile(facetConfig.getOutputDir(c)));
+                    VirtualFile dir = facetConfig.getOutputDir(c);
+                    if (dir != null) {
+                        folders.add(VfsUtil.virtualToIoFile(dir));
+                    }
                 }
 
             }
@@ -100,9 +106,23 @@ public class Slice2Xxx implements SourceGeneratingCompiler {
             final IceFacet iceFacet = FacetManager.getInstance(m).getFacetByType(IceFacet.ID);
 
             if (iceFacet != null) {
-                IceFacetConfiguration facetConfiguration = iceFacet.getConfiguration();
-                if (!facetConfiguration.getConfig().isValid()) {
-                    return false;
+                Config facetConfiguration = iceFacet.getConfiguration().getConfig();
+                Set<IceComponent> componentSet = facetConfiguration.getConfiguredComponents();
+                if (!componentSet.isEmpty()) {
+                    // Check paths for validness
+                    for (IceComponent ic : componentSet) {
+                        VirtualFile outputDir = facetConfiguration.getOutputDir(ic);
+
+                        if (outputDir == null || !outputDir.isDirectory() || !outputDir.isValid()) {
+                            Notification notification = new Notification(
+                                    "Ice Facet",
+                                    IceErrorMessages.message("ICE.output.folder.invalid.title"),
+                                    IceErrorMessages.message("ICE.output.folder.invalid", ic.name()),
+                                    NotificationType.WARNING
+                            );
+                            Notifications.Bus.notify(notification, m.getProject());
+                        }
+                    }
                 }
             }
         }
