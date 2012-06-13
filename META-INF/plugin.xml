@@ -2,7 +2,7 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.0.5</version>
+    <version>0.0.1.0</version>
     <vendor email="xblackcat@gmail.com"
             url="http://code.google.com/p/ice-framework-idea-plugin/"
             logo="/icons/facet-32.png"
@@ -15,6 +15,7 @@
             <li><b>0.0.0.3</b> - More error detections while file parsing. Allow to configure translation to several languages. Autodetection of Ice library in module classpath.</li>
             <li><b>0.0.0.4</b> - Search source files for #include directive in content and source roots. Added line/block commenter.</li>
             <li><b>0.0.0.5</b> - FIX: configuration check bug prevent compilation start
+            <li><b>0.0.1.0</b> - Create full PSI tree.
             </ul>]]>
     </change-notes>
 
