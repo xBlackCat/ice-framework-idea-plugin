@@ -121,6 +121,7 @@ octalDigit = [0-7]
 <YYINITIAL> ";"   { return SliceTypes.ICE_SEMICOLON; }
 <YYINITIAL> ","   { return SliceTypes.ICE_COMA; }
 <YYINITIAL> "="   { return SliceTypes.ICE_EQ; }
+<YYINITIAL> "*"   { return SliceTypes.ICE_ASTERISK; }
 
 <YYINITIAL> {BAD_STRING} { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 <YYINITIAL> . { return com.intellij.psi.TokenType.BAD_CHARACTER; }
