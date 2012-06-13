@@ -61,7 +61,7 @@ public class SliceParserDefinition implements ParserDefinition {
             SliceTypes.ICE_KW_VOID
     );
 
-    public static final TokenSet LITERALS = TokenSet.create(SliceTypes.ICE_STRING_LITERAL);
+    public static final TokenSet LITERALS = TokenSet.create(SliceTypes.ICE_STRING);
     public static final TokenSet WHITESPACE_BIT_SET = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENT_BIT_SET = TokenSet.create(C_STYLE_COMMENT, END_OF_LINE_COMMENT, ICE_DIRECTIVE);
 

@@ -29,7 +29,7 @@ public class SliceSyntaxHighlighter extends SyntaxHighlighterBase {
 
         fillMap(keys1, SliceParserDefinition.KEYWORD_BIT_SET, SyntaxHighlighterColors.KEYWORD);
 
-        keys1.put(SliceTypes.ICE_STRING_LITERAL, SyntaxHighlighterColors.STRING);
+        keys1.put(SliceTypes.ICE_STRING, SyntaxHighlighterColors.STRING);
         keys1.put(SliceTypes.ICE_INTEGER_VALUE, SyntaxHighlighterColors.NUMBER);
         keys1.put(SliceTypes.ICE_FLOAT_VALUE, SyntaxHighlighterColors.NUMBER);
 

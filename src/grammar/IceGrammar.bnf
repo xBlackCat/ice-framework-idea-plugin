@@ -89,44 +89,77 @@
 external slice_file ::= parse_file slice_block
 private slice_block ::= (global_metadata)*  module {recoverUntil=slice_block_recover}
 private module_start ::= metadata* 'module' id
-module ::= module_start module_body {pin=2}
-slice_block_recover ::= !('[[' | module_start)
+module ::= module_start '{' module_body '}' ';' {pin=2}
+private slice_block_recover ::= !('[[' | module_start)
 
-module_body ::= '{' (module | data_definition | constant/* | forward_declaration */) * '}' ';'
+module_body ::= (module | data_definition | constant | forward_declaration ) * {recoverUntil=data_def_recover }
 global_metadata ::= '[[' metadata_body ']]' {pin=1}
 metadata ::= '[' metadata_body ']' {pin=1}
 
 metadata_body ::= metadata_element (',' metadata_element) *
-metadata_element ::= string_literal
-string_literal ::= string
+metadata_element ::= string
 
-private data_definition ::= class_def | interface_def /*| exception_def | sequence_def | dictionary_def | enum_def | structure_def*/
+private data_definition ::= class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def
+private data_def_recover ::= !(module_start | '[' | 'const' | 'class' | 'interface' | 'enum' | 'exception' | 'struct' | 'sequence' | 'dictionary' | '}' | ';')
+
+extends_list ::= 'extends' type_reference (',' type_reference) {pin=1}
+implements_list ::= 'implements' type_reference (',' type_reference) * {pin=1}
+
+// --- Forward declaration ---
+private forward_declaration ::= class_fw_def | interface_fw_def | exception_fw_def | structure_fw_def
+class_fw_def ::= class_def_start ';'
+interface_fw_def ::= interface_def_start ';'
+exception_fw_def ::= exception_def_start ';'
+structure_fw_def ::= struct_def_start ';'
 
 // --- Class ---
-class_def ::= metadata* 'class' id class_extends_list? class_implements_list? class_body
-class_extends_list ::= 'extends' type_reference
-class_implements_list ::= 'implements' type_reference (',' type_reference) *
-
-class_body ::= '{' (field_definition | method_definition | data_definition  /*| constant*/ ) * '}' ';'
+private class_def_start ::= metadata* 'class' id
+class_def ::= class_def_start extends_list? implements_list? '{' class_body '}' ';' {pin=4}
+class_body ::= (field_definition | method_definition | constant ) *
 
 // --- Interface ---
-interface_def ::= metadata* 'interface' id interface_extends_list ? interface_body
-interface_extends_list ::= 'extends' type_reference (',' type_reference) *
+private interface_def_start ::= metadata* 'interface' id
+interface_def ::= interface_def_start extends_list? '{' interface_body '}' ';'{pin=3}
+interface_body ::= (method_definition | constant ) *
 
-interface_body ::= '{' (field_definition | method_definition /*| constant*/ ) * '}' ';' {pin=1}
+// --- Exceptions ---
+private exception_def_start ::= metadata* 'exception' id
+exception_def ::= exception_def_start extends_list? '{' exception_body '}' ';' {pin=3}
+exception_body ::= (method_definition | field_definition | constant) *
 
+// --- Structures ---
+private struct_def_start ::= metadata* 'struct' id
+struct_def ::= struct_def_start '{' struct_body '}' ';'{pin=2}
+struct_body ::= field_definition +
+
+// --- Enums ---
+private enum_def_start ::= metadata* 'enum' id
+enum_def ::= enum_def_start '{' enum_constant_list '}' {pin=2}
+enum_constant_list ::= id (',' id) *
+
+element_type ::= valid_type
+key_type ::= valid_type
+// --- Sequences ---
+sequence_def ::= metadata* 'sequence' '<' element_type '>' id ';' {pin = 2}
+
+// --- Dictionaries ---
+dictionary_def ::= metadata* 'dictionary' '<' key_type ',' element_type '>' ';' {pin = 2}
+
+// --- Other ---
 type_reference ::= id
 private valid_return_type ::= valid_type | 'void'
 private valid_type ::= primitive_data_types | simple_data_types | type_reference
 
+// -- method --
+method_definition ::= metadata* modifier* method_return_type id ('throws' throws_list)? '(' parameters_list? ')' ';'
+throws_list ::= type_reference (',' type_reference) *
 modifier ::= 'idempotent' | 'local'
 method_return_type ::= valid_return_type
-method_definition ::= metadata* modifier* method_return_type id '(' parameters_list? ')' ';'
 parameters_list ::= parameter (',' parameter) *
 parameter ::= parameter_modifier * valid_type id
 parameter_modifier ::= 'out'
 
-constant_value ::= (integer_value | float_value | bool_value | string_literal | type_reference)
+constant_value ::= (integer_value | float_value | bool_value | string | type_reference)
 
 variable_type ::= valid_type
 
@@ -146,10 +179,3 @@ private simple_data_types ::= 'LocalObject' | 'string' | 'Object'
 
 // Boolean data type allowed values
 private bool_value ::= 'false' | 'true'
-
-// Temporary:
-private all_keywords ::='bool' | 'exception' | 'interface' |
-'sequence' | 'byte' | 'extends' | 'local' | 'short' | 'class' |
-'false' | 'LocalObject' | 'string' | 'const' | 'float' | 'long' |
-'struct' | 'dictionary' | 'idempotent' | 'module' | 'throws' |
-'double' | 'implements' | 'Object' | 'true' | 'enum' | 'int' | 'out' | 'void' | '...' | '<' | '>' | '=' | '.'

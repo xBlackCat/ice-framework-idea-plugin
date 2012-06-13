@@ -120,8 +120,6 @@ octalDigit = [0-7]
 <YYINITIAL> "]"   { return SliceTypes.ICE_RIGHT_BRACKET; }
 <YYINITIAL> ";"   { return SliceTypes.ICE_SEMICOLON; }
 <YYINITIAL> ","   { return SliceTypes.ICE_COMA; }
-<YYINITIAL> "..." { return SliceTypes.ICE_ELLIPSIS; }
-<YYINITIAL> "."   { return SliceTypes.ICE_DOT; }
 <YYINITIAL> "="   { return SliceTypes.ICE_EQ; }
 
 <YYINITIAL> {BAD_STRING} { return com.intellij.psi.TokenType.BAD_CHARACTER; }
