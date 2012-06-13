@@ -3,7 +3,7 @@ package org.xblackcat.frozenice;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenice.util.Icons;
+import org.xblackcat.frozenice.util.SliceIcons;
 
 import javax.swing.*;
 
@@ -39,7 +39,7 @@ public class IceFileType extends LanguageFileType {
 
     @Override
     public Icon getIcon() {
-        return Icons.FILE_ICON;
+        return SliceIcons.FILE_ICON;
     }
 
     @Override

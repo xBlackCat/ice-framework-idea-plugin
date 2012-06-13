@@ -7,7 +7,7 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.UnknownModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenice.util.Icons;
+import org.xblackcat.frozenice.util.SliceIcons;
 
 import javax.swing.*;
 
@@ -38,6 +38,6 @@ public class IceFacetType extends FacetType<IceFacet, IceFacetConfiguration> {
 
     @Override
     public Icon getIcon() {
-        return Icons.FACET_ICON;
+        return SliceIcons.FACET_ICON;
     }
 }

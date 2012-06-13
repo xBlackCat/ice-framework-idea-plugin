@@ -3,6 +3,7 @@ package org.xblackcat.frozenice;
 import com.intellij.openapi.fileTypes.SingleLazyInstanceSyntaxHighlighterFactory;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import org.jetbrains.annotations.NotNull;
+import org.xblackcat.frozenice.syntax.SliceSyntaxHighlighter;
 
 /**
  * 04.01.12 12:07

@@ -16,7 +16,7 @@ import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.config.IceFrameworkSupportConfigurable;
 import org.xblackcat.frozenice.util.IceErrorMessages;
-import org.xblackcat.frozenice.util.Icons;
+import org.xblackcat.frozenice.util.SliceIcons;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -72,6 +72,6 @@ public class IceFacetSupportProvider extends FrameworkSupportProvider {
 
     @Override
     public Icon getIcon() {
-        return Icons.FACET_ICON;
+        return SliceIcons.FACET_ICON;
     }
 }

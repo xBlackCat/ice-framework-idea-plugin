@@ -4,8 +4,7 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.StandardPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import org.xblackcat.frozenice.psi.SliceElementTypes;
-import org.xblackcat.frozenice.psi.SliceTokenTypes;
+import org.xblackcat.frozenice.psi.SliceTypes;
 
 /**
  * 09.02.12 12:19
@@ -22,6 +21,6 @@ public class PsiIcePatterns extends StandardPatterns {
     }
 
     public static ElementPattern<? extends PsiElement> metadataDirective() {
-        return psiElement(SliceTokenTypes.STRING_LITERAL).inside(psiElement(SliceElementTypes.ICE_METADATA_ELEMENT));
+        return psiElement(SliceTypes.ICE_STRING_LITERAL).inside(psiElement(SliceTypes.ICE_METADATA_ELEMENT));
     }
 }

@@ -6,9 +6,8 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenice.psi.SliceElementType;
-import org.xblackcat.frozenice.psi.SliceElementTypes;
-import org.xblackcat.frozenice.psi.SliceTokenTypes;
+import org.xblackcat.frozenice.psi.SliceTokenType;
+import org.xblackcat.frozenice.psi.SliceTypes;
 
 /**
  * 19.01.12 14:44
@@ -17,9 +16,10 @@ import org.xblackcat.frozenice.psi.SliceTokenTypes;
  */
 public class SliceBraceMatcher implements PairedBraceMatcher {
     public static final BracePair[] BRACES = new BracePair[]{
-            new BracePair(SliceTokenTypes.LPARENTH, SliceTokenTypes.RPARENTH, false),
-            new BracePair(SliceTokenTypes.LBRACE, SliceTokenTypes.RBRACE, true),
-            new BracePair(SliceElementTypes.ICE_METADATA_BEGIN, SliceElementTypes.ICE_METADATA_END, false)
+            new BracePair(SliceTypes.ICE_LEFT_PARENTH, SliceTypes.ICE_RIGHT_PARENTH, false),
+            new BracePair(SliceTypes.ICE_LEFT_BRACE, SliceTypes.ICE_RIGHT_BRACE, true),
+            new BracePair(SliceTypes.ICE_LEFT_BRACKET, SliceTypes.ICE_RIGHT_BRACKET, false),
+            new BracePair(SliceTypes.ICE_OPEN_GL_MD, SliceTypes.ICE_CLOSE_GL_MD, false)
     };
 
     public int getCodeConstructStart(PsiFile file, int openingBraceOffset) {
@@ -31,15 +31,14 @@ public class SliceBraceMatcher implements PairedBraceMatcher {
     }
 
     public boolean isPairedBracesAllowedBeforeType(@NotNull IElementType lbraceType, @Nullable IElementType contextType) {
-        return !(contextType instanceof SliceElementType) ||
-                contextType == SliceTokenTypes.C_STYLE_COMMENT ||
-                contextType == SliceTokenTypes.END_OF_LINE_COMMENT ||
-                contextType == SliceTokenTypes.WHITE_SPACE ||
-                contextType == SliceTokenTypes.SEMICOLON ||
-                contextType == SliceTokenTypes.COMMA ||
-                contextType == SliceTokenTypes.RPARENTH ||
-                contextType == SliceTokenTypes.RBRACKET ||
-                contextType == SliceTokenTypes.RBRACE ||
-                contextType == SliceTokenTypes.LBRACE;
+        return !(contextType instanceof SliceTokenType) ||
+                contextType == SliceParserDefinition.C_STYLE_COMMENT ||
+                contextType == SliceParserDefinition.END_OF_LINE_COMMENT ||
+                contextType == SliceTypes.ICE_SEMICOLON ||
+                contextType == SliceTypes.ICE_COMA ||
+                contextType == SliceTypes.ICE_RIGHT_PARENTH ||
+                contextType == SliceTypes.ICE_RIGHT_BRACKET ||
+                contextType == SliceTypes.ICE_RIGHT_BRACE ||
+                contextType == SliceTypes.ICE_LEFT_BRACE;
     }
 }

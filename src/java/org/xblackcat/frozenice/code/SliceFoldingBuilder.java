@@ -12,7 +12,7 @@ import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenice.psi.IcePsiFile;
+import org.xblackcat.frozenice.psi.impl.SliceFileImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +26,11 @@ public class SliceFoldingBuilder extends FoldingBuilderEx implements DumbAware {
     @NotNull
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
-        if (!(root instanceof IcePsiFile)) {
+        if (!(root instanceof SliceFileImpl)) {
             return FoldingDescriptor.EMPTY;
         }
 
-        IcePsiFile file = (IcePsiFile) root;
+        SliceFileImpl file = (SliceFileImpl) root;
 
         List<FoldingDescriptor> result = new ArrayList<FoldingDescriptor>();
 

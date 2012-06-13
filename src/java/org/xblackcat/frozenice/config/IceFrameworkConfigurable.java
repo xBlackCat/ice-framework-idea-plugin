@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.FrozenIdea;
 import org.xblackcat.frozenice.util.IceChecker;
 import org.xblackcat.frozenice.util.IceComponent;
-import org.xblackcat.frozenice.util.Icons;
+import org.xblackcat.frozenice.util.SliceIcons;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +49,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
 
     @Override
     public Icon getIcon() {
-        return Icons.FACET_ICON_32;
+        return SliceIcons.FACET_ICON_32;
     }
 
     @Override

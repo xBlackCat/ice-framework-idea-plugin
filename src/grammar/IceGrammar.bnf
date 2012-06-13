@@ -1,0 +1,155 @@
+{
+    parserClass="org.xblackcat.frozenice.parser.SliceParser"
+    stubParserClass="org.xblackcat.frozenice.parser.SliceParserUtil"
+
+    implements="org.xblackcat.frozenice.psi.SliceCompositeElement"
+    extends="org.xblackcat.frozenice.psi.impl.SliceCompositeElementImpl"
+
+    psiClassPrefix="Slice"
+    psiImplClassSuffix="Impl"
+    psiPackage="org.xblackcat.frozenice.psi"
+    psiImplPackage="org.xblackcat.frozenice.psi.impl"
+    psiImplUtilClass="org.xblackcat.frozenice.psi.impl.SlicePsiImplUtil"
+
+    elementTypeHolderClass="org.xblackcat.frozenice.psi.SliceTypes"
+    elementTypePrefix="ICE_"
+    elementTypeClass="org.xblackcat.frozenice.psi.SliceCompositeElementType"
+    tokenTypeClass="org.xblackcat.frozenice.psi.SliceTokenType"
+
+
+    // Tokens
+    EQ="="
+    SEMICOLON=";"
+    COMA=","
+    ELLIPSIS="..."
+    DOT="."
+    LT="<"
+    GT=">"
+    LEFT_BRACE="{"
+    RIGHT_BRACE="}"
+    LEFT_BRACKET="["
+    RIGHT_BRACKET="]"
+    OPEN_GL_MD="[["
+    CLOSE_GL_MD="]]"
+    LEFT_PARENTH="("
+    RIGHT_PARENTH=")"
+
+    KW_VOID="void"
+
+    // Primitive data types
+    KW_BOOL="bool"
+    KW_BYTE="byte"
+    KW_SHORT="short"
+    KW_INT="int"
+    KW_LONG="long"
+    KW_FLOAT="float"
+    KW_DOUBLE="double"
+
+    // Simple data types
+    KW_LOCAL_OBJECT="LocalObject"
+    KW_STRING="string"
+    KW_OBJECT="Object"
+
+    // Composite data type declarations
+    KW_CLASS="class"
+    KW_EXCEPTION="exception"
+    KW_INTERFACE="interface"
+    KW_SEQUENCE="sequence"
+    KW_STRUCT="struct"
+    KW_DICTIONARY="dictionary"
+    KW_ENUM="enum"
+
+    //
+    // Other keywords
+    //
+
+    // Boolean data type allowed values
+    KW_FALSE="false"
+    KW_TRUE="true"
+
+    // Parameter modifier list
+    KW_OUT="out"
+
+    // Method modifier list
+    KW_LOCAL="local"
+    KW_IDEMPOTENT="idempotent"
+
+    // Other keywords
+    KW_MODULE="module"
+    KW_CONST="const"
+    KW_THROWS="throws"
+    KW_EXTENDS="extends"
+    KW_IMPLEMENTS="implements"
+
+
+    implements("class_def|interface_def|exception_def|sequence_def|dictionary_def|enum_def|structure_def")="org.xblackcat.frozenice.psi.SliceNamedElement"
+    extends("class_def|interface_def|exception_def|sequence_def|dictionary_def|enum_def|structure_def")="org.xblackcat.frozenice.psi.impl.SliceNamedElementImpl"
+}
+
+external slice_file ::= parse_file slice_block
+private slice_block ::= (global_metadata)*  module {recoverUntil=slice_block_recover}
+private module_start ::= metadata* 'module' id
+module ::= module_start module_body {pin=2}
+slice_block_recover ::= !('[[' | module_start)
+
+module_body ::= '{' (module | data_definition | constant/* | forward_declaration */) * '}' ';'
+global_metadata ::= '[[' metadata_body ']]' {pin=1}
+metadata ::= '[' metadata_body ']' {pin=1}
+
+metadata_body ::= metadata_element (',' metadata_element) *
+metadata_element ::= string_literal
+string_literal ::= string
+
+private data_definition ::= class_def | interface_def /*| exception_def | sequence_def | dictionary_def | enum_def | structure_def*/
+
+// --- Class ---
+class_def ::= metadata* 'class' id class_extends_list? class_implements_list? class_body
+class_extends_list ::= 'extends' type_reference
+class_implements_list ::= 'implements' type_reference (',' type_reference) *
+
+class_body ::= '{' (field_definition | method_definition | data_definition  /*| constant*/ ) * '}' ';'
+
+// --- Interface ---
+interface_def ::= metadata* 'interface' id interface_extends_list ? interface_body
+interface_extends_list ::= 'extends' type_reference (',' type_reference) *
+
+interface_body ::= '{' (field_definition | method_definition /*| constant*/ ) * '}' ';' {pin=1}
+
+type_reference ::= id
+private valid_return_type ::= valid_type | 'void'
+private valid_type ::= primitive_data_types | simple_data_types | type_reference
+
+modifier ::= 'idempotent' | 'local'
+method_return_type ::= valid_return_type
+method_definition ::= metadata* modifier* method_return_type id '(' parameters_list? ')' ';'
+parameters_list ::= parameter (',' parameter) *
+parameter ::= parameter_modifier * valid_type id
+parameter_modifier ::= 'out'
+
+constant_value ::= (integer_value | float_value | bool_value | string_literal | type_reference)
+
+variable_type ::= valid_type
+
+field_definition ::= variable_type id ('=' constant_value )? ';' {pin=2}
+
+constant ::= 'const' variable_type id '=' constant_value ';' {pin=3}
+
+//
+// Data types
+//
+
+// Primitive data types
+private primitive_data_types ::= 'float' | 'double' | 'bool' | 'byte' | 'short' | 'int' | 'long'
+
+// Simple data types
+private simple_data_types ::= 'LocalObject' | 'string' | 'Object'
+
+// Boolean data type allowed values
+private bool_value ::= 'false' | 'true'
+
+// Temporary:
+private all_keywords ::='bool' | 'exception' | 'interface' |
+'sequence' | 'byte' | 'extends' | 'local' | 'short' | 'class' |
+'false' | 'LocalObject' | 'string' | 'const' | 'float' | 'long' |
+'struct' | 'dictionary' | 'idempotent' | 'module' | 'throws' |
+'double' | 'implements' | 'Object' | 'true' | 'enum' | 'int' | 'out' | 'void' | '...' | '<' | '>' | '=' | '.'
