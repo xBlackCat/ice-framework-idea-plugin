@@ -101,8 +101,8 @@ metadata_element ::= string
 private data_definition ::= class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def
 private data_def_recover ::= !(module_start | '[' | 'const' | 'class' | 'interface' | 'enum' | 'exception' | 'struct' | 'sequence' | 'dictionary' | '}' | ';')
 
-extends_list ::= 'extends' type_reference (',' type_reference) {pin=1}
-implements_list ::= 'implements' type_reference (',' type_reference) * {pin=1}
+extends_list ::= 'extends' type_reference (',' type_reference) *
+implements_list ::= 'implements' type_reference (',' type_reference) *
 
 // --- Forward declaration ---
 private forward_declaration ::= class_fw_def | interface_fw_def | exception_fw_def | structure_fw_def
@@ -114,29 +114,31 @@ structure_fw_def ::= struct_def_start ';'
 // --- Class ---
 private class_def_start ::= metadata* 'class' id
 class_def ::= class_def_start extends_list? implements_list? '{' class_body '}' ';' {pin=4}
-class_body ::= (field_definition | method_definition | constant ) *
+class_body ::= (field_definition | method_definition | constant ) * {recoverUntil=block_recover}
 
 // --- Interface ---
 private interface_def_start ::= metadata* 'interface' id
 interface_def ::= interface_def_start extends_list? '{' interface_body '}' ';'{pin=3}
-interface_body ::= (method_definition | constant ) *
+interface_body ::= (method_definition | constant ) * {recoverUntil=block_recover}
 
 // --- Exceptions ---
 private exception_def_start ::= metadata* 'exception' id
 exception_def ::= exception_def_start extends_list? '{' exception_body '}' ';' {pin=3}
-exception_body ::= (method_definition | field_definition | constant) *
+exception_body ::= (method_definition | field_definition | constant) * {recoverUntil=block_recover}
 
 // --- Structures ---
 private struct_def_start ::= metadata* 'struct' id
 struct_def ::= struct_def_start '{' struct_body '}' ';'{pin=2}
-struct_body ::= field_definition +
+struct_body ::= field_definition + {recoverUntil=block_recover}
 
 // --- Enums ---
 private enum_def_start ::= metadata* 'enum' id
-enum_def ::= enum_def_start '{' enum_constant_list '}' {pin=2}
-enum_constant_list ::= id (',' id) *
+enum_def ::= enum_def_start '{' enum_constant_list '}' ';'
+enum_constant_list ::= id (',' id) * {recoverUntil=block_recover}
 
-element_type ::= valid_type
+block_recover ::= !('}')
+
+element_type ::= data_type
 key_type ::= primitive_data_types | 'string' | type_reference
 // --- Sequences ---
 sequence_def ::= metadata* 'sequence' '<' element_type '>' id ';' {pin = 2}
@@ -147,22 +149,22 @@ dictionary_def ::= metadata* 'dictionary' '<' key_type ',' element_type '>' ';' 
 // --- Other ---
 type_reference ::= id
 proxy_type ::= (simple_data_types | type_reference) '*'
-private valid_return_type ::= valid_type | 'void'
-private valid_type ::= proxy_type | primitive_data_types | simple_data_types | type_reference
+private valid_return_type ::= data_type | 'void'
+data_type ::= proxy_type | primitive_data_types | simple_data_types | type_reference
 
 // -- method --
-method_definition ::= metadata* modifier* method_return_type id ('throws' throws_list)? '(' parameters_list? ')' ';'
+method_definition ::= metadata* modifier* method_return_type id  '(' parameters_list? ')' ('throws' throws_list)? ';'
 throws_list ::= type_reference (',' type_reference) *
 modifier ::= 'idempotent' | 'local'
 method_return_type ::= valid_return_type
 parameters_list ::= parameter (',' parameter) * {recoverUntil=parameters_list_recovery}
-parameter ::= parameter_modifier * valid_type id
+parameter ::= parameter_modifier * data_type id
 parameter_modifier ::= 'out'
 private parameters_list_recovery ::= !(')')
 
 constant_value ::= (integer_value | float_value | bool_value | string | type_reference)
 
-variable_type ::= valid_type
+variable_type ::= data_type
 
 field_definition ::= variable_type id ('=' constant_value )? ';' {pin=2}
 
