@@ -25,6 +25,7 @@
         </component>
     </project-components>
 
+    <depends optional="true" config-file="plugin-java.xml">com.intellij.modules.java</depends>
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
 

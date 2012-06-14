@@ -27,12 +27,6 @@ import org.xblackcat.frozenice.psi.SliceTypes;
 
 import javax.swing.*;
 
-/**
- * Created by IntelliJ IDEA.
- * User: gregory
- * Date: 14.07.11
- * Time: 20:04
- */
 public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl implements SliceNamedElement {
 
   private volatile String myCachedName;
@@ -78,6 +72,7 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
   }
 
   @NotNull
+  @Override
   public PsiElement getId() {
     ASTNode child = getNode().findChildByType(SliceTypes.ICE_ID);
     return child == null ? null : child.getPsi();

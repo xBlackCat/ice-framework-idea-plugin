@@ -1,5 +1,6 @@
 package org.xblackcat.frozenice.psi;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 
 /**
@@ -8,4 +9,5 @@ import com.intellij.psi.PsiNameIdentifierOwner;
  * @author xBlackCat
  */
 public interface SliceNamedElement extends SliceCompositeElement, PsiNameIdentifierOwner {
+    PsiElement getId();
 }

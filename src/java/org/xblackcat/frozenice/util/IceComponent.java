@@ -41,6 +41,15 @@ public enum IceComponent {
 
             return jar;
         }
+
+        @Override
+        public String extractPackageName(String text) {
+            if (text != null && text.startsWith("java:package:")) {
+                return text.substring(12);
+            } else {
+                return null;
+            }
+        }
     },
     Ruby("slice2rb"),
     PHP("slice2php"),
@@ -77,6 +86,10 @@ public enum IceComponent {
     }
 
     public VirtualFile getLibraryPath(VirtualFile home) {
+        return null;
+    }
+
+    public String extractPackageName(String text) {
         return null;
     }
 }
