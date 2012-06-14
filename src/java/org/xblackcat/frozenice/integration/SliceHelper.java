@@ -1,6 +1,10 @@
 package org.xblackcat.frozenice.integration;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.NavigatablePsiElement;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiModifier;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.xblackcat.frozenice.psi.*;
 import org.xblackcat.frozenice.util.IceComponent;
@@ -16,11 +20,14 @@ public class SliceHelper {
     public static String getPackageName(PsiFile file, IceComponent target) {
         List<SliceGlobalMetadata> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(file, SliceGlobalMetadata.class);
         for (SliceGlobalMetadata md : globalMetadatas) {
-            for (SliceMetadataElement el : md.getMetadataBody().getMetadataElementList()) {
-                String packageString = target.extractPackageName(el.getString().getText());
+            SliceMetadataBody body = md.getMetadataBody();
+            if (body != null) {
+                for (SliceMetadataElement el : body.getMetadataElementList()) {
+                    String packageString = target.extractPackageName(el.getString().getText());
 
-                if (packageString != null) {
-                    return packageString;
+                    if (packageString != null) {
+                        return packageString;
+                    }
                 }
             }
         }
@@ -68,5 +75,40 @@ public class SliceHelper {
 
         return fqn.toString();
 
+    }
+
+    public static PsiClass searchClassImplementation(SliceClassDef element) {
+        if (element == null) {
+            return null;
+        }
+
+        String implFQN = getFQN(element);
+
+        return checkJavaClass(element, implFQN);
+    }
+
+    private static PsiClass checkJavaClass(SliceDataTypeElement element, String implFQN) {
+        Project project = element.getProject();
+        JavaHelper javaHelper = JavaHelper.getJavaHelper(project);
+        NavigatablePsiElement aClass = javaHelper.findClass(implFQN);
+
+        if (!(aClass instanceof PsiClass) || !((PsiClass) aClass).hasModifierProperty(PsiModifier.ABSTRACT)) {
+            return null;
+        }
+
+        return (PsiClass) aClass;
+    }
+
+    public static PsiClass searchInterfaceImplementation(SliceInterfaceDef element) {
+        if (element == null) {
+            return null;
+        }
+
+        String moduleFQN = getFQN(element.getModule());
+        String name = element.getName();
+
+        String implFQN = moduleFQN + "._" + name + "Disp";
+
+        return checkJavaClass(element, implFQN);
     }
 }
