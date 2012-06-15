@@ -81,10 +81,11 @@
     KW_IMPLEMENTS="implements"
 
 
-    implements("class_def|interface_def|exception_def|enum_def|structure_def")="org.xblackcat.frozenice.psi.SliceDataTypeElement"
-    extends("class_def|interface_def|exception_def|enum_def|structure_def")="org.xblackcat.frozenice.psi.impl.SliceDataTypeElementImpl"
+    implements("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.SliceDataTypeElement"
+    extends("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.impl.SliceDataTypeElementImpl"
     implements(".*_def|module")="org.xblackcat.frozenice.psi.SliceNamedElement"
     extends(".*_def|module")="org.xblackcat.frozenice.psi.impl.SliceNamedElementImpl"
+    mixin("type_reference")="org.xblackcat.frozenice.psi.impl.SliceTypeRefImpl"
 }
 
 external slice_file ::= parse_file slice_block
@@ -114,29 +115,30 @@ exception_def_fw ::= exception_def_start ';'
 structure_def_fw ::= struct_def_start ';'
 
 // --- Class ---
-private class_def_start ::= metadata* 'class' id
-class_def ::= class_def_start extends_list? implements_list? '{' class_body '}' ';' {pin=4}
+private class_def_start ::= metadata* 'class' id {pin=3}
+class_def ::= class_def_start extends_list? implements_list? '{' class_body '}' ';' {pin=1}
 class_body ::= (field_def | method_def | constant ) * {recoverUntil=block_recover}
 
 // --- Interface ---
-private interface_def_start ::= metadata* 'interface' id
-interface_def ::= interface_def_start extends_list? '{' interface_body '}' ';'{pin=3}
+private interface_def_start ::= metadata* 'interface' id {pin=3}
+interface_def ::= interface_def_start extends_list? '{' interface_body '}' ';'{pin=1}
 interface_body ::= (method_def | constant ) * {recoverUntil=block_recover}
 
 // --- Exceptions ---
-private exception_def_start ::= metadata* 'exception' id
-exception_def ::= exception_def_start extends_list? '{' exception_body '}' ';' {pin=3}
+private exception_def_start ::= metadata* 'exception' id {pin=3}
+exception_def ::= exception_def_start extends_list? '{' exception_body '}' ';' {pin=1}
 exception_body ::= (method_def | field_def | constant) * {recoverUntil=block_recover}
 
 // --- Structures ---
-private struct_def_start ::= metadata* 'struct' id
-struct_def ::= struct_def_start '{' struct_body '}' ';'{pin=2}
+private struct_def_start ::= metadata* 'struct' id {pin=3}
+struct_def ::= struct_def_start '{' struct_body '}' ';'{pin=1}
 struct_body ::= field_def + {recoverUntil=block_recover}
 
 // --- Enums ---
-private enum_def_start ::= metadata* 'enum' id
-enum_def ::= enum_def_start '{' enum_constant_list '}' ';'
-enum_constant_list ::= id (',' id) * {recoverUntil=block_recover}
+private enum_def_start ::= metadata* 'enum' id {pin=3}
+enum_def ::= enum_def_start '{' enum_constant_list '}' ';' {pin=1}
+enum_constant_list ::= enum_constant (',' enum_constant) * {recoverUntil=block_recover}
+enum_constant ::= id
 
 block_recover ::= !('}')
 

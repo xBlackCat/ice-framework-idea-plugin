@@ -15,7 +15,7 @@
             <li><b>0.0.0.3</b> - More error detections while file parsing. Allow to configure translation to several languages. Autodetection of Ice library in module classpath.</li>
             <li><b>0.0.0.4</b> - Search source files for #include directive in content and source roots. Added line/block commenter.</li>
             <li><b>0.0.0.5</b> - FIX: configuration check bug prevent compilation start
-            <li><b>0.0.1.0</b> - Create full PSI tree.
+            <li><b>0.0.1.0</b> - Create a link between a java code and slice definitions. Implement find usages action</li>
             </ul>]]>
     </change-notes>
 
@@ -41,8 +41,13 @@
         <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceFoldingBuilder"/>
 
         <lang.commenter language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceCommenter"/>
+        <lang.findUsagesProvider language="SLICE"
+                                 implementationClass="org.xblackcat.frozenice.link.SliceFindUsagesProvider"/>
 
         <!--<completion.contributor language="SLICE" implementationClass="org.xblackcat.frozenice.completion.SliceCompletionContributor" id="sliceBasic"/>-->
-        <completion.contributor language="SLICE" implementationClass="org.xblackcat.frozenice.completion.SliceMetadataCompletionContributor" id="sliceMetadata"/>
+        <completion.contributor language="SLICE"
+                                implementationClass="org.xblackcat.frozenice.completion.SliceMetadataCompletionContributor"
+                                id="sliceMetadata"/>
+
     </extensions>
 </idea-plugin>
