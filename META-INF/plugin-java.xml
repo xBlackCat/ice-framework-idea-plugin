@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<idea-plugin version="2">
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceInterface="org.xblackcat.frozenice.integration.JavaHelper"
+                        serviceImplementation="org.xblackcat.frozenice.integration.JavaHelper$Impl"/>
+        <moduleService serviceInterface="org.xblackcat.frozenice.integration.JavaModuleHelper"
+                        serviceImplementation="org.xblackcat.frozenice.integration.JavaModuleHelper$Impl"/>
+        <codeInsight.lineMarkerProvider language="SLICE"
+                                        implementationClass="org.xblackcat.frozenice.link.JavaSliceLineMarkerProvider"/>
+    </extensions>
+</idea-plugin>
