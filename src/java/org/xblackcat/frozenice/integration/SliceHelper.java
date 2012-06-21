@@ -1,6 +1,7 @@
 package org.xblackcat.frozenice.integration;
 
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
@@ -88,8 +89,8 @@ public class SliceHelper {
     }
 
     private static PsiClass checkJavaClass(SliceDataTypeElement element, String implFQN) {
-        Project project = element.getProject();
-        JavaHelper javaHelper = JavaHelper.getJavaHelper(project);
+        Module module = ModuleUtil.findModuleForPsiElement(element);
+        JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(module);
         NavigatablePsiElement aClass = javaHelper.findClass(implFQN);
 
         if (!(aClass instanceof PsiClass) || !((PsiClass) aClass).hasModifierProperty(PsiModifier.ABSTRACT)) {
