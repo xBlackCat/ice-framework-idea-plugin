@@ -91,10 +91,10 @@
 external slice_file ::= parse_file slice_block
 private slice_block ::= (global_metadata)*  module {recoverUntil=slice_block_recover}
 private module_start ::= metadata* 'module' id
-module ::= module_start '{' module_body '}' ';' {pin=2}
+module ::= module_start '{' (module_element) * '}' ';' {pin=2}
 private slice_block_recover ::= !('[[' | module_start)
 
-module_body ::= (module | data_definition | constant | forward_declaration ) * {recoverUntil=data_def_recover }
+private module_element ::= ( module | data_definition | constant | forward_declaration ) {recoverUntil=data_def_recover }
 global_metadata ::= '[[' metadata_body ']]' {pin=1}
 metadata ::= '[' metadata_body ']' {pin=1}
 
