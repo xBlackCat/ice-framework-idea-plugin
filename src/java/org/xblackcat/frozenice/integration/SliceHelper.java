@@ -22,13 +22,11 @@ public class SliceHelper {
         List<SliceGlobalMetadata> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(file, SliceGlobalMetadata.class);
         for (SliceGlobalMetadata md : globalMetadatas) {
             SliceMetadataBody body = md.getMetadataBody();
-            if (body != null) {
-                for (SliceMetadataElement el : body.getMetadataElementList()) {
-                    String packageString = target.extractPackageName(el.getString().getText());
+            for (SliceMetadataElement el : body.getMetadataElementList()) {
+                String packageString = target.extractPackageName(el.getStringLiteral().getText());
 
-                    if (packageString != null) {
-                        return packageString;
-                    }
+                if (packageString != null) {
+                    return packageString;
                 }
             }
         }

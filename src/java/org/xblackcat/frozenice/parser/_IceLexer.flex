@@ -71,7 +71,7 @@ octalDigit = [0-7]
 <YYINITIAL> {C_STYLE_COMMENT} { return SliceParserDefinition.C_STYLE_COMMENT; }
 <YYINITIAL> {END_OF_LINE_COMMENT} { return SliceParserDefinition.END_OF_LINE_COMMENT; }
 
-<YYINITIAL> {STRING_LITERAL} { return SliceTypes.ICE_STRING; }
+<YYINITIAL> {STRING_LITERAL} { return SliceTypes.ICE_STRING_LITERAL; }
 
 <YYINITIAL> {floatingPointLiteral} { return SliceTypes.ICE_FLOAT_VALUE; }
 <YYINITIAL> {integerLiteral} { return SliceTypes.ICE_INTEGER_VALUE; }
