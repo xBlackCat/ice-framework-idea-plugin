@@ -21,6 +21,6 @@ public class PsiIcePatterns extends StandardPatterns {
     }
 
     public static ElementPattern<? extends PsiElement> metadataDirective() {
-        return psiElement(SliceTypes.ICE_STRING).inside(psiElement(SliceTypes.ICE_METADATA_ELEMENT));
+        return psiElement(SliceTypes.ICE_STRING_LITERAL).inside(psiElement(SliceTypes.ICE_METADATA_ELEMENT));
     }
 }

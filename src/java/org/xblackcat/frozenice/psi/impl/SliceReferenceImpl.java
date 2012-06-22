@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.psi.SliceCompositeElement;
 import org.xblackcat.frozenice.psi.SliceDataTypeElement;
 import org.xblackcat.frozenice.psi.SliceModule;
-import org.xblackcat.frozenice.psi.SliceModuleBody;
 
 /**
  * 15.06.12 15:37
@@ -28,12 +27,8 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
         if (module == null) {
             return null;
         }
-        SliceModuleBody body = module.getModuleBody();
-        if (body == null) {
-            return null;
-        }
 
-        for (PsiElement c : body.getChildren()) {
+        for (PsiElement c : module.getChildren()) {
             if (c instanceof SliceDataTypeElement) {
                 if (referenceName.equals(((SliceDataTypeElement) c).getName())) {
                     return c;
