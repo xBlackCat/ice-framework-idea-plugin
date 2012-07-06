@@ -2,7 +2,7 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.1.0</version>
+    <version>0.0.1.1</version>
     <vendor email="xblackcat@gmail.com"
             url="http://code.google.com/p/ice-framework-idea-plugin/"
             logo="/icons/facet-32.png"
@@ -16,6 +16,7 @@
             <li><b>0.0.0.4</b> - Search source files for #include directive in content and source roots. Added line/block commenter.</li>
             <li><b>0.0.0.5</b> - FIX: configuration check bug prevent compilation start
             <li><b>0.0.1.0</b> - Create a link between a java code and slice definitions. Implement find usages action</li>
+            <li><b>0.0.1.1</b> - Find usages of generated objects.</li>
             </ul>]]>
     </change-notes>
 
@@ -42,12 +43,14 @@
 
         <lang.commenter language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceCommenter"/>
         <lang.findUsagesProvider language="SLICE"
-                                 implementationClass="org.xblackcat.frozenice.link.SliceFindUsagesProvider"/>
+                                 implementationClass="org.xblackcat.frozenice.find.usages.SliceFindUsagesProvider"/>
 
         <!--<completion.contributor language="SLICE" implementationClass="org.xblackcat.frozenice.completion.SliceCompletionContributor" id="sliceBasic"/>-->
         <completion.contributor language="SLICE"
                                 implementationClass="org.xblackcat.frozenice.completion.SliceMetadataCompletionContributor"
                                 id="sliceMetadata"/>
+        <findUsagesHandlerFactory implementation="org.xblackcat.frozenice.find.usages.SliceFindUsagesHandlerFactory" id="slice"
+                                  order="last, before default"/>
 
     </extensions>
 </idea-plugin>

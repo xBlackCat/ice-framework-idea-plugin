@@ -1,4 +1,4 @@
-package org.xblackcat.frozenice.link;
+package org.xblackcat.frozenice.find.usages;
 
 import com.intellij.ide.TypePresentationService;
 import com.intellij.lang.LangBundle;
