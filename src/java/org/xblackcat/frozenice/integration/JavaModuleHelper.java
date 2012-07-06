@@ -19,6 +19,7 @@ package org.xblackcat.frozenice.integration;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleServiceManager;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassReferenceProvider;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -32,7 +33,7 @@ import java.util.List;
 /**
  * @author gregsh
  */
-public class JavaModuleHelper  {
+public class JavaModuleHelper {
     protected Module module;
 
     public JavaModuleHelper(Module module) {
@@ -42,6 +43,20 @@ public class JavaModuleHelper  {
     public static JavaModuleHelper getJavaHelper(Module module) {
         JavaModuleHelper service = ModuleServiceManager.getService(module, JavaModuleHelper.class);
         return service == null ? new JavaModuleHelper(module) : service;
+    }
+
+    public static JavaModuleHelper getJavaHelper(PsiElement element) {
+        Module module = ModuleUtil.findModuleForPsiElement(element);
+
+        if (module != null) {
+            JavaModuleHelper service = ModuleServiceManager.getService(module, JavaModuleHelper.class);
+
+            if (service != null) {
+                return service;
+            }
+        }
+
+        return new JavaModuleHelper(module);
     }
 
     @Nullable

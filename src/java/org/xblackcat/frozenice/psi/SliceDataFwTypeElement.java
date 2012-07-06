@@ -5,6 +5,8 @@ package org.xblackcat.frozenice.psi;
  *
  * @author xBlackCat
  */
-public interface SliceDataTypeElement extends SliceNamedElement {
+public interface SliceDataFwTypeElement extends SliceNamedElement {
     SliceModule getModule();
+
+    SliceDataTypeElement getDeclaration();
 }
