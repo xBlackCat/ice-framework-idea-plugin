@@ -37,7 +37,12 @@ public class Slice2Xxx implements SourceGeneratingCompiler {
     public static final GenerationItem[] NO_ITEMS = new GenerationItem[0];
 
     @Override
-    public VirtualFile getPresentableFile(CompileContext context, Module module, VirtualFile outputRoot, VirtualFile generatedFile) {
+    public VirtualFile getPresentableFile(
+            CompileContext context,
+            Module module,
+            VirtualFile outputRoot,
+            VirtualFile generatedFile
+    ) {
         return null;
     }
 
@@ -59,7 +64,14 @@ public class Slice2Xxx implements SourceGeneratingCompiler {
             final Project project = context.getProject();
             final Sdk projectSdk = ProjectRootManager.getInstance(project).getProjectSdk();
 
-            GenerationItem[] generationItems = application.runReadAction(new GenerateAction(context, items, outputRootDirectory, projectSdk));
+            GenerationItem[] generationItems = application.runReadAction(
+                    new GenerateAction(
+                            context,
+                            items,
+                            outputRootDirectory,
+                            projectSdk
+                    )
+            );
 
             Set<Module> processedModules = new HashSet<Module>();
 

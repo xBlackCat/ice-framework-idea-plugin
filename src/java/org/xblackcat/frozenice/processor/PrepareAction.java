@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-* 08.02.12 10:47
-*
-* @author xBlackCat
-*/
+ * 08.02.12 10:47
+ *
+ * @author xBlackCat
+ */
 final class PrepareAction implements Computable<GeneratingCompiler.GenerationItem[]> {
     private CompileContext context;
 
@@ -48,7 +48,11 @@ final class PrepareAction implements Computable<GeneratingCompiler.GenerationIte
                 IceFacet iceFacet = FacetManager.getInstance(moduleByFile).getFacetByType(IceFacet.ID);
 
                 if (iceFacet != null) {
-                    IceGenerationItem generationItem = new IceGenerationItem(iceFacet, file, fileIndex.isInTestSourceContent(file));
+                    IceGenerationItem generationItem = new IceGenerationItem(
+                            iceFacet,
+                            file,
+                            fileIndex.isInTestSourceContent(file)
+                    );
                     items.add(generationItem);
                 }
             }

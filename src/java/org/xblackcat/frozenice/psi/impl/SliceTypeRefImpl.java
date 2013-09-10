@@ -26,7 +26,7 @@ public abstract class SliceTypeRefImpl extends SliceCompositeElementImpl impleme
 
     @Override
     public String toString() {
-      return super.toString() + ": " + getText();
+        return super.toString() + ": " + getText();
     }
 
 }

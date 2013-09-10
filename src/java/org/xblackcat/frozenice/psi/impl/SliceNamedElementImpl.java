@@ -29,62 +29,62 @@ import javax.swing.*;
 
 public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl implements SliceNamedElement {
 
-  private volatile String myCachedName;
+    private volatile String myCachedName;
 
-  public SliceNamedElementImpl(ASTNode node) {
-    super(node);
-  }
-
-  @Override
-  public void subtreeChanged() {
-    super.subtreeChanged();
-    myCachedName = null;
-  }
-
-  @Override
-  public String getName() {
-    if (myCachedName == null) {
-      myCachedName = getId().getText();
+    public SliceNamedElementImpl(ASTNode node) {
+        super(node);
     }
-    return myCachedName;
-  }
 
-  @Override
-  public PsiElement setName(@NonNls @NotNull String s) throws IncorrectOperationException {
+    @Override
+    public void subtreeChanged() {
+        super.subtreeChanged();
+        myCachedName = null;
+    }
+
+    @Override
+    public String getName() {
+        if (myCachedName == null) {
+            myCachedName = getId().getText();
+        }
+        return myCachedName;
+    }
+
+    @Override
+    public PsiElement setName(@NonNls @NotNull String s) throws IncorrectOperationException {
 //    getId().replace(BnfElementFactory.createLeafFromText(getProject(), s));
-    return this;
-  }
+        return this;
+    }
 
-  @Override
-  public int getTextOffset() {
-    return getId().getTextOffset();
-  }
+    @Override
+    public int getTextOffset() {
+        return getId().getTextOffset();
+    }
 
-  @NotNull
-  @Override
-  public SearchScope getUseScope() {
-    return new LocalSearchScope(getContainingFile());
-  }
+    @NotNull
+    @Override
+    public SearchScope getUseScope() {
+        return new LocalSearchScope(getContainingFile());
+    }
 
-  @Override
-  public Icon getIcon(int flags) {
-    return super.getIcon(flags);
-  }
+    @Override
+    public Icon getIcon(int flags) {
+        return super.getIcon(flags);
+    }
 
-  @NotNull
-  @Override
-  public PsiElement getId() {
-    ASTNode child = getNode().findChildByType(SliceTypes.ICE_ID);
-    return child == null ? null : child.getPsi();
-  }
+    @NotNull
+    @Override
+    public PsiElement getId() {
+        ASTNode child = getNode().findChildByType(SliceTypes.ICE_ID);
+        return child == null ? null : child.getPsi();
+    }
 
-  @Override
-  public PsiElement getNameIdentifier() {
-    return getId();
-  }
+    @Override
+    public PsiElement getNameIdentifier() {
+        return getId();
+    }
 
-  @Override
-  public String toString() {
-    return super.toString() + ":" + getName();
-  }
+    @Override
+    public String toString() {
+        return super.toString() + ":" + getName();
+    }
 }

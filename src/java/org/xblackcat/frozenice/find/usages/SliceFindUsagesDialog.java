@@ -33,82 +33,98 @@ import com.intellij.usageView.UsageViewUtil;
 import javax.swing.*;
 
 public abstract class SliceFindUsagesDialog<T extends SliceFindUsagesOptions> extends AbstractFindUsagesDialog {
-  protected final PsiElement myPsiElement;
-  private StateRestoringCheckBox myCbIncludeOverloadedMethods;
-  private boolean myIncludeOverloadedMethodsAvailable = false;
+    protected final PsiElement myPsiElement;
+    private StateRestoringCheckBox myCbIncludeOverloadedMethods;
+    private boolean myIncludeOverloadedMethodsAvailable = false;
 
-  protected SliceFindUsagesDialog(PsiElement element, Project project, FindUsagesOptions findUsagesOptions, boolean toShowInNewTab, boolean mustOpenInNewTab,
-                                  boolean isSingleFile,
-                                  FindUsagesHandler handler) {
-    super(project, findUsagesOptions, toShowInNewTab, mustOpenInNewTab, isSingleFile, isTextSearch(element, isSingleFile, handler), !isSingleFile && !element.getManager().isInProject(element));
-    myPsiElement = element;
-    myIncludeOverloadedMethodsAvailable = element instanceof PsiMethod && MethodSignatureUtil.hasOverloads((PsiMethod)element);
-    init();
-  }
+    protected SliceFindUsagesDialog(
+            PsiElement element,
+            Project project,
+            FindUsagesOptions findUsagesOptions,
+            boolean toShowInNewTab,
+            boolean mustOpenInNewTab,
+            boolean isSingleFile,
+            FindUsagesHandler handler
+    ) {
+        super(
+                project, findUsagesOptions, toShowInNewTab, mustOpenInNewTab, isSingleFile, isTextSearch(
+                element,
+                isSingleFile,
+                handler
+        ), !isSingleFile && !element.getManager().isInProject(element)
+        );
+        myPsiElement = element;
+        myIncludeOverloadedMethodsAvailable = element instanceof PsiMethod &&
+                MethodSignatureUtil.hasOverloads((PsiMethod) element);
+        init();
+    }
 
-  private static boolean isTextSearch(PsiElement element, boolean isSingleFile, FindUsagesHandler handler) {
-    return FindUsagesUtil.isSearchForTextOccurrencesAvailable(element, isSingleFile, handler);
-  }
+    private static boolean isTextSearch(PsiElement element, boolean isSingleFile, FindUsagesHandler handler) {
+        return FindUsagesUtil.isSearchForTextOccurrencesAvailable(element, isSingleFile, handler);
+    }
 
-  public void calcFindUsagesOptions(T options) {
+    public void calcFindUsagesOptions(T options) {
 //    if (options instanceof JavaMethodFindUsagesOptions) {
 //      ((JavaMethodFindUsagesOptions)options).isIncludeOverloadUsages =
 //        myIncludeOverloadedMethodsAvailable && isToChange(myCbIncludeOverloadedMethods) && myCbIncludeOverloadedMethods.isSelected();
 //    }
-  }
-
-  @Override
-  public void calcFindUsagesOptions(FindUsagesOptions options) {
-    super.calcFindUsagesOptions(options);
-    calcFindUsagesOptions((T)options);
-  }
-
-  @Override
-  protected void doOKAction() {
-    if (shouldDoOkAction()) {
-      if (myIncludeOverloadedMethodsAvailable) {
-        FindSettings.getInstance().setSearchOverloadedMethods(myCbIncludeOverloadedMethods.isSelected());
-      }
     }
-    else {
-      return;
+
+    @Override
+    public void calcFindUsagesOptions(FindUsagesOptions options) {
+        super.calcFindUsagesOptions(options);
+        calcFindUsagesOptions((T) options);
     }
-    super.doOKAction();
-  }
 
-  @Override
-  protected void addUsagesOptions(JPanel optionsPanel) {
-    super.addUsagesOptions(optionsPanel);
-    if (myIncludeOverloadedMethodsAvailable) {
-      myCbIncludeOverloadedMethods = addCheckboxToPanel(FindBundle.message("find.options.include.overloaded.methods.checkbox"),
-                                                        FindSettings.getInstance().isSearchOverloadedMethods(), optionsPanel, false);
-
+    @Override
+    protected void doOKAction() {
+        if (shouldDoOkAction()) {
+            if (myIncludeOverloadedMethodsAvailable) {
+                FindSettings.getInstance().setSearchOverloadedMethods(myCbIncludeOverloadedMethods.isSelected());
+            }
+        } else {
+            return;
+        }
+        super.doOKAction();
     }
-  }
 
-  @Override
-  protected boolean isInFileOnly() {
-    return super.isInFileOnly() ||
-           myPsiElement != null && PsiSearchHelper.SERVICE.getInstance(myPsiElement.getProject()).getUseScope(myPsiElement)instanceof LocalSearchScope;
-  }
+    @Override
+    protected void addUsagesOptions(JPanel optionsPanel) {
+        super.addUsagesOptions(optionsPanel);
+        if (myIncludeOverloadedMethodsAvailable) {
+            myCbIncludeOverloadedMethods = addCheckboxToPanel(
+                    FindBundle.message("find.options.include.overloaded.methods.checkbox"),
+                    FindSettings.getInstance().isSearchOverloadedMethods(), optionsPanel, false
+            );
 
-  @Override
-  public void configureLabelComponent(final SimpleColoredComponent coloredComponent) {
-    coloredComponent.append(StringUtil.capitalize(UsageViewUtil.getType(myPsiElement)));
-    coloredComponent.append(" ");
-    coloredComponent.append(UsageViewUtil.getDescriptiveName(myPsiElement));
-  }
+        }
+    }
 
-  protected final PsiElement getPsiElement() {
-    return myPsiElement;
-  }
+    @Override
+    protected boolean isInFileOnly() {
+        return super.isInFileOnly() ||
+                myPsiElement != null && PsiSearchHelper.SERVICE.getInstance(myPsiElement.getProject()).getUseScope(
+                        myPsiElement
+                ) instanceof LocalSearchScope;
+    }
 
-  @Override
-  protected void doHelpAction() {
-    HelpManager.getInstance().invokeHelp(FindUsagesManager.getHelpID(myPsiElement));
-  }
+    @Override
+    public void configureLabelComponent(final SimpleColoredComponent coloredComponent) {
+        coloredComponent.append(StringUtil.capitalize(UsageViewUtil.getType(myPsiElement)));
+        coloredComponent.append(" ");
+        coloredComponent.append(UsageViewUtil.getLongName(myPsiElement));
+    }
 
-  protected T getFindUsagesOptions() {
-    return (T)myFindUsagesOptions;
-  }
+    protected final PsiElement getPsiElement() {
+        return myPsiElement;
+    }
+
+    @Override
+    protected void doHelpAction() {
+        HelpManager.getInstance().invokeHelp(FindUsagesManager.getHelpID(myPsiElement));
+    }
+
+    protected T getFindUsagesOptions() {
+        return (T) myFindUsagesOptions;
+    }
 }

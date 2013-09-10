@@ -27,7 +27,12 @@ public class IceFacetType extends FacetType<IceFacet, IceFacetConfiguration> {
     }
 
     @Override
-    public IceFacet createFacet(@NotNull Module module, String name, @NotNull IceFacetConfiguration configuration, @Nullable Facet underlyingFacet) {
+    public IceFacet createFacet(
+            @NotNull Module module,
+            String name,
+            @NotNull IceFacetConfiguration configuration,
+            @Nullable Facet underlyingFacet
+    ) {
         return new IceFacet(module, name, configuration, underlyingFacet);
     }
 

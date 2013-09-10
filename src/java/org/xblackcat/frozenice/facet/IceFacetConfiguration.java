@@ -40,15 +40,20 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
     private Config config = new Config();
 
     @Override
-    public FacetEditorTab[] createEditorTabs(FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
+    public FacetEditorTab[] createEditorTabs(
+            FacetEditorContext editorContext,
+            FacetValidatorsManager validatorsManager
+    ) {
         return new FacetEditorTab[]{new IceFacetEditor(editorContext, validatorsManager)};
     }
 
     @Override
+    @Deprecated
     public void readExternal(Element element) throws InvalidDataException {
     }
 
     @Override
+    @Deprecated
     public void writeExternal(Element element) throws WriteExternalException {
     }
 
@@ -87,7 +92,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
 
             pane.add(settingsPane, BorderLayout.NORTH);
 
-            settingsPane.setBorder(IdeBorderFactory.createTitledBorder("Generated files result folder.", false, false, true));
+            settingsPane.setBorder(IdeBorderFactory.createTitledBorder("Generated files result folder.", false));
 
             for (IceComponent c : IceChecker.getAvailableTranslators(editorContext.getModule())) {
                 VirtualFile outputDir = config.getOutputDir(c);

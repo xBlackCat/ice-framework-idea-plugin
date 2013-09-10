@@ -23,7 +23,11 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
         this(psiElement, PsiElement.EMPTY_ARRAY, factory);
     }
 
-    public SliceFindUsagesHandler(@NotNull PsiElement psiElement, @NotNull PsiElement[] elementsToSearch, SliceFindUsagesHandlerFactory factory) {
+    public SliceFindUsagesHandler(
+            @NotNull PsiElement psiElement,
+            @NotNull PsiElement[] elementsToSearch,
+            SliceFindUsagesHandlerFactory factory
+    ) {
         super(psiElement);
         this.factory = factory;
         myElementsToSearch = elementsToSearch;
@@ -31,11 +35,23 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
 
     @NotNull
     @Override
-    public AbstractFindUsagesDialog getFindUsagesDialog(boolean isSingleFile, boolean toShowInNewTab, boolean mustOpenInNewTab) {
+    public AbstractFindUsagesDialog getFindUsagesDialog(
+            boolean isSingleFile,
+            boolean toShowInNewTab,
+            boolean mustOpenInNewTab
+    ) {
         PsiElement element = getPsiElement();
 
         if (element instanceof SliceDataTypeElement || element instanceof SliceDataFwTypeElement) {
-            return new FindClassUsagesDialog(element, getProject(), factory.getFindClassOptions(), toShowInNewTab, mustOpenInNewTab, isSingleFile, this);
+            return new FindClassUsagesDialog(
+                    element,
+                    getProject(),
+                    factory.getFindClassOptions(),
+                    toShowInNewTab,
+                    mustOpenInNewTab,
+                    isSingleFile,
+                    this
+            );
         }
 
         return super.getFindUsagesDialog(isSingleFile, toShowInNewTab, mustOpenInNewTab);
@@ -53,7 +69,7 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
 
             NavigatablePsiElement javaClass = javaHelper.findClass(SliceHelper.getFQN(classDef));
             if (javaClass != null) {
-                return new PsiElement[] {
+                return new PsiElement[]{
                         element,
                         javaClass
                 };

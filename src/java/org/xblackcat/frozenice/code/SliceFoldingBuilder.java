@@ -35,7 +35,6 @@ public class SliceFoldingBuilder extends FoldingBuilderEx implements DumbAware {
         List<FoldingDescriptor> result = new ArrayList<FoldingDescriptor>();
 
 
-
         return result.toArray(new FoldingDescriptor[result.size()]);
     }
 
@@ -137,7 +136,12 @@ public class SliceFoldingBuilder extends FoldingBuilderEx implements DumbAware {
         return null;
     }
 
-    private static boolean addToFold(List<FoldingDescriptor> list, PsiElement elementToFold, Document document, boolean allowOneLiners) {
+    private static boolean addToFold(
+            List<FoldingDescriptor> list,
+            PsiElement elementToFold,
+            Document document,
+            boolean allowOneLiners
+    ) {
         TextRange range = getRangeToFold(elementToFold);
         if (range == null) {
             return false;
@@ -146,9 +150,11 @@ public class SliceFoldingBuilder extends FoldingBuilderEx implements DumbAware {
         return addFoldRegion(list, elementToFold, document, allowOneLiners, range);
     }
 
-    private static boolean addFoldRegion(final List<FoldingDescriptor> list, final PsiElement elementToFold, final Document document,
-                                         final boolean allowOneLiners,
-                                         final TextRange range) {
+    private static boolean addFoldRegion(
+            final List<FoldingDescriptor> list, final PsiElement elementToFold, final Document document,
+            final boolean allowOneLiners,
+            final TextRange range
+    ) {
         final TextRange fileRange = elementToFold.getContainingFile().getTextRange();
         if (range.equals(fileRange)) {
             return false;

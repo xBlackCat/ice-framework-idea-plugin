@@ -7,10 +7,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.xblackcat.frozenice.facet.IceFacet;
 
 /**
-* 16.01.12 15:32
-*
-* @author xBlackCat
-*/
+ * 16.01.12 15:32
+ *
+ * @author xBlackCat
+ */
 class IceGenerationItem implements GeneratingCompiler.GenerationItem {
     private final VirtualFile file;
     private final boolean inTestSourceContent;

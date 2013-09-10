@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.FrozenIdea;
 import org.xblackcat.frozenice.util.IceChecker;
 import org.xblackcat.frozenice.util.IceComponent;
-import org.xblackcat.frozenice.util.SliceIcons;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,11 +44,6 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
     @Override
     public String getDisplayName() {
         return "ZeroC ICE Framework";
-    }
-
-    @Override
-    public Icon getIcon() {
-        return SliceIcons.FACET_ICON_32;
     }
 
     @Override
@@ -111,7 +105,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
             super(new BorderLayout());
             this.plugin = plugin;
 
-            setBorder(IdeBorderFactory.createTitledBorder("ZeroC ICE framework", false, false, true));
+            setBorder(IdeBorderFactory.createTitledBorder("ZeroC ICE framework", false));
 
             JPanel fieldsPane = new JPanel();
             final GroupLayout gl = new GroupLayout(fieldsPane);
@@ -156,68 +150,87 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                     );
 
             TextFieldWithBrowseButton.MyDoClickAction.addTo(browseDirectoryButton, iceHomeFolder);
-            browseDirectoryButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    final VirtualFile[] files = FileChooser.chooseFiles(
-                            IceFrameworkConfigForm.this,
-                            new FileChooserDescriptor(false, true, false, false, false, false),
-                            selectedFolder
-                    );
-                    if (files.length != 0) {
-                        final Task.Modal checkTask = new Task.Modal(project, "Checking ZeroC home folder", true) {
-                            private VirtualFile checkingFolder = files[0];
-                            private String version;
+            browseDirectoryButton.addActionListener(
+                    new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            final VirtualFile[] files = FileChooser.chooseFiles(
+                                    new FileChooserDescriptor(false, true, false, false, false, false),
+                                    IceFrameworkConfigForm.this,
+                                    null,
+                                    selectedFolder
+                            );
+                            if (files.length != 0) {
+                                final Task.Modal checkTask = new Task.Modal(
+                                        project,
+                                        "Checking ZeroC home folder",
+                                        true
+                                ) {
+                                    private VirtualFile checkingFolder = files[0];
+                                    private String version;
 
-                            @Override
-                            public void run(@NotNull ProgressIndicator indicator) {
-                                indicator.setIndeterminate(true);
+                                    @Override
+                                    public void run(@NotNull ProgressIndicator indicator) {
+                                        indicator.setIndeterminate(true);
 
-                                if (checkingFolder.isDirectory()) {
-                                    // Find executable files
-                                    EnumSet<IceComponent> installedComponents = IceChecker.getInstalledComponents(checkingFolder);
-                                    if (installedComponents.isEmpty()) {
-                                        checkingFolder = checkingFolder.getParent();
-
-                                        if (checkingFolder == null) {
-                                            return;
-                                        } else {
-                                            installedComponents = IceChecker.getInstalledComponents(checkingFolder);
+                                        if (checkingFolder.isDirectory()) {
+                                            // Find executable files
+                                            EnumSet<IceComponent> installedComponents = IceChecker.getInstalledComponents(
+                                                    checkingFolder
+                                            );
                                             if (installedComponents.isEmpty()) {
+                                                checkingFolder = checkingFolder.getParent();
+
+                                                if (checkingFolder == null) {
+                                                    return;
+                                                } else {
+                                                    installedComponents = IceChecker.getInstalledComponents(
+                                                            checkingFolder
+                                                    );
+                                                    if (installedComponents.isEmpty()) {
+                                                        checkingFolder = null;
+                                                        return;
+                                                    }
+                                                }
+                                            }
+
+                                            final IceComponent anyComponent = installedComponents.iterator().next();
+                                            version = IceChecker.readVersion(anyComponent, checkingFolder);
+                                            if (version == null) {
                                                 checkingFolder = null;
-                                                return;
                                             }
                                         }
                                     }
 
-                                    final IceComponent anyComponent = installedComponents.iterator().next();
-                                    version = IceChecker.readVersion(anyComponent, checkingFolder);
-                                    if (version == null) {
-                                        checkingFolder = null;
+                                    @Override
+                                    public void onSuccess() {
+                                        if (checkingFolder != null) {
+                                            selectedFolder = checkingFolder;
+                                            iceHomeFolder.setText(selectedFolder.getPath());
+
+                                            if (version != null) {
+                                                Messages.showInfoMessage(
+                                                        project,
+                                                        "Found ZeroC framework. Version: " + version,
+                                                        "ZeroC ICE Framework is found"
+                                                );
+                                            }
+
+                                            setModified(true);
+                                        } else {
+                                            Messages.showWarningDialog(
+                                                    project,
+                                                    "Selected folder is not ZeroC ICE framework home directory",
+                                                    "ZeroC ICE Framework is not found"
+                                            );
+                                        }
                                     }
-                                }
+                                };
+
+                                checkTask.queue();
                             }
-
-                            @Override
-                            public void onSuccess() {
-                                if (checkingFolder != null) {
-                                    selectedFolder = checkingFolder;
-                                    iceHomeFolder.setText(selectedFolder.getPath());
-
-                                    if (version != null) {
-                                        Messages.showInfoMessage(project, "Found ZeroC framework. Version: " + version, "ZeroC ICE Framework is found");
-                                    }
-
-                                    setModified(true);
-                                } else {
-                                    Messages.showWarningDialog(project, "Selected folder is not ZeroC ICE framework home directory", "ZeroC ICE Framework is not found");
-                                }
-                            }
-                        };
-
-                        checkTask.queue();
+                        }
                     }
-                }
-            });
+            );
 
         }
 

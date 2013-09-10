@@ -14,10 +14,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 /**
-* 30.01.12 9:22
-*
-* @author xBlackCat
-*/
+ * 30.01.12 9:22
+ *
+ * @author xBlackCat
+ */
 class TranslatorItemConfig extends JPanel {
     private final JTextField outputFolder = new JTextField(40);
     private final JCheckBox compilationEnabled;
@@ -37,32 +37,37 @@ class TranslatorItemConfig extends JPanel {
 
         outputFolder.setEditable(false);
 
-        compilationEnabled.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                outputFolder.setEnabled(compilationEnabled.isSelected());
-                browseDirectoryButton.setEnabled(compilationEnabled.isSelected());
-            }
-        });
+        compilationEnabled.addItemListener(
+                new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        outputFolder.setEnabled(compilationEnabled.isSelected());
+                        browseDirectoryButton.setEnabled(compilationEnabled.isSelected());
+                    }
+                }
+        );
 
         Dimension size = new Dimension(80, 2);
         compilationEnabled.setMinimumSize(size);
         compilationEnabled.setPreferredSize(size);
 
         TextFieldWithBrowseButton.MyDoClickAction.addTo(browseDirectoryButton, outputFolder);
-        browseDirectoryButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                final VirtualFile[] files = FileChooser.chooseFiles(
-                        TranslatorItemConfig.this.getParent(),
-                        new FileChooserDescriptor(false, true, false, false, false, false),
-                        selectedFolder
-                );
-                if (files.length != 0) {
-                    selectedFolder = files[0];
-                    outputFolder.setText(selectedFolder.getPath());
+        browseDirectoryButton.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        final VirtualFile[] files = FileChooser.chooseFiles(
+                                new FileChooserDescriptor(false, true, false, false, false, false),
+                                TranslatorItemConfig.this.getParent(),
+                                null,
+                                selectedFolder
+                        );
+                        if (files.length != 0) {
+                            selectedFolder = files[0];
+                            outputFolder.setText(selectedFolder.getPath());
+                        }
+                    }
                 }
-            }
-        });
+        );
 
     }
 

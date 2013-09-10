@@ -35,7 +35,12 @@ class GenerateAction implements Computable<GeneratingCompiler.GenerationItem[]> 
     private final VirtualFile outputRootDirectory;
     private final Sdk projectSdk;
 
-    public GenerateAction(CompileContext context, GeneratingCompiler.GenerationItem[] items, VirtualFile outputRootDirectory, Sdk projectSdk) {
+    public GenerateAction(
+            CompileContext context,
+            GeneratingCompiler.GenerationItem[] items,
+            VirtualFile outputRootDirectory,
+            Sdk projectSdk
+    ) {
         this.context = context;
         this.items = items;
         this.outputRootDirectory = outputRootDirectory;
@@ -71,7 +76,13 @@ class GenerateAction implements Computable<GeneratingCompiler.GenerationItem[]> 
             IceFacet facet = entry.getKey();
             Config facetConfig = facet.getConfiguration().getConfig();
             if (!facetConfig.isValid()) {
-                context.addMessage(CompilerMessageCategory.WARNING, "IceFacet is not configured for module " + facet.getModule().getName() + ".", null, -1, -1);
+                context.addMessage(
+                        CompilerMessageCategory.WARNING,
+                        "IceFacet is not configured for module " + facet.getModule().getName() + ".",
+                        null,
+                        -1,
+                        -1
+                );
 
                 continue;
             }
@@ -82,7 +93,15 @@ class GenerateAction implements Computable<GeneratingCompiler.GenerationItem[]> 
             translators.retainAll(installedComponents);
 
             if (translators.isEmpty()) {
-                context.addMessage(CompilerMessageCategory.WARNING, "No valid translators found for module " + facet.getModule().getName() + ". Check facet configuration.", null, -1, -1);
+                context.addMessage(
+                        CompilerMessageCategory.WARNING,
+                        "No valid translators found for module " +
+                                facet.getModule().getName() +
+                                ". Check facet configuration.",
+                        null,
+                        -1,
+                        -1
+                );
 
                 continue;
             }
@@ -101,7 +120,15 @@ class GenerateAction implements Computable<GeneratingCompiler.GenerationItem[]> 
             }
 
             if (sourceFiles.isEmpty()) {
-                context.addMessage(CompilerMessageCategory.WARNING, "No files found to translate in module " + facet.getModule().getName() + ". Check facet configuration.", null, -1, -1);
+                context.addMessage(
+                        CompilerMessageCategory.WARNING,
+                        "No files found to translate in module " +
+                                facet.getModule().getName() +
+                                ". Check facet configuration.",
+                        null,
+                        -1,
+                        -1
+                );
 
                 continue;
             }
@@ -112,7 +139,17 @@ class GenerateAction implements Computable<GeneratingCompiler.GenerationItem[]> 
                 VirtualFile outputDir = facetConfig.getOutputDir(c);
 
                 if (outputDir == null) {
-                    context.addMessage(CompilerMessageCategory.WARNING, "Output folder is not specified for " + c.getTranslatorName() + " in module " + facet.getModule().getName() + ". Check facet configuration.", null, -1, -1);
+                    context.addMessage(
+                            CompilerMessageCategory.WARNING,
+                            "Output folder is not specified for " +
+                                    c.getTranslatorName() +
+                                    " in module " +
+                                    facet.getModule().getName() +
+                                    ". Check facet configuration.",
+                            null,
+                            -1,
+                            -1
+                    );
 
                     continue;
                 }
@@ -142,27 +179,48 @@ class GenerateAction implements Computable<GeneratingCompiler.GenerationItem[]> 
                             .redirectErrorStream(true)
                             .start();
 
-                    InputStream out = process.getInputStream();
-                    try {
-                        String result = StreamUtil.readText(out);
+                    try (InputStream out = process.getInputStream()) {
+                        String result = StreamUtil.readText(out, "utf-8");
                         int code = 0;
 
                         try {
                             code = process.waitFor();
                         } catch (InterruptedException e) {
-                            context.addMessage(CompilerMessageCategory.WARNING, "Translator " + c.getTranslatorName() + " was interrupted", null, -1, -1);
+                            context.addMessage(
+                                    CompilerMessageCategory.WARNING,
+                                    "Translator " + c.getTranslatorName() + " was interrupted",
+                                    null,
+                                    -1,
+                                    -1
+                            );
                         }
                         context.addMessage(CompilerMessageCategory.INFORMATION, result, null, -1, -1);
                         if (code != 0) {
-                            context.addMessage(CompilerMessageCategory.ERROR, "Failed to translate files " + c.getTranslatorName() + ". Process returns error code " + code, null, -1, -1);
+                            context.addMessage(
+                                    CompilerMessageCategory.ERROR,
+                                    "Failed to translate files " +
+                                            c.getTranslatorName() +
+                                            ". Process returns error code " +
+                                            code,
+                                    null,
+                                    -1,
+                                    -1
+                            );
                         } else {
                             results.addAll(itemsToProcess);
                         }
-                    } finally {
-                        out.close();
                     }
                 } catch (IOException e) {
-                    context.addMessage(CompilerMessageCategory.ERROR, "Failed to translate files with " + c.getTranslatorName() + ". Error: " + e.getMessage(), null, -1, -1);
+                    context.addMessage(
+                            CompilerMessageCategory.ERROR,
+                            "Failed to translate files with " +
+                                    c.getTranslatorName() +
+                                    ". Error: " +
+                                    e.getMessage(),
+                            null,
+                            -1,
+                            -1
+                    );
                 }
             }
         }

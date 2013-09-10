@@ -1,5 +1,6 @@
 {
     parserClass="org.xblackcat.frozenice.parser.SliceParser"
+  parserUtilClass="org.xblackcat.frozenice.parser.SliceParserUtil"
     stubParserClass="org.xblackcat.frozenice.parser.SliceParserUtil"
 
     implements="org.xblackcat.frozenice.psi.SliceCompositeElement"
@@ -105,7 +106,7 @@ metadata_element ::= string_literal {recoverUntil=metadata_recover}
 private metadata_recover ::= !(']' | ']]' | ',')
 
 private data_definition ::= class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def
-private data_def_recover ::= !(module_start | '[' | 'const' | 'class' | 'interface' | 'enum' | 'exception' | 'struct' | 'sequence' | 'dictionary' | '}')
+private data_def_recover ::= !(module_start | '[' | 'const' | 'class' | 'interface' | 'enum' | 'exception' | 'struct' | 'sequence' | 'dictionary' | '}' | ';')
 
 extends_list ::= 'extends' type_reference (',' type_reference) *
 implements_list ::= 'implements' type_reference (',' type_reference) *
@@ -151,7 +152,7 @@ key_type ::= primitive_data_types | 'string' | type_reference
 sequence_def ::= metadata* 'sequence' '<' element_type '>' id ';'
 
 // --- Dictionaries ---
-dictionary_def ::= metadata* 'dictionary' '<' key_type ',' element_type '>' ';'
+dictionary_def ::= metadata* 'dictionary' '<' key_type ',' element_type '>' id ';'
 
 // --- Other ---
 type_reference ::= id {

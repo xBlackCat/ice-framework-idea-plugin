@@ -30,7 +30,10 @@ public class SliceBraceMatcher implements PairedBraceMatcher {
         return BRACES;
     }
 
-    public boolean isPairedBracesAllowedBeforeType(@NotNull IElementType lbraceType, @Nullable IElementType contextType) {
+    public boolean isPairedBracesAllowedBeforeType(
+            @NotNull IElementType lbraceType,
+            @Nullable IElementType contextType
+    ) {
         return !(contextType instanceof SliceTokenType) ||
                 contextType == SliceParserDefinition.C_STYLE_COMMENT ||
                 contextType == SliceParserDefinition.END_OF_LINE_COMMENT ||

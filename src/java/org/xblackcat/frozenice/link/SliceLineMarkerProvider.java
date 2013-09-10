@@ -5,7 +5,6 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -14,6 +13,7 @@ import org.xblackcat.frozenice.integration.SliceHelper;
 import org.xblackcat.frozenice.psi.SliceClassDef;
 import org.xblackcat.frozenice.psi.SliceInterfaceDef;
 import org.xblackcat.frozenice.psi.SliceMethodDef;
+import org.xblackcat.frozenice.psi.SliceNamedElement;
 import org.xblackcat.frozenice.util.SliceIcons;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.Set;
  *
  * @author xBlackCat
  */
-public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
+public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
     public void collectNavigationMarkers(
             List<PsiElement> elements,
@@ -36,9 +36,19 @@ public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
         Set<PsiElement> visited = forNavigation ? new THashSet<PsiElement>() : null;
 
         for (PsiElement element : elements) {
-            if (element instanceof PsiIdentifier) {
-                collectClassLinks(result, forNavigation, visited, (PsiIdentifier) element);
+            if (element instanceof SliceNamedElement) {
+                // The element is interface
+                if (element instanceof SliceInterfaceDef) {
+                    collectInterfaceLinks(result, forNavigation, visited, (SliceInterfaceDef) element);
+                } else if (element instanceof SliceClassDef) {
+                    collectClassLinks(result, forNavigation, visited, (SliceClassDef) element);
+                } else if (element instanceof SliceMethodDef) {
+                    collectMethodLinks(result, forNavigation, visited, (SliceMethodDef) element);
+                }
+            } else {
+
             }
+
         }
     }
 
@@ -48,7 +58,7 @@ public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Set<PsiElement> visited,
             SliceMethodDef element
     ) {
-        List<PsiElement> items = new ArrayList<>();
+        List<PsiElement> items = new ArrayList<PsiElement>();
 
         PsiClass implClass = SliceHelper.searchClassImplementation(
                 PsiTreeUtil.getParentOfType(
@@ -93,10 +103,10 @@ public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Collection<? super RelatedItemLineMarkerInfo> result,
             boolean forNavigation,
             Set<PsiElement> visited,
-            PsiIdentifier element
+            SliceClassDef element
     ) {
-        List<PsiElement> items = new ArrayList<>();
-        PsiClass classImplClass = null;//SliceHelper.searchClassImplementation(element);
+        List<PsiElement> items = new ArrayList<PsiElement>();
+        PsiClass classImplClass = SliceHelper.searchClassImplementation(element);
 
         if (classImplClass != null) {
             if (!forNavigation || visited.add(element)) {
@@ -122,7 +132,7 @@ public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Set<PsiElement> visited,
             SliceInterfaceDef element
     ) {
-        List<PsiElement> items = new ArrayList<>();
+        List<PsiElement> items = new ArrayList<PsiElement>();
         PsiClass interfaceImplClass = SliceHelper.searchInterfaceImplementation(element);
 
         if (interfaceImplClass != null) {
