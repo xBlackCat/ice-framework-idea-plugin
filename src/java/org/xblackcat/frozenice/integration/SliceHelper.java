@@ -17,7 +17,10 @@ import java.util.List;
  */
 public class SliceHelper {
     public static String getPackageName(PsiFile file, IceComponent target) {
-        List<SliceGlobalMetadata> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(file, SliceGlobalMetadata.class);
+        List<SliceGlobalMetadata> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(
+                file,
+                SliceGlobalMetadata.class
+        );
         for (SliceGlobalMetadata md : globalMetadatas) {
             SliceMetadataBody body = md.getMetadataBody();
             for (SliceMetadataElement el : body.getMetadataElementList()) {

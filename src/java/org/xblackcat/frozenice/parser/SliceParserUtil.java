@@ -16,13 +16,14 @@
 package org.xblackcat.frozenice.parser;
 
 import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.parser.GeneratedParserUtilBase;
 
 /**
  * @author gregsh
  */
 public class SliceParserUtil extends GeneratedParserUtilBase {
-  public static boolean parse_file(PsiBuilder builder_, int level, Parser parser) {
-    ErrorState state = ErrorState.get(builder_);
-    return parseAsTree(state, builder_, level, DUMMY_BLOCK, true, parser, TRUE_CONDITION);
-  }
+    public static boolean parse_file(PsiBuilder builder_, int level, Parser parser) {
+        ErrorState state = ErrorState.get(builder_);
+        return parseAsTree(state, builder_, level, DUMMY_BLOCK, true, parser, TRUE_CONDITION);
+    }
 }

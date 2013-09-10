@@ -24,12 +24,26 @@ public class SliceMetadataCompletionContributor extends CompletionContributor {
 
     private static class MetadataDirectivesProvider extends CompletionProvider<CompletionParameters> {
         @Override
-        protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+        protected void addCompletions(
+                @NotNull CompletionParameters parameters,
+                ProcessingContext context,
+                @NotNull CompletionResultSet result
+        ) {
             for (MetadataDirective d : MetadataDirective.DIRECTIVES) {
                 if (d.isHasArgument()) {
-                    result.addElement(TailTypeDecorator.withTail(LookupElementBuilder.create(d.getDirective()), TailType.CASE_COLON));
+                    result.addElement(
+                            TailTypeDecorator.withTail(
+                                    LookupElementBuilder.create(d.getDirective()),
+                                    TailType.CASE_COLON
+                            )
+                    );
                 } else {
-                    result.addElement(TailTypeDecorator.withTail(LookupElementBuilder.create(d.getDirective()), TailType.createSimpleTailType('"')));
+                    result.addElement(
+                            TailTypeDecorator.withTail(
+                                    LookupElementBuilder.create(d.getDirective()),
+                                    TailType.createSimpleTailType('"')
+                            )
+                    );
                 }
             }
         }

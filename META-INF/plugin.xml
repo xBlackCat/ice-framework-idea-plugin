@@ -2,12 +2,12 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.1.1</version>
+    <version>0.0.1.2</version>
     <vendor email="xblackcat@gmail.com"
             url="http://code.google.com/p/ice-framework-idea-plugin/"
             logo="/icons/facet-32.png"
             >xBlackCat</vendor>
-    <idea-version since-build="111.1"/>
+    <idea-version since-build="130.1"/>
     <depends>com.intellij.modules.lang</depends>
     <change-notes><![CDATA[<ul>
             <li><b>0.0.0.1</b> - First revision: Only syntax highlighting</li>
@@ -29,6 +29,7 @@
     <depends optional="true" config-file="plugin-java.xml">com.intellij.modules.java</depends>
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
+        <compilerFactory implementation="org.xblackcat.frozenice.processor.SliceCompilerFactory" />
 
         <projectConfigurable instance="org.xblackcat.frozenice.config.IceFrameworkConfigurable" id="frozenidea"/>
 
@@ -40,6 +41,9 @@
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.SliceParserDefinition"/>
         <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenice.SliceBraceMatcher"/>
         <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceFoldingBuilder"/>
+
+        <codeInsight.lineMarkerProvider language="SLICE"
+                                        implementationClass="org.xblackcat.frozenice.link.SliceLineMarkerProvider"/>
 
         <lang.commenter language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceCommenter"/>
         <lang.findUsagesProvider language="SLICE"

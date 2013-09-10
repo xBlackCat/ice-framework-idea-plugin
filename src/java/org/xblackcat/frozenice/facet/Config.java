@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
-* 30.01.12 9:22
-*
-* @author xBlackCat
-*/
+ * 30.01.12 9:22
+ *
+ * @author xBlackCat
+ */
 public class Config {
     public boolean cleanOutput;
     public Map<IceComponent, String> outputDirPath = new HashMap<IceComponent, String>();

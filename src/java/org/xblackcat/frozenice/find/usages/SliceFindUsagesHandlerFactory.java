@@ -30,7 +30,10 @@ public class SliceFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
     private final SliceFindClassUsagesOptions myFindClassOptions;
 
     public static SliceFindUsagesHandlerFactory getInstance(@NotNull Project project) {
-        return ContainerUtil.findInstance(Extensions.getExtensions(EP_NAME, project), SliceFindUsagesHandlerFactory.class);
+        return ContainerUtil.findInstance(
+                Extensions.getExtensions(EP_NAME, project),
+                SliceFindUsagesHandlerFactory.class
+        );
     }
 
     public SliceFindUsagesHandlerFactory(Project project) {
@@ -43,7 +46,10 @@ public class SliceFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
     }
 
     @Override
-    public FindUsagesHandler createFindUsagesHandler(@NotNull final PsiElement element, final boolean forHighlightUsages) {
+    public FindUsagesHandler createFindUsagesHandler(
+            @NotNull final PsiElement element,
+            final boolean forHighlightUsages
+    ) {
 //        if (element instanceof PsiMethod && !forHighlightUsages) {
 //            final PsiMethod[] methods = SuperMethodWarningUtil.checkSuperMethods((PsiMethod) element, JavaFindUsagesHandler.ACTION_STRING);
 //            if (methods.length > 1) {
