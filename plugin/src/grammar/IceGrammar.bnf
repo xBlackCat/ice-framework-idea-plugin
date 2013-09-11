@@ -1,0 +1,195 @@
+{
+    parserClass="org.xblackcat.frozenice.parser.SliceParser"
+    parserUtilClass="org.xblackcat.frozenice.parser.SliceParserUtil"
+//    stubParserClass="org.xblackcat.frozenice.parser.SliceParserUtil"
+
+    implements="org.xblackcat.frozenice.psi.SliceCompositeElement"
+    extends="org.xblackcat.frozenice.psi.impl.SliceCompositeElementImpl"
+
+    psiClassPrefix="Slice"
+    psiImplClassSuffix="Impl"
+    psiPackage="org.xblackcat.frozenice.psi"
+    psiImplPackage="org.xblackcat.frozenice.psi.impl"
+    psiImplUtilClass="org.xblackcat.frozenice.psi.impl.SlicePsiImplUtil"
+
+    elementTypeHolderClass="org.xblackcat.frozenice.psi.SliceTypes"
+    elementTypePrefix="ICE_"
+    elementTypeClass="org.xblackcat.frozenice.psi.SliceCompositeElementType"
+    tokenTypeClass="org.xblackcat.frozenice.psi.SliceTokenType"
+
+
+    // Tokens
+    tokens=[
+        EQ="="
+        SEMICOLON=";"
+        COMA=","
+        ASTERISK="*"
+        LT="<"
+        GT=">"
+        LEFT_BRACE="{"
+        RIGHT_BRACE="}"
+        LEFT_BRACKET="["
+        RIGHT_BRACKET="]"
+        OPEN_GL_MD="[["
+        CLOSE_GL_MD="]]"
+        LEFT_PARENTH="("
+        RIGHT_PARENTH=")"
+
+        KW_VOID="void"
+
+        // Primitive data types
+        KW_BOOL="bool"
+        KW_BYTE="byte"
+        KW_SHORT="short"
+        KW_INT="int"
+        KW_LONG="long"
+        KW_FLOAT="float"
+        KW_DOUBLE="double"
+
+        // Simple data types
+        KW_LOCAL_OBJECT="LocalObject"
+        KW_STRING="string"
+        KW_OBJECT="Object"
+
+        // Composite data type declarations
+        KW_CLASS="class"
+        KW_EXCEPTION="exception"
+        KW_INTERFACE="interface"
+        KW_SEQUENCE="sequence"
+        KW_STRUCT="struct"
+        KW_DICTIONARY="dictionary"
+        KW_ENUM="enum"
+
+        //
+        // Other keywords
+        //
+
+        // Boolean data type allowed values
+        KW_FALSE="false"
+        KW_TRUE="true"
+
+        // Parameter modifier list
+        KW_OUT="out"
+
+        // Method modifier list
+        KW_LOCAL="local"
+        KW_IDEMPOTENT="idempotent"
+
+        // Other keywords
+        KW_MODULE="module"
+        KW_CONST="const"
+        KW_THROWS="throws"
+        KW_EXTENDS="extends"
+        KW_IMPLEMENTS="implements"
+    ]
+
+    implements("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.SliceDataTypeElement"
+    extends("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.impl.SliceDataTypeElementImpl"
+    implements(".*_def_fw")="org.xblackcat.frozenice.psi.SliceDataFwTypeElement"
+    extends(".*_def_fw")="org.xblackcat.frozenice.psi.impl.SliceDataFwTypeElementImpl"
+    implements(".*_def|module")="org.xblackcat.frozenice.psi.SliceNamedElement"
+    extends(".*_def|module")="org.xblackcat.frozenice.psi.impl.SliceNamedElementImpl"
+}
+
+external slice_file ::= parse_file slice_block
+private slice_block ::= (global_metadata)*  module {recoverUntil=slice_block_recover}
+private module_start ::= metadata* 'module' id
+module ::= module_start '{' (module_element) * '}' ';' {pin=2}
+private slice_block_recover ::= !('[[' | module_start)
+
+private module_element ::= ( module | data_definition | constant | forward_declaration ) {recoverUntil=data_def_recover }
+global_metadata ::= '[[' metadata_body ']]'
+metadata ::= '[' metadata_body ']'
+
+metadata_body ::= metadata_element (',' metadata_element) *
+metadata_element ::= string_literal {recoverUntil=metadata_recover}
+private metadata_recover ::= !(']' | ']]' | ',')
+
+private data_definition ::= class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def
+private data_def_recover ::= !(module_start | '[' | 'const' | 'class' | 'interface' | 'enum' | 'exception' | 'struct' | 'sequence' | 'dictionary' | '}' | ';')
+
+extends_list ::= 'extends' type_reference (',' type_reference) *
+implements_list ::= 'implements' type_reference (',' type_reference) *
+
+// --- Forward declaration ---
+private forward_declaration ::= class_def_fw | interface_def_fw | exception_def_fw | structure_def_fw
+class_def_fw ::= class_def_start ';'
+interface_def_fw ::= interface_def_start ';'
+exception_def_fw ::= exception_def_start ';'
+structure_def_fw ::= struct_def_start ';'
+
+// --- Class ---
+private class_def_start ::= metadata* 'class' id
+class_def ::= class_def_start extends_list? implements_list? '{' (class_declaration) * '}' ';' {pin=4}
+private class_declaration ::= (field_def | method_def | constant ) {recoverUntil=declaration_recover}
+
+private declaration_recover ::= !('}' | 'const' | method_def_start | variable_type)
+
+// --- Interface ---
+private interface_def_start ::= metadata* 'interface' id
+interface_def ::= interface_def_start extends_list? '{' (interface_declaration) * '}' ';'{pin=3}
+private interface_declaration ::= (method_def | constant ) {recoverUntil=declaration_recover}
+
+// --- Exceptions ---
+private exception_def_start ::= metadata* 'exception' id
+exception_def ::= exception_def_start extends_list? '{' (class_declaration)* '}' ';' {pin=3}
+
+// --- Structures ---
+private struct_def_start ::= metadata* 'struct' id
+struct_def ::= struct_def_start '{' (structure_declaration) * '}' ';'{pin=2}
+private structure_declaration ::= (field_def) * {recoverUntil=declaration_recover}
+
+// --- Enums ---
+private enum_def_start ::= metadata* 'enum' id
+enum_def ::= enum_def_start '{' enum_constant_list '}' ';' {pin=2}
+enum_constant_list ::= enum_constant (',' enum_constant) *
+enum_constant ::= id {recoverUntil=enum_constant_list_recover}
+private enum_constant_list_recover ::= !(',' | '}')
+
+element_type ::= data_type
+key_type ::= primitive_data_types | 'string' | type_reference
+// --- Sequences ---
+sequence_def ::= metadata* 'sequence' '<' element_type '>' id ';'
+
+// --- Dictionaries ---
+dictionary_def ::= metadata* 'dictionary' '<' key_type ',' element_type '>' id ';'
+
+// --- Other ---
+type_reference ::= id {
+    methods = [getReferences]
+}
+proxy_type ::= (simple_data_types | type_reference) '*'
+private valid_return_type ::= data_type | 'void'
+data_type ::= proxy_type | primitive_data_types | simple_data_types | type_reference
+
+// -- method --
+method_def ::= method_def_start  '(' parameters_list? ')' ('throws' throws_list)? ';'
+private method_def_start ::= metadata* modifier* method_return_type id
+throws_list ::= type_reference (',' type_reference) *
+modifier ::= 'idempotent' | 'local'
+method_return_type ::= valid_return_type
+parameters_list ::= parameter (',' parameter) *
+parameter ::= parameter_modifier * data_type id {recoverUntil=parameter_recovery}
+parameter_modifier ::= 'out'
+private parameter_recovery ::= !(')' | ',')
+
+constant_value ::= (integer_value | float_value | bool_value | string_literal | type_reference)
+
+variable_type ::= data_type
+
+field_def ::= variable_type id ('=' constant_value )? ';'
+
+constant ::= 'const' variable_type id '=' constant_value ';'
+
+//
+// Data types
+//
+
+// Primitive data types
+private primitive_data_types ::= 'float' | 'double' | 'bool' | 'byte' | 'short' | 'int' | 'long'
+
+// Simple data types
+private simple_data_types ::= 'LocalObject' | 'string' | 'Object'
+
+// Boolean data type allowed values
+private bool_value ::= 'false' | 'true'
