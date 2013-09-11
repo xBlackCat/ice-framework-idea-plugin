@@ -1,6 +1,10 @@
 package org.xblackcat.frozenice.jps;
 
+import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.io.StreamUtil;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
@@ -9,6 +13,7 @@ import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
+import org.jetbrains.jps.incremental.messages.FileGeneratedEvent;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
 import org.xblackcat.frozenice.config.IceComponent;
@@ -70,9 +75,9 @@ public class SliceBuilder extends ModuleLevelBuilder {
             }
 
             // Translate files
-
             for (IceComponent c : translators) {
-                compileFiles(context, frameworkHome, target, sourceFiles, facetConfig, c);
+                final File outputDir = facetConfig.getOutputDir(c);
+                compileFiles(context, frameworkHome, target, sourceFiles, c, outputDir);
             }
         }
 
@@ -84,10 +89,8 @@ public class SliceBuilder extends ModuleLevelBuilder {
             File frameworkHome,
             ModuleBuildTarget buildTarget,
             List<File> sourceFiles,
-            SliceCompilerSettings facetConfig,
-            IceComponent target
+            IceComponent target, File outputDir
     ) {
-        File outputDir = facetConfig.getOutputDir(target);
         final JpsModule module = buildTarget.getModule();
 
         if (outputDir == null) {
@@ -108,8 +111,10 @@ public class SliceBuilder extends ModuleLevelBuilder {
 
         List<String> command = new ArrayList<>();
         command.add(target.getTranslatorPath(frameworkHome).getAbsolutePath());
+        command.add("--list-generated");
         command.add("--output-dir");
-        command.add(outputDir.getAbsolutePath());
+        final String outputDirPath = outputDir.getAbsolutePath();
+        command.add(outputDirPath);
         for (JpsModuleSourceRoot contentRoot : module.getSourceRoots()) {
             command.add("-I" + contentRoot.getFile().getAbsolutePath());
         }
@@ -138,19 +143,34 @@ public class SliceBuilder extends ModuleLevelBuilder {
                             )
                     );
                 }
-                context.processMessage(
-                        new CompilerMessage(
-                                getPresentableName(),
-                                BuildMessage.Kind.INFO,
-                                result
-                        )
-                );
+
+                Document res;
+                try {
+                    res = JDOMUtil.loadDocument(result);
+                    final FileGeneratedEvent msg = new FileGeneratedEvent();
+
+                    for (Element source : res.getRootElement().getChildren("source")) {
+                        for (Element file : source.getChildren("file")) {
+                            final String fileName = file.getAttributeValue("name");
+
+                            if (fileName.startsWith(outputDirPath)) {
+                                msg.add(outputDirPath, fileName.substring(outputDirPath.length() + 1));
+                            }
+                        }
+                    }
+
+                    context.processMessage(msg);
+                } catch (JDOMException e) {
+                    // ignore
+                }
+
+
                 if (code != 0) {
                     context.processMessage(
                             new CompilerMessage(
                                     getPresentableName(),
                                     BuildMessage.Kind.ERROR,
-                                    "Failed to translate files " +
+                                    "Failed to translate files with " +
                                             target.getTranslatorName() +
                                             ". Process returns error code " +
                                             code
