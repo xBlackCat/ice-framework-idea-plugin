@@ -1,7 +1,13 @@
 package org.xblackcat.frozenice.jps;
 
+import com.intellij.execution.process.BaseOSProcessHandler;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.openapi.util.JDOMUtil;
-import com.intellij.openapi.util.io.StreamUtil;
+import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.CharsetToolkit;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -23,8 +29,8 @@ import org.xblackcat.frozenice.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 10.09.13 17:01
@@ -32,6 +38,8 @@ import java.util.*;
  * @author xBlackCat
  */
 public class SliceBuilder extends ModuleLevelBuilder {
+    private static final String BUILDER_NAME = "SliceTranslator";
+
     protected SliceBuilder() {
         super(BuilderCategory.SOURCE_GENERATOR);
     }
@@ -85,21 +93,22 @@ public class SliceBuilder extends ModuleLevelBuilder {
     }
 
     private void compileFiles(
-            CompileContext context,
+            final CompileContext context,
             File frameworkHome,
             ModuleBuildTarget buildTarget,
             List<File> sourceFiles,
             IceComponent target, File outputDir
-    ) {
+    ) throws StopBuildException {
         final JpsModule module = buildTarget.getModule();
 
+        final String translatorName = target.getTranslatorName();
         if (outputDir == null) {
             context.processMessage(
                     new CompilerMessage(
                             getPresentableName(),
                             BuildMessage.Kind.WARNING,
                             "Output folder is not specified for " +
-                                    target.getTranslatorName() +
+                                    translatorName +
                                     " in module " +
                                     module.getName() +
                                     ". Check facet configuration."
@@ -125,66 +134,107 @@ public class SliceBuilder extends ModuleLevelBuilder {
         try {
             Process process = new ProcessBuilder()
                     .command(command)
-                    .redirectErrorStream(true)
                     .start();
 
-            try (InputStream out = process.getInputStream()) {
-                String result = StreamUtil.readText(out, "UTF-8");
-                int code = 0;
 
-                try {
-                    code = process.waitFor();
-                } catch (InterruptedException e) {
-                    context.processMessage(
-                            new CompilerMessage(
-                                    getPresentableName(),
-                                    BuildMessage.Kind.WARNING,
-                                    "Translator " + target.getTranslatorName() + " was interrupted"
-                            )
-                    );
-                }
+            BaseOSProcessHandler handler = new BaseOSProcessHandler(process, StringUtil.join(command, " "), CharsetToolkit.UTF8_CHARSET);
+            final AtomicBoolean hasErrors = new AtomicBoolean();
+            handler.addProcessListener(
+                    new ProcessAdapter() {
+                        final StringBuilder errorOutput = new StringBuilder();
+                        final StringBuilder stdOutput = new StringBuilder();
 
-                Document res;
-                try {
-                    res = JDOMUtil.loadDocument(result);
-                    final FileGeneratedEvent msg = new FileGeneratedEvent();
+                        @Override
+                        public void onTextAvailable(ProcessEvent event, Key outputType) {
+                            if (outputType == ProcessOutputTypes.STDERR) {
+                                errorOutput.append(event.getText());
+                            } else if (outputType == ProcessOutputTypes.STDOUT) {
+                                stdOutput.append(event.getText());
+                            }
+                        }
 
-                    for (Element source : res.getRootElement().getChildren("source")) {
-                        for (Element file : source.getChildren("file")) {
-                            final String fileName = file.getAttributeValue("name");
+                        @Override
+                        public void processTerminated(ProcessEvent event) {
+                            Document res;
+                            final String stdout = stdOutput.toString();
+                            try {
+                                res = JDOMUtil.loadDocument(stdout);
+                            } catch (JDOMException | IOException e) {
+                                context.processMessage(
+                                        new CompilerMessage(
+                                                BUILDER_NAME,
+                                                BuildMessage.Kind.ERROR,
+                                                "Can't process compiler output: " + stdout
+                                        )
+                                );
+                                hasErrors.set(true);
+                                return;
+                            }
 
-                            if (fileName.startsWith(outputDirPath)) {
-                                msg.add(outputDirPath, fileName.substring(outputDirPath.length() + 1));
+
+                            int exitCode = event.getExitCode();
+                            if (exitCode != 0) {
+                                for (Element source : res.getRootElement().getChildren("source")) {
+                                    final Element output = source.getChild("output");
+                                    if (output != null) {
+                                        context.processMessage(
+                                                new CompilerMessage(
+                                                        BUILDER_NAME,
+                                                        BuildMessage.Kind.ERROR,
+                                                        output.getTextTrim()
+                                                )
+                                        );
+                                    }
+                                }
+
+                                final String stdErr = errorOutput.toString();
+                                if (stdErr.length() > 0) {
+                                    context.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR, stdErr));
+                                }
+                                context.processMessage(
+                                        new CompilerMessage(
+                                                BUILDER_NAME, BuildMessage.Kind.ERROR,
+                                                "translator '" +
+                                                        translatorName +
+                                                        "' for '" +
+                                                        module.getName() +
+                                                        "' finished with exit code " +
+                                                        exitCode
+                                        )
+                                );
+                                hasErrors.set(true);
+                            } else {
+                                final FileGeneratedEvent msg = new FileGeneratedEvent();
+
+                                for (Element source : res.getRootElement().getChildren("source")) {
+                                    for (Element file : source.getChildren("file")) {
+                                        final String fileName = file.getAttributeValue("name");
+
+                                        if (fileName.startsWith(outputDirPath)) {
+                                            msg.add(outputDirPath, fileName.substring(outputDirPath.length() + 1));
+                                        }
+                                    }
+                                }
+
+                                context.processMessage(msg);
+
                             }
                         }
                     }
-
-                    context.processMessage(msg);
-                } catch (JDOMException e) {
-                    // ignore
-                }
-
-
-                if (code != 0) {
-                    context.processMessage(
-                            new CompilerMessage(
-                                    getPresentableName(),
-                                    BuildMessage.Kind.ERROR,
-                                    "Failed to translate files with " +
-                                            target.getTranslatorName() +
-                                            ". Process returns error code " +
-                                            code
-                            )
-                    );
-                }
+            );
+            handler.startNotify();
+            handler.waitFor();
+            if (hasErrors.get()) {
+                throw new StopBuildException();
             }
+
         } catch (IOException e) {
             context.processMessage(
                     new CompilerMessage(
                             getPresentableName(),
                             BuildMessage.Kind.ERROR,
                             "Failed to translate files with " +
-                                    target.getTranslatorName() +
+                                    translatorName +
                                     ". Error: " +
                                     e.getMessage()
                     )
