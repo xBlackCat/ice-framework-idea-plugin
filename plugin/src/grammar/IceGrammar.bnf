@@ -113,7 +113,7 @@ metadata_element ::= string_literal {recoverWhile=metadata_element_recover}
 private metadata_body_recover ::= !(']')
 private metadata_element_recover ::= !(']]' | ']' | ',')
 
-data_definition ::= (metadata)* (class_def | interface_def | exception_def | struct_def | enum_def /* | sequence_def | dictionary_def */ )
+data_definition ::= (metadata)* (class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def )
 
 extends_list ::= 'extends' type_reference (',' type_reference) * {pin=1}
 implements_list ::= 'implements' type_reference (',' type_reference) *  {pin=1}
@@ -147,13 +147,14 @@ enum_constant ::= id {recoverWhile=enum_constant_recover}
 private enum_constant_list_recover ::= !('}')
 private enum_constant_recover ::= !(',' | '}')
 
-element_type ::= data_type
-key_type ::= primitive_data_types | 'string' | type_reference
+element_type ::= data_type {recoverWhile=type_recovery}
+key_type ::= primitive_data_types | 'string' | type_reference {recoverWhile=type_recovery}
+private type_recovery ::= !('>' | ',')
 // --- Sequences ---
-sequence_def ::= metadata* 'sequence' '<' element_type '>' id ';'
+sequence_def ::= 'sequence' '<' element_type '>' id ';' {pin=1 recoverWhile=declaration_recover}
 
 // --- Dictionaries ---
-dictionary_def ::= metadata* 'dictionary' '<' key_type ',' element_type '>' id ';'
+dictionary_def ::= 'dictionary' '<' key_type ',' element_type '>' id ';' {pin=1 recoverWhile=declaration_recover}
 
 // --- Other ---
 type_reference ::= id {
