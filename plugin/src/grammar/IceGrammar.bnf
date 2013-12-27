@@ -97,7 +97,7 @@ private slice_block ::= (global_metadata)* (metadata)* module
 module ::= 'module' id '{' module_body '}' ';' {pin=1}
 private module_body ::= (module_element) * {pin(".*") = 1}
 
-private module_element ::= (metadata)* ( module | data_definition | constant )
+private module_element ::= ( module | data_definition | constant )
 
 global_metadata ::= '[[' global_metadata_body ']]' {pin=1 recoverWhile=global_metadata_recover}
 private global_metadata_body ::= metadata_element (',' metadata_element)*
@@ -112,8 +112,7 @@ metadata_element ::= string_literal {recoverWhile=metadata_element_recover}
 private metadata_body_recover ::= !(']')
 private metadata_element_recover ::= !(']]' | ']' | ',')
 
-private data_definition ::= class_def | interface_def // | exception_def | struct_def | enum_def | sequence_def | dictionary_def
-private data_def_recover ::= !('module' | '[' | '[[' |  data_definition | ('}' ';'))
+data_definition ::= (metadata)* (class_def | interface_def | exception_def | struct_def /* | enum_def | sequence_def | dictionary_def */ )
 
 extends_list ::= 'extends' type_reference (',' type_reference) * {pin=1}
 implements_list ::= 'implements' type_reference (',' type_reference) *  {pin=1}
@@ -133,13 +132,12 @@ private interface_element ::= (method_def | constant ) {recoverWhile=interface_e
 private interface_element_recover ::= !(interface_element | '}')
 
 // --- Exceptions ---
-private exception_def_start ::= metadata* 'exception' id
-exception_def ::= exception_def_start extends_list? '{' (class_element) * '}' ';'
+exception_def ::= 'exception' id extends_list? '{' (class_element) * '}' ';' {pin=1 recoverWhile=declaration_recover}
 
 // --- Structures ---
-private struct_def_start ::= metadata* 'struct' id
-struct_def ::= struct_def_start '{' (structure_declaration) * '}' ';'
-private structure_declaration ::= (field_def) * {recoverWhile=declaration_recover}
+struct_def ::= 'struct' id '{' (structure_element) * '}' ';' {pin=1 recoverWhile=declaration_recover}
+private structure_element ::= (field_def) {recoverWhile=structure_element_recover}
+private structure_element_recover ::= !( structure_element | '}')
 
 // --- Enums ---
 private enum_def_start ::= metadata* 'enum' id
