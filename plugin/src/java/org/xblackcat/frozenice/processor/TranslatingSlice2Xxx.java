@@ -80,12 +80,22 @@ public class TranslatingSlice2Xxx implements TranslatingCompiler {
                 final Module moduleByFile = context.getModuleByFile(file);
                 if (moduleByFile != null) {
                     IceFacet iceFacet = FacetManager.getInstance(moduleByFile).getFacetByType(IceFacet.ID);
+                    if (iceFacet == null) {
+                        context.addMessage(
+                                CompilerMessageCategory.WARNING,
+                                "IceFacet is not configured for module " + moduleByFile.getName() + ".",
+                                null,
+                                -1,
+                                -1
+                        );
+                        continue;
+                    }
 
                     SliceCompilerSettings facetConfig = iceFacet.getConfiguration().getConfig();
                     if (!facetConfig.isValid()) {
                         context.addMessage(
                                 CompilerMessageCategory.WARNING,
-                                "IceFacet is not configured for module " + iceFacet.getModule().getName() + ".",
+                                "IceFacet is not configured for module " + moduleByFile.getName() + ".",
                                 null,
                                 -1,
                                 -1
@@ -94,16 +104,14 @@ public class TranslatingSlice2Xxx implements TranslatingCompiler {
                         continue;
                     }
 
-                    if (iceFacet != null) {
-                        List<VirtualFile> list = filesByFacet.get(iceFacet);
+                    List<VirtualFile> list = filesByFacet.get(iceFacet);
 
-                        if (list == null) {
-                            list = new ArrayList<>();
-                            filesByFacet.put(iceFacet, list);
-                        }
-
-                        list.add(file);
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        filesByFacet.put(iceFacet, list);
                     }
+
+                    list.add(file);
                 }
             }
 

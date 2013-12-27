@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.integration.JavaModuleHelper;
 import org.xblackcat.frozenice.integration.SliceHelper;
-import org.xblackcat.frozenice.psi.SliceDataFwTypeElement;
 import org.xblackcat.frozenice.psi.SliceDataTypeElement;
 
 /**
@@ -41,7 +40,7 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
     ) {
         PsiElement element = getPsiElement();
 
-        if (element instanceof SliceDataTypeElement || element instanceof SliceDataFwTypeElement) {
+        if (element instanceof SliceDataTypeElement) {
             return new FindClassUsagesDialog(
                     element,
                     getProject(),

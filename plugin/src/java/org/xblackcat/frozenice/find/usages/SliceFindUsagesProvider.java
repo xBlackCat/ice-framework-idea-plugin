@@ -44,10 +44,10 @@ public class SliceFindUsagesProvider implements FindUsagesProvider {
         if (element instanceof SliceEnumDef) {
             return LangBundle.message("java.terms.enum");
         }
-        if (element instanceof SliceInterfaceDef || element instanceof SliceInterfaceDefFw) {
+        if (element instanceof SliceInterfaceDef) {
             return LangBundle.message("java.terms.interface");
         }
-        if (element instanceof SliceClassDef || element instanceof SliceClassDefFw) {
+        if (element instanceof SliceClassDef) {
             return LangBundle.message("java.terms.class");
 
         }

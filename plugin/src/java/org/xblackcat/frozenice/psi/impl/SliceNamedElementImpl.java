@@ -22,6 +22,7 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenice.psi.SliceNamedElement;
 import org.xblackcat.frozenice.psi.SliceTypes;
 
@@ -44,7 +45,12 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
     @Override
     public String getName() {
         if (myCachedName == null) {
-            myCachedName = getId().getText();
+            final PsiElement id = getId();
+            if (id != null) {
+                myCachedName = id.getText();
+            } else {
+                return "!! " + getClass().getName();
+            }
         }
         return myCachedName;
     }
@@ -57,7 +63,12 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
 
     @Override
     public int getTextOffset() {
-        return getId().getTextOffset();
+        final PsiElement id = getId();
+        if (id != null) {
+            return id.getTextOffset();
+        } else {
+            return -1;
+        }
     }
 
     @NotNull
@@ -71,7 +82,7 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
         return super.getIcon(flags);
     }
 
-    @NotNull
+    @Nullable
     @Override
     public PsiElement getId() {
         ASTNode child = getNode().findChildByType(SliceTypes.ICE_ID);
