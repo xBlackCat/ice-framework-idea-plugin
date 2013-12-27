@@ -162,7 +162,12 @@ public class SliceModuleHelper {
                     return null;
                 }
             } else if (aClass instanceof SliceInterfaceDef) {
-                return ((SliceInterfaceDef) aClass).getMethodDefList();
+                final SliceInterfaceBody body = ((SliceInterfaceDef) aClass).getInterfaceBody();
+                if (body != null) {
+                    return body.getMethodDefList();
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }
