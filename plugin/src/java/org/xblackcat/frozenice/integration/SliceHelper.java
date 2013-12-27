@@ -1,9 +1,6 @@
 package org.xblackcat.frozenice.integration;
 
-import com.intellij.psi.NavigatablePsiElement;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiModifier;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.xblackcat.frozenice.config.IceComponent;
 import org.xblackcat.frozenice.psi.*;
@@ -22,8 +19,7 @@ public class SliceHelper {
                 SliceGlobalMetadata.class
         );
         for (SliceGlobalMetadata md : globalMetadatas) {
-            SliceMetadataBody body = md.getMetadataBody();
-            for (SliceMetadataElement el : body.getMetadataElementList()) {
+            for (SliceMetadataElement el : md.getMetadataElementList()) {
                 String packageString = target.extractPackageName(el.getStringLiteral().getText());
 
                 if (packageString != null) {
@@ -39,10 +35,14 @@ public class SliceHelper {
         if (module == null) {
             return;
         }
+        final PsiElement id = module.getId();
+        if (id == null) {
+            return;
+        }
 
         collectName(res, PsiTreeUtil.getParentOfType(module, SliceModule.class));
 
-        res.append(module.getId().getText());
+        res.append(id.getText());
         res.append(".");
     }
 

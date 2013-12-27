@@ -20,6 +20,9 @@
 
     // Tokens
     tokens=[
+        id="regexp:\p{Alpha}\w*"
+        string_literal="regexp:\"([^\"\\]|\\.)*\""
+
         EQ="="
         SEMICOLON=";"
         COMA=","
@@ -85,66 +88,65 @@
 
     implements("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.SliceDataTypeElement"
     extends("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.impl.SliceDataTypeElementImpl"
-    implements(".*_def_fw")="org.xblackcat.frozenice.psi.SliceDataFwTypeElement"
-    extends(".*_def_fw")="org.xblackcat.frozenice.psi.impl.SliceDataFwTypeElementImpl"
     implements(".*_def|module")="org.xblackcat.frozenice.psi.SliceNamedElement"
     extends(".*_def|module")="org.xblackcat.frozenice.psi.impl.SliceNamedElementImpl"
 }
 
-external slice_file ::= parse_file slice_block
-private slice_block ::= (global_metadata)*  module {recoverUntil=slice_block_recover}
-private module_start ::= metadata* 'module' id
-module ::= module_start '{' (module_element) * '}' ';' {pin=2}
-private slice_block_recover ::= !('[[' | module_start)
+root ::= slice_block
+private slice_block ::= (global_metadata)*  module
+module ::= (metadata)* 'module' id '{' module_body '}' ';' {pin=2}
+private module_body ::= (module_element) * {pin(".*") = 1}
 
-private module_element ::= ( module | data_definition | constant | forward_declaration ) {recoverUntil=data_def_recover }
-global_metadata ::= '[[' metadata_body ']]'
-metadata ::= '[' metadata_body ']'
+private module_element ::= ( module | data_definition | constant )
 
-metadata_body ::= metadata_element (',' metadata_element) *
-metadata_element ::= string_literal {recoverUntil=metadata_recover}
-private metadata_recover ::= !(']' | ']]' | ',')
+global_metadata ::= '[[' global_metadata_body ']]' {pin=1 recoverWhile=global_metadata_recover}
+private global_metadata_body ::= metadata_element (',' metadata_element)*
+private global_metadata_recover ::= !('module' | '[' | '[[')
 
-private data_definition ::= class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def
-private data_def_recover ::= !(module_start | '[' | 'const' | 'class' | 'interface' | 'enum' | 'exception' | 'struct' | 'sequence' | 'dictionary' | '}' | ';')
+metadata ::= '[' metadata_body ']' {pin=1 recoverWhile=metadata_recover}
+private metadata_body ::= metadata_element (',' metadata_element)* {pin=1 recoverWhile=metadata_body_recover}
+private metadata_recover ::= !('module' | data_def_keywords | '[[' | '[' )
+private data_def_keywords ::= 'class' | 'interface' | 'exception' | 'struct' | 'enum' | 'sequence' | 'dictionary'
 
-extends_list ::= 'extends' type_reference (',' type_reference) *
-implements_list ::= 'implements' type_reference (',' type_reference) *
+metadata_element ::= string_literal {recoverWhile=metadata_element_recover}
+private metadata_body_recover ::= !(']')
+private metadata_element_recover ::= !(']]' | ']' | ',')
 
-// --- Forward declaration ---
-private forward_declaration ::= class_def_fw | interface_def_fw | exception_def_fw | structure_def_fw
-class_def_fw ::= class_def_start ';'
-interface_def_fw ::= interface_def_start ';'
-exception_def_fw ::= exception_def_start ';'
-structure_def_fw ::= struct_def_start ';'
+private data_definition ::= class_def | interface_def // | exception_def | struct_def | enum_def | sequence_def | dictionary_def
+private data_def_recover ::= !('module' | '[' | '[[' |  data_definition | ('}' ';'))
+
+extends_list ::= 'extends' type_reference (',' type_reference) * {pin=1}
+implements_list ::= 'implements' type_reference (',' type_reference) *  {pin=1}
 
 // --- Class ---
-private class_def_start ::= metadata* 'class' id
-class_def ::= class_def_start extends_list? implements_list? '{' (class_declaration) * '}' ';' {pin=4}
-private class_declaration ::= (field_def | method_def | constant ) {recoverUntil=declaration_recover}
+class_def ::= (metadata)* 'class' id extends_list? implements_list? classBody? ';' {pin=2 recoverWhile=declaration_recover}
+classBody ::= '{' (class_element) * '}'
+private class_element ::= (field_def | method_def | constant )
 
-private declaration_recover ::= !('}' | 'const' | method_def_start | variable_type)
+private class_element_recover ::= (field_def | method_def | constant | '}' ';' )
+private declaration_recover ::= !(data_definition | '}')
 
 // --- Interface ---
-private interface_def_start ::= metadata* 'interface' id
-interface_def ::= interface_def_start extends_list? '{' (interface_declaration) * '}' ';'{pin=3}
-private interface_declaration ::= (method_def | constant ) {recoverUntil=declaration_recover}
+private interface_def_start ::= metadata* 'interface' id {pin=2 recoverWhile=interface_def_start_recover}
+private interface_def_start_recover ::= !(';' | '{' | 'extends' | '}')
+interface_def ::= interface_def_start extends_list? '{' (interface_declaration) * '}' ';' {pin=1 recoverWhile=declaration_recover}
+private interface_declaration ::= (method_def | constant ) {recoverWhile=declaration_recover}
 
 // --- Exceptions ---
 private exception_def_start ::= metadata* 'exception' id
-exception_def ::= exception_def_start extends_list? '{' (class_declaration)* '}' ';' {pin=3}
+exception_def ::= exception_def_start extends_list? '{' (class_element) * '}' ';'
 
 // --- Structures ---
 private struct_def_start ::= metadata* 'struct' id
-struct_def ::= struct_def_start '{' (structure_declaration) * '}' ';'{pin=2}
-private structure_declaration ::= (field_def) * {recoverUntil=declaration_recover}
+struct_def ::= struct_def_start '{' (structure_declaration) * '}' ';'
+private structure_declaration ::= (field_def) * {recoverWhile=declaration_recover}
 
 // --- Enums ---
 private enum_def_start ::= metadata* 'enum' id
-enum_def ::= enum_def_start '{' enum_constant_list '}' ';' {pin=2}
+enum_def ::= enum_def_start '{' enum_constant_list '}' ';'
 enum_constant_list ::= enum_constant (',' enum_constant) *
-enum_constant ::= id {recoverUntil=enum_constant_list_recover}
-private enum_constant_list_recover ::= !(',' | '}')
+enum_constant ::= id {recoverWhile=enum_constant_list_recover}
+private enum_constant_list_recover ::= !(',' | '}' ';')
 
 element_type ::= data_type
 key_type ::= primitive_data_types | 'string' | type_reference
@@ -159,27 +161,27 @@ type_reference ::= id {
     methods = [getReferences]
 }
 proxy_type ::= (simple_data_types | type_reference) '*'
-private valid_return_type ::= data_type | 'void'
 data_type ::= proxy_type | primitive_data_types | simple_data_types | type_reference
 
 // -- method --
-method_def ::= method_def_start  '(' parameters_list? ')' ('throws' throws_list)? ';'
-private method_def_start ::= metadata* modifier* method_return_type id
-throws_list ::= type_reference (',' type_reference) *
+method_def ::= metadata* modifier* method_return_type id '(' parameters_list ')' (throws_list)? ';' {recoverWhile=class_element_recover}
+throws_list ::= 'throws' type_reference (',' type_reference) * {pin=1 recoverWhile=throws_list_recovery}
+private throws_list_recovery ::= !(';')
 modifier ::= 'idempotent' | 'local'
-method_return_type ::= valid_return_type
-parameters_list ::= parameter (',' parameter) *
-parameter ::= parameter_modifier * data_type id {recoverUntil=parameter_recovery}
+method_return_type ::= data_type | 'void'
+parameters_list ::= (parameter (',' parameter) *)? {pin(".*")=1 recoverWhile=parameter_list_recovery}
+parameter ::= parameter_modifier * data_type id {pin=2 recoverWhile=parameter_recovery}
 parameter_modifier ::= 'out'
+private parameter_list_recovery ::= !(')')
 private parameter_recovery ::= !(')' | ',')
 
 constant_value ::= (integer_value | float_value | bool_value | string_literal | type_reference)
 
 variable_type ::= data_type
 
-field_def ::= variable_type id ('=' constant_value )? ';'
+field_def ::= variable_type id ('=' constant_value )? ';' {recoverWhile=class_element_recover}
 
-constant ::= 'const' variable_type id '=' constant_value ';'
+constant ::= 'const' variable_type id '=' constant_value ';' {pin=1 recoverWhile=class_element_recover}
 
 //
 // Data types
