@@ -93,11 +93,11 @@
 }
 
 root ::= slice_block
-private slice_block ::= (global_metadata)*  module
-module ::= (metadata)* 'module' id '{' module_body '}' ';' {pin=2}
+private slice_block ::= (global_metadata)* (metadata)* module
+module ::= 'module' id '{' module_body '}' ';' {pin=1}
 private module_body ::= (module_element) * {pin(".*") = 1}
 
-private module_element ::= ( module | data_definition | constant )
+private module_element ::= (metadata)* ( module | data_definition | constant )
 
 global_metadata ::= '[[' global_metadata_body ']]' {pin=1 recoverWhile=global_metadata_recover}
 private global_metadata_body ::= metadata_element (',' metadata_element)*
@@ -105,8 +105,8 @@ private global_metadata_recover ::= !('module' | '[' | '[[')
 
 metadata ::= '[' metadata_body ']' {pin=1 recoverWhile=metadata_recover}
 private metadata_body ::= metadata_element (',' metadata_element)* {pin=1 recoverWhile=metadata_body_recover}
-private metadata_recover ::= !('module' | data_def_keywords | '[[' | '[' )
-private data_def_keywords ::= 'class' | 'interface' | 'exception' | 'struct' | 'enum' | 'sequence' | 'dictionary'
+private metadata_recover ::= !(data_def_keywords | 'module' | '[[' | '[' )
+private data_def_keywords ::= 'exception' | 'class' | 'interface' | 'struct' | 'enum' | 'sequence' | 'dictionary'
 
 metadata_element ::= string_literal {recoverWhile=metadata_element_recover}
 private metadata_body_recover ::= !(']')
@@ -119,18 +119,18 @@ extends_list ::= 'extends' type_reference (',' type_reference) * {pin=1}
 implements_list ::= 'implements' type_reference (',' type_reference) *  {pin=1}
 
 // --- Class ---
-class_def ::= (metadata)* 'class' id extends_list? implements_list? classBody? ';' {pin=2 recoverWhile=declaration_recover}
+class_def ::= 'class' id extends_list? implements_list? classBody? ';' {pin=1 recoverWhile=declaration_recover}
 classBody ::= '{' (class_element) * '}'
 private class_element ::= (field_def | method_def | constant )
 
-private class_element_recover ::= (field_def | method_def | constant | '}' ';' )
-private declaration_recover ::= !(data_definition | '}')
+private class_element_recover ::= (class_element | ('}' ';'))
+private declaration_recover ::= !('[' | data_def_keywords | 'const' | '}')
 
 // --- Interface ---
-private interface_def_start ::= metadata* 'interface' id {pin=2 recoverWhile=interface_def_start_recover}
-private interface_def_start_recover ::= !(';' | '{' | 'extends' | '}')
-interface_def ::= interface_def_start extends_list? '{' (interface_declaration) * '}' ';' {pin=1 recoverWhile=declaration_recover}
-private interface_declaration ::= (method_def | constant ) {recoverWhile=declaration_recover}
+interface_def ::= 'interface' id extends_list? interface_body? ';' {pin=1 recoverWhile=declaration_recover}
+interface_body ::= '{' (interface_element) * '}'
+private interface_element ::= (method_def | constant ) {recoverWhile=interface_element_recover}
+private interface_element_recover ::= !(interface_element | '}')
 
 // --- Exceptions ---
 private exception_def_start ::= metadata* 'exception' id
