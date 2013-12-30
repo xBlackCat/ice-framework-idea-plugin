@@ -154,26 +154,28 @@ public class SliceModuleHelper {
         }
 
         private static List<SliceMethodDef> getMethodList(String methodName, SliceDataTypeElement aClass) {
-            if (aClass instanceof SliceClassDef) {
-                final SliceClassBody body = ((SliceClassDef) aClass).getClassBody();
-                if (body != null) {
-                    return body.getMethodDefList();
-                } else {
-                    return null;
-                }
-            } else if (aClass instanceof SliceInterfaceDef) {
-                final SliceInterfaceBody body = ((SliceInterfaceDef) aClass).getInterfaceBody();
-                if (body != null) {
-                    return body.getMethodDefList();
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-
+            // TODO: uncomment
+//            if (aClass instanceof SliceClassDef) {
+//                final SliceClassBody body = ((SliceClassDef) aClass).getClassBody();
+//                if (body != null) {
+//                    return body.getMethodDefList();
+//                } else {
+//                    return null;
+//                }
+//            } else if (aClass instanceof SliceInterfaceDef) {
+//                final SliceInterfaceBody body = ((SliceInterfaceDef) aClass).getInterfaceBody();
+//                if (body != null) {
+//                    return body.getMethodDefList();
+//                } else {
+//                    return null;
+//                }
+//            } else {
+//                return null;
+//            }
+            return null;
         }
 
+            // TODO: uncomment
 //        @NotNull
 //        @Override
 //        public List<NavigatablePsiElement> getClassMethods(String className, boolean staticMethods) {
