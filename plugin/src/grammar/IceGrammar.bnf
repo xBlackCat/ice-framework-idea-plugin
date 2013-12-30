@@ -97,7 +97,8 @@ private slice_block ::= (global_metadata)* (metadata)* module
 module ::= 'module' id '{' module_body '}' ';' {pin=1}
 private module_body ::= (module_element) * {pin(".*") = 1}
 
-private module_element ::= (metadata)* ( module | data_definition | constant )
+private module_element ::= (metadata)* ( module | data_definition | constant ) {pin=2 recoverWhile=module_element_recovery}
+private module_element_recovery ::= !('}' | '[' | module_element)
 
 global_metadata ::= '[[' global_metadata_body ']]' {pin=1 recoverWhile=global_metadata_recovery}
 private global_metadata_body ::= metadata_element (',' metadata_element)* {pin=1 recoverWhile=glabal_metadata_body_recovery}
@@ -122,9 +123,9 @@ implements_list ::= 'implements' type_reference (',' type_reference) *  {pin=1}
 class_def ::= 'class' id extends_list? implements_list? class_body? ';' {pin=1 recoverWhile=declaration_recovery}
 class_body ::= '{' class_element_list '}'
 private class_element_list ::= (class_element) * {pin(".*") = 1}
-class_element ::= (metadata)* (/*field_def | method_def |*/ constant )
+private class_element ::= (metadata)* (/*field_def | method_def |*/ constant ) {pin=2 recoverWhile=class_element_recovery}
 
-private class_element_recovery ::= !('}' | '[' | 'const' | id | constant_value)
+private class_element_recovery ::= !('}' | '[' | class_element)
 private declaration_recovery ::= !('[' | data_def_keywords | '}')
 
 // --- Interface ---
@@ -180,9 +181,9 @@ constant_value ::= (integer_value | float_value | bool_value | string_literal | 
 
 variable_type ::= data_type
 
-field_def ::= variable_type id ('=' constant_value )? ';' {recoverWhile=class_element_recovery}
+field_def ::= variable_type id ('=' constant_value )? ';'
 
-constant ::= 'const' variable_type id '=' constant_value ';' {pin=1 recoverWhile=class_element_recovery}
+constant ::= 'const' variable_type id '=' constant_value ';' {pin=1}
 
 //
 // Data types
