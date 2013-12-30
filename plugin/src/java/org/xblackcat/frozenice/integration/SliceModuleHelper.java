@@ -154,34 +154,31 @@ public class SliceModuleHelper {
         }
 
         private static List<SliceMethodDef> getMethodList(String methodName, SliceDataTypeElement aClass) {
-            // TODO: uncomment
-//            if (aClass instanceof SliceClassDef) {
-//                final SliceClassBody body = ((SliceClassDef) aClass).getClassBody();
-//                if (body != null) {
-//                    return body.getMethodDefList();
-//                } else {
-//                    return null;
-//                }
-//            } else if (aClass instanceof SliceInterfaceDef) {
-//                final SliceInterfaceBody body = ((SliceInterfaceDef) aClass).getInterfaceBody();
-//                if (body != null) {
-//                    return body.getMethodDefList();
-//                } else {
-//                    return null;
-//                }
-//            } else {
-//                return null;
-//            }
-            return null;
+            if (aClass instanceof SliceClassDef) {
+                final SliceClassBody body = ((SliceClassDef) aClass).getClassBody();
+                if (body != null) {
+                    return body.getMethodDefList();
+                } else {
+                    return null;
+                }
+            } else if (aClass instanceof SliceInterfaceDef) {
+                final SliceInterfaceBody body = ((SliceInterfaceDef) aClass).getInterfaceBody();
+                if (body != null) {
+                    return body.getMethodDefList();
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
         }
 
-            // TODO: uncomment
-//        @NotNull
-//        @Override
-//        public List<NavigatablePsiElement> getClassMethods(String className, boolean staticMethods) {
-//            PsiClass aClass = findClass(className);
-//            if (aClass == null) return Collections.emptyList();
-//            final ArrayList<NavigatablePsiElement> result = new ArrayList<NavigatablePsiElement>();
+        @NotNull
+        @Override
+        public List<NavigatablePsiElement> getClassMethods(String className, boolean staticMethods) {
+            SliceDataTypeElement aClass = findClass(className);
+            if (aClass == null) return Collections.emptyList();
+            final ArrayList<NavigatablePsiElement> result = new ArrayList<>();
 //            for (PsiMethod method : aClass.getAllMethods()) {
 //                PsiModifierList modifierList = method.getModifierList();
 //                if (modifierList.hasExplicitModifier(PsiModifier.PUBLIC) &&
@@ -189,8 +186,8 @@ public class SliceModuleHelper {
 //                    result.add(method);
 //                }
 //            }
-//            return result;
-//        }
+            return result;
+        }
 
         @NotNull
         @Override
