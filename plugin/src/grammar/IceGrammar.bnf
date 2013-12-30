@@ -98,7 +98,7 @@ module ::= 'module' id '{' module_body '}' ';' {pin=1}
 private module_body ::= (module_element) * {pin(".*") = 1}
 
 private module_element ::= (metadata)* ( module | constant | data_definition ) {recoverWhile=module_element_recovery}
-private module_element_recovery ::= !('}' | '[' | data_def_keywords | 'const')
+private module_element_recovery ::= !('}' | '[' | module_element)
 
 global_metadata ::= '[[' global_metadata_body ']]' {pin=1 recoverWhile=global_metadata_recovery}
 private global_metadata_body ::= metadata_element (',' metadata_element)* {pin=1 recoverWhile=glabal_metadata_body_recovery}
@@ -121,21 +121,21 @@ implements_list ::= 'implements' type_reference (',' type_reference) *  {pin=1}
 
 // --- Class ---
 class_def ::= 'class' id extends_list? implements_list? class_body? ';' {pin=1}
-class_body ::= '{' class_element_list '}'
-private class_element_list ::= (class_element) * {pin(".*") = 1}
-private class_element ::= (metadata)* (/*field_def | method_def |*/ ) {pin=2 recoverWhile=class_element_recovery}
+class_body ::= '{' class_element_list '}' {pin = 1;}
+private class_element_list ::= (class_element) * {pin=".*" recoverWhile=class_element_list_recovery}
+private class_element_list_recovery ::= !('}')
 
+private class_element ::= (metadata)* (field_def | method_def ) {recoverWhile=class_element_recovery}
 private class_element_recovery ::= !('}' | '[' | class_element)
-private declaration_recovery ::= !('[' | data_def_keywords | '}')
 
 // --- Interface ---
 interface_def ::= 'interface' id extends_list? interface_body? ';' {pin=1}
 interface_body ::= '{' (interface_element) * '}' {pin=1}
-private interface_element ::= (metadata)* (/*method_def */  ) {recoverWhile=interface_element_recovery}
+private interface_element ::= (metadata)* ( method_def ) {recoverWhile=interface_element_recovery}
 private interface_element_recovery ::= !(interface_element | '}')
 
 // --- Exceptions ---
-exception_def ::= 'exception' id extends_list? '{' (class_element) * '}' ';' {pin=1}
+exception_def ::= 'exception' id extends_list? '{' class_element_list '}' ';' {pin=1}
 
 // --- Structures ---
 struct_def ::= 'struct' id '{' (structure_element) * '}' ';' {pin=1}
@@ -166,14 +166,18 @@ proxy_type ::= (simple_data_types | type_reference) '*'
 data_type ::= proxy_type | primitive_data_types | simple_data_types | type_reference
 
 // -- method --
+modifier ::= 'idempotent' | 'local'
+method_return_type ::= data_type | 'void'
+
 method_def ::= modifier* method_return_type id '(' parameters_list ')' (throws_list)? ';' {pin=4}
 throws_list ::= 'throws' type_reference (',' type_reference) * {pin=1 recoverWhile=declaration_end_recovery}
 private declaration_end_recovery ::= !(';')
-modifier ::= 'idempotent' | 'local'
-method_return_type ::= data_type | 'void'
-parameters_list ::= (parameter (',' parameter) *)? {pin(".*")=1 recoverWhile=parameter_list_recovery}
-parameter ::= parameter_modifier * data_type id {pin=2 recoverWhile=parameter_recovery}
+
 parameter_modifier ::= 'out'
+
+parameters_list ::= (parameter (',' parameter) *)? {pin(".*")=1 recoverWhile=parameter_list_recovery}
+parameter ::= parameter_modifier* data_type id {pin=2 recoverWhile=parameter_recovery}
+
 private parameter_list_recovery ::= !(')')
 private parameter_recovery ::= !(')' | ',')
 
@@ -181,7 +185,7 @@ constant_value ::= (integer_value | float_value | bool_value | string_literal | 
 
 variable_type ::= data_type
 
-field_def ::= variable_type id ('=' constant_value )? ';' {pin=2}
+field_def ::= variable_type id ('=' constant_value )? ';'
 
 constant ::= 'const' variable_type id '=' constant_value ';' {pin=1}
 
