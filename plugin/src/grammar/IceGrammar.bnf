@@ -190,9 +190,11 @@ constant_value ::= (integer_value | float_value | bool_value | string_literal | 
 
 variable_type ::= data_type
 
-field_def ::= variable_type id ('=' constant_value )? ';'
+field_initializer ::= '=' constant_value {pin = 1 recoverWhile=declaration_end_recovery}
 
-constant ::= 'const' variable_type id '=' constant_value ';' {pin=1}
+field_def ::= variable_type id (field_initializer )? ';'
+
+constant ::= 'const' variable_type id field_initializer ';' {pin=1}
 
 //
 // Data types
