@@ -114,7 +114,7 @@ metadata_element ::= string_literal {recoverWhile=metadata_element_recovery}
 private metadata_body_recovery ::= !(']')
 private metadata_element_recovery ::= !(']]' | ']' | ',')
 
-data_definition ::= (class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def )
+private data_definition ::= (class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def )
 
 extends_list ::= 'extends' type_reference (',' type_reference) * {pin=1}
 implements_list ::= 'implements' type_reference (',' type_reference) *  {pin=1}

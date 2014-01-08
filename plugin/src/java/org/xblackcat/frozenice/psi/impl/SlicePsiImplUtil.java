@@ -15,7 +15,7 @@ public class SlicePsiImplUtil {
     @NotNull
     public static PsiReference[] getReferences(SliceTypeReference o) {
         return new PsiReference[]{
-                new SliceReferenceImpl<SliceTypeReference>(o, TextRange.from(0, o.getTextLength()))
+                new SliceReferenceImpl<>(o, TextRange.from(0, o.getTextLength()))
         };
     }
 }

@@ -13,11 +13,15 @@ import org.xblackcat.frozenice.psi.SliceTypes;
  */
 public class PsiIcePatterns extends StandardPatterns {
     public static PsiIceElementPattern.Capture<PsiElement> psiElement() {
-        return new PsiIceElementPattern.Capture<PsiElement>(PsiElement.class);
+        return new PsiIceElementPattern.Capture<>(PsiElement.class);
     }
 
     public static PsiIceElementPattern.Capture<PsiElement> psiElement(IElementType type) {
         return psiElement().withElementType(type);
+    }
+
+    public static ElementPattern<? extends PsiElement> moduleBody() {
+        return psiElement();
     }
 
     public static ElementPattern<? extends PsiElement> metadataDirective() {
