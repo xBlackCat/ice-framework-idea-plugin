@@ -2,10 +2,14 @@ package org.xblackcat.frozenice.psi.impl;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.psi.*;
+
+import java.util.Collection;
+import java.util.Map;
 
 
 /**
@@ -45,5 +49,11 @@ public class SlicePsiImplUtil {
         }
 
         return null;
+    }
+
+    public static <T extends PsiNamedElement> void addAll(Map<String, T> map, Collection<? extends T> collection) {
+        for (T el : collection) {
+            map.put(el.getName(), el);
+        }
     }
 }
