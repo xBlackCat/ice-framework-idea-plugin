@@ -7,6 +7,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.psi.*;
 
+import java.util.List;
+
 /**
  * 08.01.14 14:08
  *
@@ -21,6 +23,21 @@ class SliceEnumConstRefImpl extends PsiReferenceBase<SliceEnumConstantReference>
     public PsiElement resolve() {
         final String referenceName = getRangeInElement().substring(myElement.getText());
 
+        final SliceEnumConstantList constantList = obtainEnumConstantList();
+        if (constantList == null) {
+            return null;
+        }
+
+        for (SliceEnumConstant enumConst : constantList.getEnumConstantList()) {
+            if (referenceName.equals(enumConst.getName())) {
+                return enumConst;
+            }
+        }
+
+        return null;
+    }
+
+    protected SliceEnumConstantList obtainEnumConstantList() {
         final SliceConstant constantDef = PsiTreeUtil.getParentOfType(myElement, SliceConstant.class);
         if (constantDef == null) {
             return null;
@@ -41,18 +58,18 @@ class SliceEnumConstRefImpl extends PsiReferenceBase<SliceEnumConstantReference>
             return null;
         }
 
-        for (SliceEnumConstant enumConst : constantList.getEnumConstantList()) {
-            if (referenceName.equals(enumConst.getName())) {
-                return enumConst;
-            }
-        }
-
-        return null;
+        return constantList;
     }
 
     @NotNull
     @Override
     public Object[] getVariants() {
-        return new Object[0];
+        final SliceEnumConstantList constantList = obtainEnumConstantList();
+        if (constantList == null) {
+            return EMPTY_ARRAY;
+        }
+
+        final List<SliceEnumConstant> list = constantList.getEnumConstantList();
+        return list.toArray(new PsiElement[list.size()]);
     }
 }
