@@ -2,7 +2,9 @@ package org.xblackcat.frozenice.psi.impl;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.psi.*;
 
 /**
@@ -10,7 +12,7 @@ import org.xblackcat.frozenice.psi.*;
  *
  * @author xBlackCat
  */
-class SliceEnumConstRefImpl extends SliceReferenceImpl<SliceEnumConstantReference> {
+class SliceEnumConstRefImpl extends PsiReferenceBase<SliceEnumConstantReference> {
     public SliceEnumConstRefImpl(SliceEnumConstantReference o) {
         super(o, TextRange.from(0, o.getTextLength()));
     }
@@ -29,7 +31,7 @@ class SliceEnumConstRefImpl extends SliceReferenceImpl<SliceEnumConstantReferenc
             return null;
         }
 
-        final PsiElement enumType = resolveDataType(constType, TextRange.from(0, constType.getTextLength()));
+        final PsiElement enumType = SlicePsiImplUtil.resolveDataType(constType, TextRange.from(0, constType.getTextLength()));
         if (!(enumType instanceof SliceEnumDef)) {
             return null;
         }
@@ -46,5 +48,11 @@ class SliceEnumConstRefImpl extends SliceReferenceImpl<SliceEnumConstantReferenc
         }
 
         return null;
+    }
+
+    @NotNull
+    @Override
+    public Object[] getVariants() {
+        return new Object[0];
     }
 }

@@ -20,7 +20,7 @@
 
     // Tokens
     tokens=[
-        id="regexp:\p{Alpha}\w*"
+        id="regexp:\\?\p{Alpha}\w*"
         string_literal="regexp:\"([^\"\\]|\\.)*\""
         integer_value="regexp:\"[\-\+]?\d+\""
         float_value="regexp:\"[\-\+]?(\d*\.)?\d+([eE][-+]?\d+)?\""
