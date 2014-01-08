@@ -4,7 +4,7 @@
     <description>ICE framework support.</description>
     <version>0.0.2.2</version>
     <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
-    <idea-version since-build="132.1"/>
+    <idea-version since-build="133.1"/>
     <depends>com.intellij.modules.lang</depends>
     <change-notes><![CDATA[<ul>
             <li><b>0.0.0.1</b> - First revision: Only syntax highlighting</li>
