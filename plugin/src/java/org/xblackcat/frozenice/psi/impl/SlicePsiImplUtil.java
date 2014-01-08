@@ -1,10 +1,11 @@
 package org.xblackcat.frozenice.psi.impl;
 
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenice.psi.SliceEnumConstantReference;
-import org.xblackcat.frozenice.psi.SliceTypeReference;
+import org.xblackcat.frozenice.psi.*;
 
 
 /**
@@ -27,4 +28,22 @@ public class SlicePsiImplUtil {
         };
     }
 
+    protected static PsiElement resolveDataType(SliceCompositeElement element, TextRange rangeInElement) {
+        String referenceName = rangeInElement.substring(element.getText());
+        SliceModule module = PsiTreeUtil.getParentOfType(element, SliceModule.class);
+
+        if (module == null) {
+            return null;
+        }
+
+        for (PsiElement c : module.getChildren()) {
+            if (c instanceof SliceDataTypeElement) {
+                if (referenceName.equals(((SliceDataTypeElement) c).getName())) {
+                    return c;
+                }
+            }
+        }
+
+        return null;
+    }
 }
