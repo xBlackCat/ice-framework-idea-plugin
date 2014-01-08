@@ -2,12 +2,8 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.2.1</version>
-    <vendor email="xblackcat@gmail.com"
-            url="http://code.google.com/p/ice-framework-idea-plugin/"
-            logo="/icons/facet-32.png"
-            >xBlackCat
-    </vendor>
+    <version>0.0.2.2</version>
+    <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
     <idea-version since-build="132.1"/>
     <depends>com.intellij.modules.lang</depends>
     <change-notes><![CDATA[<ul>
@@ -20,6 +16,7 @@
             <li><b>0.0.1.1</b> - Find usages of generated objects.</li>
             <li><b>0.0.2.0</b> - Use external compiler interface to support Slice compilation in Idea 12 and above.</li>
             <li><b>0.0.2.1</b> - Show more information about errors during compilation.</li>
+            <li><b>0.0.2.2</b> - Rework slice file parser. Implement basic completion for data type places (in implement/extends/etc. list).</li>
             </ul>]]>
     </change-notes>
 
@@ -48,7 +45,7 @@
         <moduleService serviceInterface="org.xblackcat.frozenice.integration.SliceModuleHelper"
                        serviceImplementation="org.xblackcat.frozenice.integration.SliceModuleHelper$Impl"/>
         <projectService serviceInterface="org.xblackcat.frozenice.psi.SlicePsiFacade"
-                            serviceImplementation="org.xblackcat.frozenice.psi.impl.SlicePsiFacadeImpl"/>
+                        serviceImplementation="org.xblackcat.frozenice.psi.impl.SlicePsiFacadeImpl"/>
 
         <compileServer.plugin classpath="frozenidea-jps-plugin.jar"/>
 
