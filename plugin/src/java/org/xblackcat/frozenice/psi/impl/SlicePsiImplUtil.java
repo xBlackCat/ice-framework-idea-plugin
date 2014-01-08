@@ -3,6 +3,7 @@ package org.xblackcat.frozenice.psi.impl;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
+import org.xblackcat.frozenice.psi.SliceEnumConstantReference;
 import org.xblackcat.frozenice.psi.SliceTypeReference;
 
 
@@ -18,4 +19,12 @@ public class SlicePsiImplUtil {
                 new SliceReferenceImpl<>(o, TextRange.from(0, o.getTextLength()))
         };
     }
+
+    @NotNull
+    public static PsiReference[] getReferences(SliceEnumConstantReference o) {
+        return new PsiReference[]{
+                new SliceEnumConstRefImpl(o)
+        };
+    }
+
 }

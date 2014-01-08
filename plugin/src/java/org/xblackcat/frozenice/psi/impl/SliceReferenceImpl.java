@@ -21,8 +21,12 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
 
     @Override
     public PsiElement resolve() {
-        String referenceName = getRangeInElement().substring(myElement.getText());
-        SliceModule module = PsiTreeUtil.getParentOfType(myElement, SliceModule.class);
+        return resolveDataType(myElement, getRangeInElement());
+    }
+
+    protected PsiElement resolveDataType(SliceCompositeElement element, TextRange rangeInElement) {
+        String referenceName = rangeInElement.substring(element.getText());
+        SliceModule module = PsiTreeUtil.getParentOfType(element, SliceModule.class);
 
         if (module == null) {
             return null;
