@@ -30,7 +30,7 @@ public enum IceComponent {
         @Override
         public String extractPackageName(String text) {
             if (text != null && text.startsWith("java:package:")) {
-                return text.substring(12);
+                return text.substring(13);
             } else {
                 return null;
             }
