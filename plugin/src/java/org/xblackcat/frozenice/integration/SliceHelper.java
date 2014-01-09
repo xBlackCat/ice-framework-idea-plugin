@@ -20,7 +20,8 @@ public class SliceHelper {
         );
         for (SliceGlobalMetadata md : globalMetadatas) {
             for (SliceMetadataElement el : md.getMetadataElementList()) {
-                String packageString = target.extractPackageName(el.getStringLiteral().getText());
+                final String text = el.getStringLiteral().getText();
+                String packageString = target.extractPackageName(text.substring(1, text.length() - 1));
 
                 if (packageString != null) {
                     return packageString;

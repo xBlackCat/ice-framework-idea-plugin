@@ -111,8 +111,10 @@ public class JavaModuleHelper {
 
         @Override
         public PsiClass findClass(String className) {
-            if (className == null) return null;
-            return myFacade.findClass(className, GlobalSearchScope.moduleScope(module));
+            if (className == null) {
+                return null;
+            }
+            return myFacade.findClass(className, GlobalSearchScope.moduleWithDependentsScope(module));
         }
 
         @Override
@@ -136,7 +138,9 @@ public class JavaModuleHelper {
         @Override
         public List<NavigatablePsiElement> getClassMethods(String className, boolean staticMethods) {
             PsiClass aClass = findClass(className);
-            if (aClass == null) return Collections.emptyList();
+            if (aClass == null) {
+                return Collections.emptyList();
+            }
             final ArrayList<NavigatablePsiElement> result = new ArrayList<>();
             for (PsiMethod method : aClass.getAllMethods()) {
                 PsiModifierList modifierList = method.getModifierList();
@@ -151,7 +155,9 @@ public class JavaModuleHelper {
         @NotNull
         @Override
         public List<String> getMethodTypes(NavigatablePsiElement method) {
-            if (method == null) return Collections.emptyList();
+            if (method == null) {
+                return Collections.emptyList();
+            }
             PsiMethod psiMethod = (PsiMethod) method;
             PsiType returnType = psiMethod.getReturnType();
             List<String> strings = new ArrayList<>();
@@ -166,12 +172,18 @@ public class JavaModuleHelper {
         @NotNull
         @Override
         public List<String> getAnnotations(NavigatablePsiElement element) {
-            if (element == null) return Collections.emptyList();
+            if (element == null) {
+                return Collections.emptyList();
+            }
             PsiModifierList modifierList = ((PsiModifierListOwner) element).getModifierList();
-            if (modifierList == null) return super.getAnnotations(element);
+            if (modifierList == null) {
+                return super.getAnnotations(element);
+            }
             List<String> strings = new ArrayList<>();
             for (PsiAnnotation annotation : modifierList.getAnnotations()) {
-                if (annotation.getParameterList().getAttributes().length > 0) continue;
+                if (annotation.getParameterList().getAttributes().length > 0) {
+                    continue;
+                }
                 strings.add(annotation.getQualifiedName());
             }
             return strings;
