@@ -5,7 +5,6 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiIdentifier;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -27,7 +26,7 @@ import java.util.Set;
  *
  * @author xBlackCat
  */
-public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
+public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
     public void collectNavigationMarkers(
             List<PsiElement> elements,
@@ -46,8 +45,6 @@ public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 } else if (element instanceof SliceMethodDef) {
                     collectToJavaMethodLinks(result, forNavigation, visited, (SliceMethodDef) element);
                 }
-            } else if (element instanceof PsiIdentifier) {
-                collectFromJavaClassLinks(result, forNavigation, visited, (PsiIdentifier) element);
             }
         }
     }
@@ -58,7 +55,7 @@ public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Set<PsiElement> visited,
             SliceClassDef element
     ) {
-        List<PsiElement> items = new ArrayList<PsiElement>();
+        List<PsiElement> items = new ArrayList<>();
         PsiClass classImplClass = SliceHelper.searchClassImplementation(element);
 
         if (classImplClass != null) {
@@ -122,33 +119,6 @@ public class JavaSliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     .create(SliceIcons.IMPLEMENTED)
                     .setTargets(items)
                     .setTooltipText("Implemented");
-            result.add(builder.createLineMarkerInfo(element));
-        }
-    }
-
-    private static void collectFromJavaClassLinks(
-            Collection<? super RelatedItemLineMarkerInfo> result,
-            boolean forNavigation,
-            Set<PsiElement> visited,
-            PsiIdentifier element
-    ) {
-        List<PsiElement> items = new ArrayList<>();
-        PsiClass classImplClass = null;//SliceHelper.searchClassImplementation(element);
-
-        if (classImplClass != null) {
-            if (!forNavigation || visited.add(element)) {
-                // Search for implementations
-                PsiClass first = ClassInheritorsSearch.search(classImplClass, false).findFirst();
-
-                if (first != null) {
-                    items.add(first);
-                }
-            }
-        }
-
-        if (!items.isEmpty()) {
-            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.OVERRIDDEN).
-                    setTargets(items).setTooltipText("Implemented");
             result.add(builder.createLineMarkerInfo(element));
         }
     }

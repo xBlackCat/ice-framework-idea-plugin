@@ -15,5 +15,7 @@ public interface SliceIcons {
     Icon FILE_ICON = IconLoader.getIcon("/icons/file.png");
 
     Icon IMPLEMENTED = IconLoader.getIcon("/gutter/implementedMethod.png");
+    Icon IMPLEMENTING = IconLoader.getIcon("/gutter/implementingMethod.png");
     Icon OVERRIDDEN = IconLoader.getIcon("/gutter/overridenMethod.png");
+    Icon OVERRIDING = IconLoader.getIcon("/gutter/overridingMethod.png");
 }
