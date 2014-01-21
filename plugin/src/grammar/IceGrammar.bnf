@@ -1,0 +1,210 @@
+{
+    parserClass="org.xblackcat.frozenice.parser.SliceParser"
+    parserUtilClass="org.xblackcat.frozenice.parser.SliceParserUtil"
+//    stubParserClass="org.xblackcat.frozenice.parser.SliceParserUtil"
+
+    implements="org.xblackcat.frozenice.psi.SliceCompositeElement"
+    extends="org.xblackcat.frozenice.psi.impl.SliceCompositeElementImpl"
+
+    psiClassPrefix="Slice"
+    psiImplClassSuffix="Impl"
+    psiPackage="org.xblackcat.frozenice.psi"
+    psiImplPackage="org.xblackcat.frozenice.psi.impl"
+    psiImplUtilClass="org.xblackcat.frozenice.psi.impl.SlicePsiImplUtil"
+
+    elementTypeHolderClass="org.xblackcat.frozenice.psi.SliceTypes"
+    elementTypePrefix="ICE_"
+    elementTypeClass="org.xblackcat.frozenice.psi.SliceCompositeElementType"
+    tokenTypeClass="org.xblackcat.frozenice.psi.SliceTokenType"
+
+
+    // Tokens
+    tokens=[
+        id="regexp:\\?\p{Alpha}\w*"
+        string_literal="regexp:\"([^\"\\]|\\.)*\""
+        integer_value="regexp:\"[\-\+]?\d+\""
+        float_value="regexp:\"[\-\+]?(\d*\.)?\d+([eE][-+]?\d+)?\""
+
+        EQ="="
+        SEMICOLON=";"
+        COMA=","
+        ASTERISK="*"
+        LT="<"
+        GT=">"
+        LEFT_BRACE="{"
+        RIGHT_BRACE="}"
+        LEFT_BRACKET="["
+        RIGHT_BRACKET="]"
+        OPEN_GL_MD="[["
+        CLOSE_GL_MD="]]"
+        LEFT_PARENTH="("
+        RIGHT_PARENTH=")"
+
+        KW_VOID="void"
+
+        // Primitive data types
+        KW_BOOL="bool"
+        KW_BYTE="byte"
+        KW_SHORT="short"
+        KW_INT="int"
+        KW_LONG="long"
+        KW_FLOAT="float"
+        KW_DOUBLE="double"
+
+        // Simple data types
+        KW_LOCAL_OBJECT="LocalObject"
+        KW_STRING="string"
+        KW_OBJECT="Object"
+
+        // Composite data type declarations
+        KW_CLASS="class"
+        KW_EXCEPTION="exception"
+        KW_INTERFACE="interface"
+        KW_SEQUENCE="sequence"
+        KW_STRUCT="struct"
+        KW_DICTIONARY="dictionary"
+        KW_ENUM="enum"
+
+        //
+        // Other keywords
+        //
+
+        // Boolean data type allowed values
+        KW_FALSE="false"
+        KW_TRUE="true"
+
+        // Parameter modifier list
+        KW_OUT="out"
+
+        // Method modifier list
+        KW_LOCAL="local"
+        KW_IDEMPOTENT="idempotent"
+
+        // Other keywords
+        KW_MODULE="module"
+        KW_CONST="const"
+        KW_THROWS="throws"
+        KW_EXTENDS="extends"
+        KW_IMPLEMENTS="implements"
+    ]
+
+    implements("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.SliceDataTypeElement"
+    extends("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.impl.SliceDataTypeElementImpl"
+    implements(".*_def|module|enum_constant")="org.xblackcat.frozenice.psi.SliceNamedElement"
+    extends(".*_def|module|enum_constant")="org.xblackcat.frozenice.psi.impl.SliceNamedElementImpl"
+}
+
+root ::= slice_block
+private slice_block ::= (global_metadata)* (metadata)* module
+module ::= 'module' id '{' module_body '}' ';' {pin=1}
+private module_body ::= (module_element) * {pin(".*") = 1}
+
+private module_element ::= (metadata)* ( module | constant | data_definition ) {recoverWhile=module_element_recovery}
+private module_element_recovery ::= !('}' | '[' | module_element)
+
+global_metadata ::= '[[' global_metadata_body ']]' {pin=1 recoverWhile=global_metadata_recovery}
+private global_metadata_body ::= metadata_element (',' metadata_element)* {pin=1 recoverWhile=glabal_metadata_body_recovery}
+private glabal_metadata_body_recovery ::= !(']]')
+private global_metadata_recovery ::= !('module' | '[')
+
+metadata ::= '[' metadata_body ']' {pin=1 recoverWhile=metadata_recovery}
+private metadata_body ::= metadata_element (',' metadata_element)* {pin=1 recoverWhile=metadata_body_recovery}
+private metadata_recovery ::= !(data_def_keywords | 'module' | '[[' | '[' )
+private data_def_keywords ::= 'exception' | 'class' | 'interface' | 'struct' | 'enum' | 'sequence' | 'dictionary'
+
+metadata_element ::= string_literal {recoverWhile=metadata_element_recovery}
+private metadata_body_recovery ::= !(']')
+private metadata_element_recovery ::= !(']]' | ']' | ',')
+
+private data_definition ::= (class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def )
+
+extends_list ::= 'extends' type_reference (',' type_reference) * {pin=1}
+implements_list ::= 'implements' type_reference (',' type_reference) *  {pin=1}
+
+// --- Class ---
+class_def ::= 'class' id extends_list? implements_list? class_body? ';' {pin=1}
+class_body ::= '{' class_element_list '}' {pin = 1;}
+private class_element_list ::= (class_element) * {pin=".*" recoverWhile=class_element_list_recovery}
+private class_element_list_recovery ::= !('}')
+
+private class_element ::= (metadata)* (field_def | method_def ) {recoverWhile=class_element_recovery}
+private class_element_recovery ::= !('}' | '[' | class_element)
+
+// --- Interface ---
+interface_def ::= 'interface' id extends_list? interface_body? ';' {pin=1}
+interface_body ::= '{' (interface_element) * '}' {pin=1}
+private interface_element ::= (metadata)* ( method_def ) {recoverWhile=interface_element_recovery}
+private interface_element_recovery ::= !(interface_element | '}')
+
+// --- Exceptions ---
+exception_def ::= 'exception' id extends_list? '{' class_element_list '}' ';' {pin=1}
+
+// --- Structures ---
+struct_def ::= 'struct' id '{' (structure_element) * '}' ';' {pin=1}
+private structure_element ::= (field_def) {recoverWhile=structure_element_recovery}
+private structure_element_recovery ::= !( structure_element | '}')
+
+// --- Enums ---
+enum_def ::='enum' id '{' enum_constant_list? '}' ';' {pin=1}
+enum_constant_list ::= enum_constant (',' enum_constant) * {pin=1 recoverWhile=enum_constant_list_recovery}
+enum_constant ::= id {recoverWhile=enum_constant_recovery}
+private enum_constant_list_recovery ::= !('}')
+private enum_constant_recovery ::= !(',' | '}')
+
+element_type ::= data_type {recoverWhile=type_recovery}
+key_type ::= primitive_data_types | 'string' | type_reference {recoverWhile=type_recovery}
+private type_recovery ::= !('>' | ',')
+// --- Sequences ---
+sequence_def ::= 'sequence' '<' element_type '>' id ';' {pin=1}
+
+// --- Dictionaries ---
+dictionary_def ::= 'dictionary' '<' key_type ',' element_type '>' id ';' {pin=1}
+
+// --- Other ---
+type_reference ::= id {
+    methods = [getReferences]
+}
+enum_constant_reference ::= id {
+    methods = [getReferences]
+}
+proxy_type ::= (simple_data_types | type_reference) '*'
+data_type ::= proxy_type | primitive_data_types | simple_data_types | type_reference
+
+// -- method --
+modifier ::= 'idempotent' | 'local'
+method_return_type ::= data_type | 'void'
+
+method_def ::= modifier* method_return_type id '(' parameters_list ')' (throws_list)? ';' {pin=4}
+throws_list ::= 'throws' type_reference (',' type_reference) * {pin=1 recoverWhile=declaration_end_recovery}
+private declaration_end_recovery ::= !(';')
+
+parameter_modifier ::= 'out'
+
+parameters_list ::= (parameter (',' parameter) *)? {pin(".*")=1 recoverWhile=parameter_list_recovery}
+parameter ::= parameter_modifier* data_type id {pin=2 recoverWhile=parameter_recovery}
+
+private parameter_list_recovery ::= !(')')
+private parameter_recovery ::= !(')' | ',')
+
+constant_value ::= (integer_value | float_value | bool_value | string_literal | enum_constant_reference)
+
+variable_type ::= data_type
+
+field_initializer ::= '=' constant_value {pin = 1 recoverWhile=declaration_end_recovery}
+
+field_def ::= variable_type id (field_initializer )? ';'
+
+constant ::= 'const' variable_type id field_initializer ';' {pin=1}
+
+//
+// Data types
+//
+
+// Primitive data types
+private primitive_data_types ::= 'float' | 'double' | 'bool' | 'byte' | 'short' | 'int' | 'long'
+
+// Simple data types
+private simple_data_types ::= 'LocalObject' | 'string' | 'Object'
+
+// Boolean data type allowed values
+private bool_value ::= 'false' | 'true'
