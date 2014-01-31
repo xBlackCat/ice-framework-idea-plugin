@@ -14,6 +14,8 @@ public interface SliceIcons {
     Icon FACET_ICON = IconLoader.getIcon("/icons/facet.png");
     Icon FILE_ICON = IconLoader.getIcon("/icons/file.png");
 
+
+    Icon TRANSLATED = IconLoader.getIcon("/actions/compile.png");
     Icon IMPLEMENTED = IconLoader.getIcon("/gutter/implementedMethod.png");
     Icon IMPLEMENTING = IconLoader.getIcon("/gutter/implementingMethod.png");
     Icon OVERRIDDEN = IconLoader.getIcon("/gutter/overridenMethod.png");

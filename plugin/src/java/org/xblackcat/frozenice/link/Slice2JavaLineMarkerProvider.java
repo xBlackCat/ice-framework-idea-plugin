@@ -10,10 +10,7 @@ import com.intellij.psi.search.searches.ClassInheritorsSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import gnu.trove.THashSet;
 import org.xblackcat.frozenice.integration.SliceHelper;
-import org.xblackcat.frozenice.psi.SliceClassDef;
-import org.xblackcat.frozenice.psi.SliceInterfaceDef;
-import org.xblackcat.frozenice.psi.SliceMethodDef;
-import org.xblackcat.frozenice.psi.SliceNamedElement;
+import org.xblackcat.frozenice.psi.*;
 import org.xblackcat.frozenice.util.SliceIcons;
 
 import java.util.ArrayList;
@@ -38,10 +35,8 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         for (PsiElement element : elements) {
             if (element instanceof SliceNamedElement) {
                 // The element is interface
-                if (element instanceof SliceInterfaceDef) {
-                    collectToJavaInterfaceLinks(result, forNavigation, visited, (SliceInterfaceDef) element);
-                } else if (element instanceof SliceClassDef) {
-                    collectToJavaClassLinks(result, forNavigation, visited, (SliceClassDef) element);
+                if (element instanceof SliceDataTypeElement) {
+                    collectToJavaClassLinks(result, forNavigation, visited, (SliceDataTypeElement) element);
                 } else if (element instanceof SliceMethodDef) {
                     collectToJavaMethodLinks(result, forNavigation, visited, (SliceMethodDef) element);
                 }
@@ -53,25 +48,23 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             Collection<? super RelatedItemLineMarkerInfo> result,
             boolean forNavigation,
             Set<PsiElement> visited,
-            SliceClassDef element
+            SliceDataTypeElement element
     ) {
         List<PsiElement> items = new ArrayList<>();
-        PsiClass classImplClass = SliceHelper.searchClassImplementation(element);
+        PsiClass classImplClass = SliceHelper.searchImplementation(element);
 
         if (classImplClass != null) {
             if (!forNavigation || visited.add(element)) {
-                // Search for implementations
-                PsiClass first = ClassInheritorsSearch.search(classImplClass, false).findFirst();
+                items.add(classImplClass);
 
-                if (first != null) {
-                    items.add(first);
-                }
+                // Search for implementations
+                items.addAll(ClassInheritorsSearch.search(classImplClass, true).findAll());
             }
         }
 
         if (!items.isEmpty()) {
-            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.OVERRIDDEN).
-                    setTargets(items).setTooltipText("Implemented");
+            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.TRANSLATED).
+                    setTargets(items).setTooltipText("Used");
             result.add(builder.createLineMarkerInfo(element));
         }
     }
@@ -84,19 +77,11 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
     ) {
         List<PsiElement> items = new ArrayList<>();
 
-        PsiClass implClass = SliceHelper.searchClassImplementation(
-                PsiTreeUtil.getParentOfType(
-                        element,
-                        SliceClassDef.class
-                )
+        PsiClass implClass = SliceHelper.searchImplementation(
+                PsiTreeUtil.getParentOfType(element, SliceClassDef.class)
         );
         if (implClass == null) {
-            implClass = SliceHelper.searchInterfaceImplementation(
-                    PsiTreeUtil.getParentOfType(
-                            element,
-                            SliceInterfaceDef.class
-                    )
-            );
+            implClass = SliceHelper.searchImplementation(PsiTreeUtil.getParentOfType(element, SliceInterfaceDef.class));
         }
 
         if (implClass != null) {
@@ -116,38 +101,10 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
         if (!items.isEmpty()) {
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
-                    .create(SliceIcons.IMPLEMENTED)
+                    .create(SliceIcons.TRANSLATED)
                     .setTargets(items)
-                    .setTooltipText("Implemented");
+                    .setTooltipText("Used");
             result.add(builder.createLineMarkerInfo(element));
         }
     }
-
-    private static void collectToJavaInterfaceLinks(
-            Collection<? super RelatedItemLineMarkerInfo> result,
-            boolean forNavigation,
-            Set<PsiElement> visited,
-            SliceInterfaceDef element
-    ) {
-        List<PsiElement> items = new ArrayList<>();
-        PsiClass interfaceImplClass = SliceHelper.searchInterfaceImplementation(element);
-
-        if (interfaceImplClass != null) {
-            if (!forNavigation || visited.add(element)) {
-                // Search for implementations
-                PsiClass first = ClassInheritorsSearch.search(interfaceImplClass, false).findFirst();
-
-                if (first != null) {
-                    items.add(first);
-                }
-            }
-        }
-
-        if (!items.isEmpty()) {
-            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.IMPLEMENTED).
-                    setTargets(items).setTooltipText("Implemented");
-            result.add(builder.createLineMarkerInfo(element));
-        }
-    }
-
 }
