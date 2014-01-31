@@ -53,7 +53,17 @@ public class SlicePsiImplUtil {
         for (PsiElement c : module.getChildren()) {
             if (c instanceof SliceDataTypeElement) {
                 if (referenceName.equals(((SliceDataTypeElement) c).getName())) {
-                    return c;
+                    if (c instanceof SliceClassDef) {
+                        if (((SliceClassDef) c).getClassBody() != null) {
+                            return c;
+                        }
+                    } else if (c instanceof SliceInterfaceDef) {
+                        if (((SliceInterfaceDef) c).getInterfaceBody() != null) {
+                            return c;
+                        }
+                    } else {
+                        return c;
+                    }
                 }
             }
         }
