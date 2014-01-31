@@ -1,6 +1,9 @@
 package org.xblackcat.frozenice.integration;
 
-import com.intellij.psi.*;
+import com.intellij.psi.NavigatablePsiElement;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.xblackcat.frozenice.config.IceComponent;
 import org.xblackcat.frozenice.psi.*;
@@ -48,18 +51,18 @@ public class SliceHelper {
     }
 
     public static String getFQN(SliceNamedElement element) {
-        String name = element.getId().getText();
+        final PsiElement id = element.getId();
+        if (id == null) {
+            return null;
+        }
+        String name = id.getText();
 
         if (name == null) {
             return null;
         }
 
-        SliceModule module;
-        if (element instanceof SliceModule) {
-            module = PsiTreeUtil.getParentOfType(element, SliceModule.class);
-        } else if (element instanceof SliceDataTypeElement) {
-            module = ((SliceDataTypeElement) element).getModule();
-        } else {
+        SliceModule module = getContaiterSliceModule(element);
+        if (module == null) {
             return null;
         }
         String packageName = SliceHelper.getPackageName(element.getContainingFile(), IceComponent.Java);
@@ -78,7 +81,19 @@ public class SliceHelper {
 
     }
 
-    public static PsiClass searchClassImplementation(SliceClassDef element) {
+    public static SliceModule getContaiterSliceModule(SliceNamedElement element) {
+        SliceModule module;
+        if (element instanceof SliceModule) {
+            module = PsiTreeUtil.getParentOfType(element, SliceModule.class);
+        } else if (element instanceof SliceDataTypeElement) {
+            module = ((SliceDataTypeElement) element).getModule();
+        } else {
+            module = null;
+        }
+        return module;
+    }
+
+    public static PsiClass searchImplementation(SliceDataTypeElement element) {
         if (element == null) {
             return null;
         }
@@ -92,23 +107,11 @@ public class SliceHelper {
         JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(element);
         NavigatablePsiElement aClass = javaHelper.findClass(implFQN);
 
-        if (!(aClass instanceof PsiClass) || !((PsiClass) aClass).hasModifierProperty(PsiModifier.ABSTRACT)) {
+        if (!(aClass instanceof PsiClass)) {
             return null;
         }
 
         return (PsiClass) aClass;
     }
 
-    public static PsiClass searchInterfaceImplementation(SliceInterfaceDef element) {
-        if (element == null) {
-            return null;
-        }
-
-        String moduleFQN = getFQN(element.getModule());
-        String name = element.getName();
-
-        String implFQN = moduleFQN + "._" + name + "Disp";
-
-        return checkJavaClass(element, implFQN);
-    }
 }

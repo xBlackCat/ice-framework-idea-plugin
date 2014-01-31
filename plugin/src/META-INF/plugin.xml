@@ -2,7 +2,7 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.2.2</version>
+    <version>0.0.2.3</version>
     <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
     <idea-version since-build="133.1"/>
 
@@ -68,5 +68,7 @@
                        serviceImplementation="org.xblackcat.frozenice.integration.JavaModuleHelper$Impl"/>
         <codeInsight.lineMarkerProvider language="SLICE"
                                         implementationClass="org.xblackcat.frozenice.link.Slice2JavaLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="SLICE"
+                                        implementationClass="org.xblackcat.frozenice.link.SliceLineMarkerProvider"/>
     </extensions>
 </idea-plugin>

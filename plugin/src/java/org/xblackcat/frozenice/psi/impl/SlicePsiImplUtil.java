@@ -21,15 +21,25 @@ public class SlicePsiImplUtil {
     @NotNull
     public static PsiReference[] getReferences(SliceTypeReference o) {
         return new PsiReference[]{
-                new SliceReferenceImpl<>(o, TextRange.from(0, o.getTextLength()))
+                new SliceReferenceImpl<>(o, TextRange.from(0, o.getTextLength())), // Slice reference is the main
         };
     }
 
     @NotNull
     public static PsiReference[] getReferences(SliceEnumConstantReference o) {
         return new PsiReference[]{
-                new SliceEnumConstRefImpl(o)
+                new SliceEnumConstRefImpl(o), // Slice reference is the main
         };
+    }
+
+    @NotNull
+    public static PsiReference getReference(SliceTypeReference o) {
+        return new SliceReferenceImpl<>(o, TextRange.from(0, o.getTextLength()));
+    }
+
+    @NotNull
+    public static PsiReference getReference(SliceEnumConstantReference o) {
+        return new SliceEnumConstRefImpl(o);
     }
 
     protected static PsiElement resolveDataType(SliceCompositeElement element, TextRange rangeInElement) {

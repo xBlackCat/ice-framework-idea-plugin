@@ -162,10 +162,10 @@ dictionary_def ::= 'dictionary' '<' key_type ',' element_type '>' id ';' {pin=1}
 
 // --- Other ---
 type_reference ::= id {
-    methods = [getReferences]
+    methods = [getReferences getReference]
 }
 enum_constant_reference ::= id {
-    methods = [getReferences]
+    methods = [getReferences getReference]
 }
 proxy_type ::= (simple_data_types | type_reference) '*'
 data_type ::= proxy_type | primitive_data_types | simple_data_types | type_reference
