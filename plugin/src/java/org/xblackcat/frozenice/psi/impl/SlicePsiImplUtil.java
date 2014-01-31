@@ -21,14 +21,14 @@ public class SlicePsiImplUtil {
     @NotNull
     public static PsiReference[] getReferences(SliceTypeReference o) {
         return new PsiReference[]{
-                new SliceReferenceImpl<>(o, TextRange.from(0, o.getTextLength())), // Slice reference is the main
+                getReference(o), // Slice reference is the main
         };
     }
 
     @NotNull
     public static PsiReference[] getReferences(SliceEnumConstantReference o) {
         return new PsiReference[]{
-                new SliceEnumConstRefImpl(o), // Slice reference is the main
+                getReference(o), // Slice reference is the main
         };
     }
 
