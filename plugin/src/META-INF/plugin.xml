@@ -19,11 +19,13 @@
             <li><b>0.0.2.0</b> - Use external compiler interface to support Slice compilation in Idea 12 and above.</li>
             <li><b>0.0.2.1</b> - Show more information about errors during compilation.</li>
             <li><b>0.0.2.2</b> - Rework slice file parser. Implement basic completion for data type places (in implement/extends/etc. list).</li>
+            <li><b>0.0.2.3</b> - Add line markers for implemented/overridden slice data types. Show line makers for slice data types which are used in java.</li>
             </ul>]]>
     </change-notes>
 
     <project-components>
         <component>
+            <loadForDefaultProject>true</loadForDefaultProject>
             <implementation-class>org.xblackcat.frozenice.FrozenIdea</implementation-class>
         </component>
     </project-components>
