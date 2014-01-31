@@ -9,7 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenice.config.IceComponent;
 import org.xblackcat.frozenice.psi.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 14.06.12 16:23
@@ -69,7 +71,9 @@ public class SliceHelper {
         return buildFQN(name, module);
     }
 
-    public static @NotNull String buildFQN(String name, SliceModule module) {
+    public static
+    @NotNull
+    String buildFQN(String name, SliceModule module) {
         String packageName = SliceHelper.getPackageName(module.getContainingFile(), IceComponent.Java);
 
         StringBuilder fqn = new StringBuilder();
@@ -132,4 +136,100 @@ public class SliceHelper {
 
     }
 
+    public static void findAllSubclasses(
+            Set<SliceDataTypeElement> elements,
+            SliceModule module,
+            SliceClassDef element
+    ) {
+        final HashSet<SliceClassDef> set = new HashSet<>();
+        set.add(element);
+        findAllSubclasses(elements, module, set);
+    }
+
+    private static void findAllSubclasses(Set<SliceDataTypeElement> elements, SliceModule module, Set<SliceClassDef> parents) {
+        for (SliceClassDef clazz : module.getClassDefList()) {
+            if (parents.contains(clazz)) {
+                continue;
+            }
+
+            if (clazz.getClassBody() == null) {
+                // Ignore forward definitions
+                continue;
+            }
+
+            SliceExtendsList extendsList = clazz.getExtendsList();
+            if (extendsList == null) {
+                continue;
+            }
+
+            for (SliceTypeReference tr : extendsList.getTypeReferenceList()) {
+                final PsiElement psiElement = tr.getReference().resolve();
+
+                if (psiElement instanceof SliceClassDef) {
+                    if (parents.contains(psiElement)) {
+                        elements.add((SliceClassDef) psiElement);
+                        parents.add(clazz);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void findAllImplementations(Set<SliceDataTypeElement> elements, SliceModule module, SliceInterfaceDef element) {
+        Set<SliceClassDef> supers = new HashSet<>();
+
+        Set<SliceInterfaceDef> hierarchy = new HashSet<>();
+        hierarchy.add(element);
+
+        for (SliceInterfaceDef interfaceDef : module.getInterfaceDefList()) {
+            if (interfaceDef.equals(element)) {
+                continue;
+            }
+            if (interfaceDef.getInterfaceBody() == null) {
+                // Ignore forward definitions
+                continue;
+            }
+
+            SliceExtendsList extendsList = interfaceDef.getExtendsList();
+            if (extendsList == null) {
+                continue;
+            }
+
+            for (SliceTypeReference tr : extendsList.getTypeReferenceList()) {
+                final PsiElement psiElement = tr.getReference().resolve();
+
+                if (psiElement instanceof SliceInterfaceDef) {
+                    if (hierarchy.contains(psiElement)) {
+                        elements.add((SliceInterfaceDef) psiElement);
+                        hierarchy.add(interfaceDef);
+                    }
+                }
+            }
+        }
+
+        final List<SliceClassDef> classDefList = module.getClassDefList();
+        for (SliceClassDef clazz : classDefList) {
+            if (clazz.getClassBody() == null) {
+                // Ignore forward definitions
+                continue;
+            }
+
+            SliceImplementsList implementsList = clazz.getImplementsList();
+            if (implementsList != null) {
+                for (SliceTypeReference tr : implementsList.getTypeReferenceList()) {
+                    final PsiElement psiElement = tr.getReference().resolve();
+
+                    if (psiElement instanceof SliceInterfaceDef) {
+                        if (hierarchy.contains(psiElement)) {
+                            elements.add(clazz);
+                            supers.add(clazz);
+                        }
+                    }
+                }
+            }
+        }
+
+        findAllSubclasses(elements, module, supers);
+    }
 }

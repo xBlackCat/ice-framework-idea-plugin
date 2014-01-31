@@ -53,11 +53,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             if (!forNavigation || visited.add(element)) {
                 // Search for implementations
                 final Collection<PsiClass> classes = ClassInheritorsSearch.search(classImplClass, true).findAll();
-                for (PsiClass clazz : classes) {
-                    if (notGeneratedClass(clazz, element)) {
-                        items.add(clazz);
-                    }
-                }
+                items.addAll(filterGeneratedClasses(classes, element));
             }
         }
 
@@ -95,12 +91,10 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
                     PsiMethod baseMethod = m[0];
 
                     // Search for implementations
-                    Collection<PsiClass> first = ClassInheritorsSearch.search(implClass, true).findAll();
+                    Collection<PsiClass> classes = ClassInheritorsSearch.search(implClass, true).findAll();
 
-                    for (PsiClass clazz : first) {
-                        if (notGeneratedClass(clazz, typeElement)) {
-                            Collections.addAll(items, clazz.findMethodsBySignature(baseMethod, false));
-                        }
+                    for (PsiClass clazz : filterGeneratedClasses(classes, typeElement)) {
+                        Collections.addAll(items, clazz.findMethodsBySignature(baseMethod, false));
                     }
                 }
             }
@@ -115,30 +109,50 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         }
     }
 
-    private static boolean notGeneratedClass(PsiClass clazz, SliceNamedElement element) {
-        final String name = element.getName();
-        if (name == null) {
-            return false;
-        }
-        final String clazzName = clazz.getName();
-        if (clazzName == null) {
-            return false;
-        }
-
+    private static Collection<PsiClass> filterGeneratedClasses(Collection<PsiClass> classes, SliceDataTypeElement element) {
         final SliceModule module = SliceHelper.getContainerSliceModule(element);
         if (module == null) {
-            return false;
+            return Collections.emptySet();
         }
 
-        //noinspection SimplifiableIfStatement
-        if (!(SliceHelper.buildFQN(clazzName, module)).equals(clazz.getQualifiedName())) {
-            // Packages are not equals - not generated class
-            return true;
+        final Set<SliceDataTypeElement> elements = new HashSet<>();
+        elements.add(element);
+        if (element instanceof SliceClassDef) {
+            SliceHelper.findAllSubclasses(elements, module, (SliceClassDef) element);
+        } else if (element instanceof SliceInterfaceDef) {
+            SliceHelper.findAllImplementations(elements, module, (SliceInterfaceDef) element);
+        } else {
+            return Collections.emptySet();
         }
 
-        return !clazzName.equals("_" + name + "Operations") &&
-               !clazzName.equals(name) &&
-               !clazzName.equals("_" + name + "Disp");
+        Set<PsiClass> items = new HashSet<>(classes);
+        for (PsiClass clazz : classes) {
+            final String clazzName = clazz.getName();
+            if (clazzName == null) {
+                continue;
+            }
 
+            //noinspection SimplifiableIfStatement
+            if (!(SliceHelper.buildFQN(clazzName, module)).equals(clazz.getQualifiedName())) {
+                // Packages are not equals - not generated class
+                continue;
+            }
+
+
+            for (SliceDataTypeElement e : elements) {
+                final String name = e.getName();
+                if (name == null) {
+                    continue;
+                }
+
+                if (clazzName.equals("_" + name + "Operations") ||
+                    clazzName.equals(name) ||
+                    clazzName.equals("_" + name + "Disp")) {
+                    items.remove(clazz);
+                }
+            }
+        }
+
+        return items;
     }
 }
