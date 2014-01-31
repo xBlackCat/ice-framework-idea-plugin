@@ -167,7 +167,7 @@ public class SliceHelper {
 
                 if (psiElement instanceof SliceClassDef) {
                     if (parents.contains(psiElement)) {
-                        elements.add((SliceClassDef) psiElement);
+                        elements.add(clazz);
                         parents.add(clazz);
                         break;
                     }
@@ -201,7 +201,7 @@ public class SliceHelper {
 
                 if (psiElement instanceof SliceInterfaceDef) {
                     if (hierarchy.contains(psiElement)) {
-                        elements.add((SliceInterfaceDef) psiElement);
+                        elements.add(interfaceDef);
                         hierarchy.add(interfaceDef);
                     }
                 }
