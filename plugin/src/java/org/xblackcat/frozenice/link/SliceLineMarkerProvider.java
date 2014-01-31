@@ -3,11 +3,7 @@ package org.xblackcat.frozenice.link;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.search.searches.ClassInheritorsSearch;
-import com.intellij.psi.util.PsiTreeUtil;
 import gnu.trove.THashSet;
 import org.xblackcat.frozenice.integration.SliceHelper;
 import org.xblackcat.frozenice.psi.*;
@@ -37,7 +33,6 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 // The element is interface
                 if (element instanceof SliceInterfaceDef) {
                     collectImplementations(result, forNavigation, visited, (SliceInterfaceDef) element);
-
                 } else if (element instanceof SliceClassDef) {
                     collectExtending(result, forNavigation, visited, (SliceClassDef) element);
                 } else if (element instanceof SliceExceptionDef) {
@@ -54,7 +49,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             SliceExceptionDef element
     ) {
         List<PsiElement> items = new ArrayList<>();
-        SliceModule module = SliceHelper.getContaiterSliceModule(element);
+        SliceModule module = SliceHelper.getContainerSliceModule(element);
         if (module == null) {
             return;
         }
@@ -82,7 +77,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             SliceClassDef element
     ) {
         List<PsiElement> items = new ArrayList<>();
-        SliceModule module = SliceHelper.getContaiterSliceModule(element);
+        SliceModule module = SliceHelper.getContainerSliceModule(element);
         if (module == null) {
             return;
         }
@@ -134,7 +129,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             SliceDataTypeElement element
     ) {
         List<PsiElement> items = new ArrayList<>();
-        SliceModule module = SliceHelper.getContaiterSliceModule(element);
+        SliceModule module = SliceHelper.getContainerSliceModule(element);
         if (module == null) {
             return;
         }
@@ -157,45 +152,6 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
         if (!items.isEmpty()) {
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.IMPLEMENTED).
                     setTargets(items).setTooltipText("Implemented");
-            result.add(builder.createLineMarkerInfo(element));
-        }
-    }
-
-    private void collectToJavaMethodLinks(
-            Collection<? super RelatedItemLineMarkerInfo> result,
-            boolean forNavigation,
-            Set<PsiElement> visited,
-            SliceMethodDef element
-    ) {
-        List<PsiElement> items = new ArrayList<>();
-
-        PsiClass implClass = SliceHelper.searchImplementation(
-                PsiTreeUtil.getParentOfType(element, SliceClassDef.class)
-        );
-        if (implClass == null) {
-            implClass = SliceHelper.searchImplementation(PsiTreeUtil.getParentOfType(element, SliceInterfaceDef.class));
-        }
-
-        if (implClass != null) {
-            if (!forNavigation || visited.add(element)) {
-                // Search for implementations
-                PsiClass first = ClassInheritorsSearch.search(implClass, false).findFirst();
-
-
-                if (first != null) {
-                    PsiMethod[] methods = first.findMethodsByName(element.getName(), false);
-                    if (methods.length > 0) {
-                        items.add(methods[0]);
-                    }
-                }
-            }
-        }
-
-        if (!items.isEmpty()) {
-            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
-                    .create(SliceIcons.IMPLEMENTED)
-                    .setTargets(items)
-                    .setTooltipText("Implemented");
             result.add(builder.createLineMarkerInfo(element));
         }
     }
