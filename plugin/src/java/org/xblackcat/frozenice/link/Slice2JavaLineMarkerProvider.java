@@ -7,16 +7,12 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
-import com.intellij.psi.util.PsiTreeUtil;
 import gnu.trove.THashSet;
 import org.xblackcat.frozenice.integration.SliceHelper;
 import org.xblackcat.frozenice.psi.*;
 import org.xblackcat.frozenice.util.SliceIcons;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 14.06.12 14:26
@@ -55,10 +51,13 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
         if (classImplClass != null) {
             if (!forNavigation || visited.add(element)) {
-                items.add(classImplClass);
-
                 // Search for implementations
-                items.addAll(ClassInheritorsSearch.search(classImplClass, true).findAll());
+                final Collection<PsiClass> classes = ClassInheritorsSearch.search(classImplClass, true).findAll();
+                for (PsiClass clazz : classes) {
+                    if (notGeneratedClass(clazz, element)) {
+                        items.add(clazz);
+                    }
+                }
             }
         }
 
@@ -69,7 +68,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         }
     }
 
-    private void collectToJavaMethodLinks(
+    private static void collectToJavaMethodLinks(
             Collection<? super RelatedItemLineMarkerInfo> result,
             boolean forNavigation,
             Set<PsiElement> visited,
@@ -77,23 +76,31 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
     ) {
         List<PsiElement> items = new ArrayList<>();
 
-        PsiClass implClass = SliceHelper.searchImplementation(
-                PsiTreeUtil.getParentOfType(element, SliceClassDef.class)
-        );
-        if (implClass == null) {
-            implClass = SliceHelper.searchImplementation(PsiTreeUtil.getParentOfType(element, SliceInterfaceDef.class));
+        final PsiElement body = element.getParent();
+        if (!(body instanceof SliceClassBody) && !(body instanceof SliceInterfaceBody)) {
+            return;
         }
+        final PsiElement type = body.getParent();
+        if (!(type instanceof SliceDataTypeElement)) {
+            return;
+        }
+
+        final SliceDataTypeElement typeElement = (SliceDataTypeElement) type;
+        PsiClass implClass = SliceHelper.searchImplementation(typeElement);
 
         if (implClass != null) {
             if (!forNavigation || visited.add(element)) {
-                // Search for implementations
-                PsiClass first = ClassInheritorsSearch.search(implClass, false).findFirst();
+                final PsiMethod[] m = implClass.findMethodsByName(element.getName(), false);
+                if (m.length != 0) {
+                    PsiMethod baseMethod = m[0];
 
+                    // Search for implementations
+                    Collection<PsiClass> first = ClassInheritorsSearch.search(implClass, true).findAll();
 
-                if (first != null) {
-                    PsiMethod[] methods = first.findMethodsByName(element.getName(), false);
-                    if (methods.length > 0) {
-                        items.add(methods[0]);
+                    for (PsiClass clazz : first) {
+                        if (notGeneratedClass(clazz, typeElement)) {
+                            Collections.addAll(items, clazz.findMethodsBySignature(baseMethod, false));
+                        }
                     }
                 }
             }
@@ -106,5 +113,32 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
                     .setTooltipText("Used");
             result.add(builder.createLineMarkerInfo(element));
         }
+    }
+
+    private static boolean notGeneratedClass(PsiClass clazz, SliceNamedElement element) {
+        final String name = element.getName();
+        if (name == null) {
+            return false;
+        }
+        final String clazzName = clazz.getName();
+        if (clazzName == null) {
+            return false;
+        }
+
+        final SliceModule module = SliceHelper.getContainerSliceModule(element);
+        if (module == null) {
+            return false;
+        }
+
+        //noinspection SimplifiableIfStatement
+        if (!(SliceHelper.buildFQN(clazzName, module)).equals(clazz.getQualifiedName())) {
+            // Packages are not equals - not generated class
+            return true;
+        }
+
+        return !clazzName.equals("_" + name + "Operations") &&
+               !clazzName.equals(name) &&
+               !clazzName.equals("_" + name + "Disp");
+
     }
 }
