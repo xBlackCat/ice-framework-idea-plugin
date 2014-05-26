@@ -124,6 +124,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
         command.add("--output-dir");
         final String outputDirPath = outputDir.getAbsolutePath();
         command.add(outputDirPath);
+        command.add("-I" + new File(frameworkHome, "slice").getAbsolutePath());
         for (JpsModuleSourceRoot contentRoot : module.getSourceRoots()) {
             command.add("-I" + contentRoot.getFile().getAbsolutePath());
         }
@@ -177,13 +178,46 @@ public class SliceBuilder extends ModuleLevelBuilder {
                                 for (Element source : res.getRootElement().getChildren("source")) {
                                     final Element output = source.getChild("output");
                                     if (output != null) {
-                                        context.processMessage(
-                                                new CompilerMessage(
-                                                        BUILDER_NAME,
-                                                        BuildMessage.Kind.ERROR,
-                                                        output.getTextTrim()
-                                                )
-                                        );
+                                        String message = output.getTextTrim();
+
+                                        for (String line : message.split("\n")) {
+                                            int separatorIndex = line.indexOf(": ");
+                                            final String path;
+                                            final long lineNumber;
+                                            if (separatorIndex <= 0) {
+                                                path = null;
+                                                lineNumber = -1L;
+                                            } else {
+                                                int lineSep = line.lastIndexOf(':', separatorIndex - 1);
+                                                if (lineSep == -1) {
+                                                    path = null;
+                                                    lineNumber = -1L;
+                                                } else {
+                                                    path = line.substring(0, lineSep);
+                                                    long l;
+                                                    try {
+                                                        l = Long.parseLong(line.substring(lineSep + 1, separatorIndex));
+                                                    } catch (NumberFormatException e) {
+                                                        l = -1L;
+                                                    }
+                                                    lineNumber = l;
+                                                }
+                                            }
+
+                                            context.processMessage(
+                                                    new CompilerMessage(
+                                                            BUILDER_NAME,
+                                                            BuildMessage.Kind.ERROR,
+                                                            line,
+                                                            path,
+                                                            -1L,
+                                                            -1L,
+                                                            -1L,
+                                                            lineNumber,
+                                                            -1L
+                                                    )
+                                            );
+                                        }
                                     }
                                 }
 
@@ -193,13 +227,10 @@ public class SliceBuilder extends ModuleLevelBuilder {
                                 }
                                 context.processMessage(
                                         new CompilerMessage(
-                                                BUILDER_NAME, BuildMessage.Kind.ERROR,
-                                                "translator '" +
-                                                        translatorName +
-                                                        "' for '" +
-                                                        module.getName() +
-                                                        "' finished with exit code " +
-                                                        exitCode
+                                                BUILDER_NAME,
+                                                BuildMessage.Kind.ERROR,
+                                                "translator '" + translatorName + "' for '" + module.getName() +
+                                                        "' finished with exit code " + exitCode
                                         )
                                 );
                                 hasErrors.set(true);
