@@ -20,57 +20,58 @@
             <li><b>0.0.2.1</b> - Show more information about errors during compilation.</li>
             <li><b>0.0.2.2</b> - Rework slice file parser. Implement basic completion for data type places (in implement/extends/etc. list).</li>
             <li><b>0.0.2.3</b> - Add line markers for implemented/overridden slice data types. Show line makers for slice data types which are used in java.</li>
+            <li><b>0.0.2.4</b> - Default include path was added to compiler command line</li>
             </ul>]]>
     </change-notes>
 
     <project-components>
         <component>
             <loadForDefaultProject>true</loadForDefaultProject>
-            <implementation-class>org.xblackcat.frozenice.FrozenIdea</implementation-class>
+            <implementation-class>org.xblackcat.frozenidea.FrozenIdea</implementation-class>
         </component>
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileTypeFactory implementation="org.xblackcat.frozenice.IceFileTypeFactory"/>
-        <compilerFactory implementation="org.xblackcat.frozenice.processor.SliceCompilerFactory"/>
+        <fileTypeFactory implementation="org.xblackcat.frozenidea.IceFileTypeFactory"/>
 
-        <projectConfigurable instance="org.xblackcat.frozenice.config.IceFrameworkConfigurable" id="frozenidea"/>
+        <projectConfigurable instance="org.xblackcat.frozenidea.config.IceFrameworkConfigurable" id="frozenidea" parentId="project.propCompiler"/>
 
-        <frameworkSupport implementation="org.xblackcat.frozenice.facet.IceFacetSupportProvider"/>
-        <facetType implementation="org.xblackcat.frozenice.facet.IceFacetType"/>
+        <frameworkSupport implementation="org.xblackcat.frozenidea.facet.IceFacetSupportProvider"/>
+        <facetType implementation="org.xblackcat.frozenidea.facet.IceFacetType"/>
 
         <lang.syntaxHighlighterFactory key="SLICE"
-                                       implementationClass="org.xblackcat.frozenice.SliceSyntaxHighlighterFactory"/>
-        <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenice.SliceParserDefinition"/>
-        <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenice.SliceBraceMatcher"/>
-        <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceFoldingBuilder"/>
+                                       implementationClass="org.xblackcat.frozenidea.SliceSyntaxHighlighterFactory"/>
+        <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceParserDefinition"/>
+        <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceBraceMatcher"/>
+        <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceFoldingBuilder"/>
 
-        <moduleService serviceInterface="org.xblackcat.frozenice.integration.SliceModuleHelper"
-                       serviceImplementation="org.xblackcat.frozenice.integration.SliceModuleHelper$Impl"/>
-        <projectService serviceInterface="org.xblackcat.frozenice.psi.SlicePsiFacade"
-                        serviceImplementation="org.xblackcat.frozenice.psi.impl.SlicePsiFacadeImpl"/>
+        <moduleService serviceInterface="org.xblackcat.frozenidea.integration.SliceModuleHelper"
+                       serviceImplementation="org.xblackcat.frozenidea.integration.SliceModuleHelper$Impl"/>
+        <projectService serviceInterface="org.xblackcat.frozenidea.psi.SlicePsiFacade"
+                        serviceImplementation="org.xblackcat.frozenidea.psi.impl.SlicePsiFacadeImpl"/>
 
         <compileServer.plugin classpath="frozenidea-jps-plugin.jar"/>
 
-        <lang.commenter language="SLICE" implementationClass="org.xblackcat.frozenice.code.SliceCommenter"/>
+        <lang.commenter language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceCommenter"/>
         <lang.findUsagesProvider language="SLICE"
-                                 implementationClass="org.xblackcat.frozenice.find.usages.SliceFindUsagesProvider"/>
+                                 implementationClass="org.xblackcat.frozenidea.find.usages.SliceFindUsagesProvider"/>
 
+        <quoteHandler fileType="SLICE" className="org.xblackcat.frozenidea.SliceQuoteHandler"/>
         <!--<completion.contributor language="SLICE" implementationClass="org.xblackcat.frozenice.completion.SliceCompletionContributor" id="sliceBasic"/>-->
         <completion.contributor language="SLICE"
-                                implementationClass="org.xblackcat.frozenice.completion.SliceMetadataCompletionContributor"
+                                implementationClass="org.xblackcat.frozenidea.completion.SliceMetadataCompletionContributor"
                                 id="sliceMetadata"/>
-        <findUsagesHandlerFactory implementation="org.xblackcat.frozenice.find.usages.SliceFindUsagesHandlerFactory"
+        <findUsagesHandlerFactory implementation="org.xblackcat.frozenidea.find.usages.SliceFindUsagesHandlerFactory"
                                   id="slice"
                                   order="last, before default"/>
 
-        <projectService serviceInterface="org.xblackcat.frozenice.integration.JavaHelper"
-                        serviceImplementation="org.xblackcat.frozenice.integration.JavaHelper$Impl"/>
-        <moduleService serviceInterface="org.xblackcat.frozenice.integration.JavaModuleHelper"
-                       serviceImplementation="org.xblackcat.frozenice.integration.JavaModuleHelper$Impl"/>
+        <projectService serviceInterface="org.xblackcat.frozenidea.integration.JavaHelper"
+                        serviceImplementation="org.xblackcat.frozenidea.integration.JavaHelper$Impl"/>
+        <moduleService serviceInterface="org.xblackcat.frozenidea.integration.JavaModuleHelper"
+                       serviceImplementation="org.xblackcat.frozenidea.integration.JavaModuleHelper$Impl"/>
         <codeInsight.lineMarkerProvider language="SLICE"
-                                        implementationClass="org.xblackcat.frozenice.link.Slice2JavaLineMarkerProvider"/>
+                                        implementationClass="org.xblackcat.frozenidea.link.Slice2JavaLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="SLICE"
-                                        implementationClass="org.xblackcat.frozenice.link.SliceLineMarkerProvider"/>
+                                        implementationClass="org.xblackcat.frozenidea.link.SliceLineMarkerProvider"/>
     </extensions>
 </idea-plugin>

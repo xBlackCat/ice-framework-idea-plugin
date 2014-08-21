@@ -1,29 +1,48 @@
 {
-    parserClass="org.xblackcat.frozenice.parser.SliceParser"
-    parserUtilClass="org.xblackcat.frozenice.parser.SliceParserUtil"
-//    stubParserClass="org.xblackcat.frozenice.parser.SliceParserUtil"
+    parserClass="org.xblackcat.frozenidea.parser.SliceParser"
+    parserUtilClass="org.xblackcat.frozenidea.parser.SliceParserUtil"
 
-    implements="org.xblackcat.frozenice.psi.SliceCompositeElement"
-    extends="org.xblackcat.frozenice.psi.impl.SliceCompositeElementImpl"
+    implements="org.xblackcat.frozenidea.psi.SliceCompositeElement"
+    extends="org.xblackcat.frozenidea.psi.impl.SliceCompositeElementImpl"
 
     psiClassPrefix="Slice"
     psiImplClassSuffix="Impl"
-    psiPackage="org.xblackcat.frozenice.psi"
-    psiImplPackage="org.xblackcat.frozenice.psi.impl"
-    psiImplUtilClass="org.xblackcat.frozenice.psi.impl.SlicePsiImplUtil"
+    psiPackage="org.xblackcat.frozenidea.psi"
+    psiImplPackage="org.xblackcat.frozenidea.psi.impl"
+    psiImplUtilClass="org.xblackcat.frozenidea.psi.impl.SlicePsiImplUtil"
 
-    elementTypeHolderClass="org.xblackcat.frozenice.psi.SliceTypes"
+    elementTypeHolderClass="org.xblackcat.frozenidea.psi.SliceTypes"
     elementTypePrefix="ICE_"
-    elementTypeClass="org.xblackcat.frozenice.psi.SliceCompositeElementType"
-    tokenTypeClass="org.xblackcat.frozenice.psi.SliceTokenType"
+    elementTypeClass="org.xblackcat.frozenidea.psi.SliceCompositeElementType"
+    tokenTypeClass="org.xblackcat.frozenidea.psi.SliceTokenType"
 
 
     // Tokens
     tokens=[
+        digit="regexp:[0-9]"
+        nonZeroDigit = "regexp:[1-9]"
+        octalDigit = "regexp:[0-7]"
+        hexDigit = "regexp:[0-9A-Fa-f]"
+
+        decimalNumeral = "regexp:0|{NONZERODIGIT}{DIGIT}*"
+        hexNumeral = "regexp:0x{HEXDIGIT}+"
+        octalNumeral = "regexp:0{OCTALDIGIT}+"
+
+        exponentPart = "regexp:(E|e)(\+|-)?{DIGIT}+"
+        floatType = "regexp:F|f|D|d"
+
+        c_style_comment="regexp:(/\*[^\*]{COMMENT_TAIL})|/\*"
+        comment_tail="regexp:([^\*]*(\*+[^\*/])?)*(\*/)?"
+        end_of_line_comment="regexp://[^\r\n]*"
+        escape_sequence="regexp:\\[^\n\r]"
+        bad_string="regexp:\"([^\\\"\r\n]|{ESCAPE_SEQUENCE})*"
+        string_literal="regexp:{BAD_STRING}\""
+
         id="regexp:\\?\p{Alpha}\w*"
-        string_literal="regexp:\"([^\"\\]|\\.)*\""
-        integer_value="regexp:\"[\-\+]?\d+\""
-        float_value="regexp:\"[\-\+]?(\d*\.)?\d+([eE][-+]?\d+)?\""
+        integer_value="regexp:({DECIMALNUMERAL}|{HEXNUMERAL}|{OCTALNUMERAL})(L|l)?"
+        float_value="regexp:{DIGIT}+\\.{DIGIT}*{EXPONENTPART}?{FLOATTYPE}?|\\.{DIGIT}+{EXPONENTPART}?{FLOATTYPE}?|{DIGIT}+{EXPONENTPART}{FLOATTYPE}?|{DIGIT}+{EXPONENTPART}?{FLOATTYPE}"
+
+        directive="regexp:#.+"
 
         EQ="="
         SEMICOLON=";"
@@ -39,6 +58,7 @@
         CLOSE_GL_MD="]]"
         LEFT_PARENTH="("
         RIGHT_PARENTH=")"
+        NAME_SEPARATOR="::"
 
         KW_VOID="void"
 
@@ -88,10 +108,10 @@
         KW_IMPLEMENTS="implements"
     ]
 
-    implements("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.SliceDataTypeElement"
-    extends("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenice.psi.impl.SliceDataTypeElementImpl"
-    implements(".*_def|module|enum_constant")="org.xblackcat.frozenice.psi.SliceNamedElement"
-    extends(".*_def|module|enum_constant")="org.xblackcat.frozenice.psi.impl.SliceNamedElementImpl"
+    implements("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenidea.psi.SliceDataTypeElement"
+    extends("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenidea.psi.impl.SliceDataTypeElementImpl"
+    implements(".*_def|module|enum_constant")="org.xblackcat.frozenidea.psi.SliceNamedElement"
+    extends(".*_def|module|enum_constant")="org.xblackcat.frozenidea.psi.impl.SliceNamedElementImpl"
 }
 
 root ::= slice_block
@@ -161,7 +181,9 @@ sequence_def ::= 'sequence' '<' element_type '>' id ';' {pin=1}
 dictionary_def ::= 'dictionary' '<' key_type ',' element_type '>' id ';' {pin=1}
 
 // --- Other ---
-type_reference ::= id {
+module_path ::= (id '::')+
+
+type_reference ::= module_path? id {
     methods = [getReferences getReference]
 }
 enum_constant_reference ::= id {
