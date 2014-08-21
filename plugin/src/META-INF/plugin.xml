@@ -34,7 +34,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="org.xblackcat.frozenidea.IceFileTypeFactory"/>
 
-        <projectConfigurable instance="org.xblackcat.frozenidea.config.IceFrameworkConfigurable" id="frozenidea" parentId="project.propCompiler"/>
+        <projectConfigurable instance="org.xblackcat.frozenidea.config.IceFrameworkConfigurable"
+                             id="frozenidea"
+                             parentId="project.propCompiler"
+                             displayName="ZeroC ICE"/>
 
         <frameworkSupport implementation="org.xblackcat.frozenidea.facet.IceFacetSupportProvider"/>
         <facetType implementation="org.xblackcat.frozenidea.facet.IceFacetType"/>
