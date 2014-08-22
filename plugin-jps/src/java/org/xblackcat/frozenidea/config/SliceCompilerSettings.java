@@ -1,5 +1,6 @@
 package org.xblackcat.frozenidea.config;
 
+import com.intellij.util.xmlb.annotations.AbstractCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.JpsElementChildRole;
 import org.jetbrains.jps.model.ex.JpsElementBase;
@@ -59,7 +60,8 @@ public class SliceCompilerSettings extends JpsElementBase<SliceCompilerSettings>
         return result;
     }
 
-    public List<Target> getConfiguredComponents() {
+    @AbstractCollection(surroundWithTag = false, elementTypes = Target.class)
+    public List<Target> getComponents() {
         return components;
     }
 

@@ -8,6 +8,7 @@ import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.CharsetToolkit;
+import org.apache.commons.io.FileUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -21,11 +22,11 @@ import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.incremental.messages.FileGeneratedEvent;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
+import org.jetbrains.jps.util.JpsPathUtil;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.config.IceConfig;
 import org.xblackcat.frozenidea.config.SliceCompilerSettings;
 import org.xblackcat.frozenidea.config.Target;
-import org.xblackcat.frozenidea.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
     ) throws ProjectBuildException, IOException {
         IceConfig iceConfig = IceConfig.getSettings(context.getProjectDescriptor().getProject());
 
-        File frameworkHome = Utils.ideaUrlToFile(iceConfig.getFrameworkHomeUrl());
+        File frameworkHome = JpsPathUtil.urlToFile(iceConfig.getFrameworkHomeUrl());
 
         final Map<ModuleBuildTarget, List<File>> toCompile = collectChangedFiles(context, dirtyFilesHolder);
         if (toCompile.isEmpty()) {
@@ -69,7 +70,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
             final SliceCompilerSettings facetConfig = SliceCompilerSettings.getSettings(module);
             final List<File> sourceFiles = e.getValue();
 
-            List<Target> translators = facetConfig.getConfiguredComponents();
+            List<Target> translators = facetConfig.getComponents();
 
             if (translators.isEmpty()) {
                 context.processMessage(
@@ -88,6 +89,21 @@ public class SliceBuilder extends ModuleLevelBuilder {
             // Translate files
             for (Target c : translators) {
                 final File outputDir = c.getOutputFile();
+
+                if (facetConfig.isCleanOutput()) {
+                    try {
+                        FileUtils.cleanDirectory(outputDir);
+                    } catch (IOException ex) {
+                        context.processMessage(
+                                new CompilerMessage(
+                                        getPresentableName(), BuildMessage.Kind.ERROR,
+                                        "Failed to empty target directory: " + outputDir.getPath() + " . Error: " + ex.getMessage()
+                                )
+                        );
+                        return ExitCode.ABORT;
+                    }
+                }
+
                 compileFiles(context, frameworkHome, target, sourceFiles, c.getComponent(), outputDir);
             }
         }

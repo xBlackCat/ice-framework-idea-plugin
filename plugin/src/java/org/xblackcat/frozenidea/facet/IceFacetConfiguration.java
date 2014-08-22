@@ -5,18 +5,23 @@ import com.intellij.facet.FacetConfiguration;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
 import com.intellij.facet.ui.FacetValidatorsManager;
+import com.intellij.ide.util.BrowseFilesListener;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.*;
 import com.intellij.ui.popup.PopupFactoryImpl;
 import com.intellij.util.ui.UIUtil;
@@ -25,6 +30,8 @@ import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.io.LocalFileFinder;
+import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.config.SliceCompilerSettings;
 import org.xblackcat.frozenidea.config.Target;
@@ -35,6 +42,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 
 /**
@@ -140,7 +148,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
             cleanOnBuildCheckBox.setSelected(config.isCleanOutput());
             final java.util.List<Target> data = targetsListPanel.getData();
             data.clear();
-            data.addAll(config.getConfiguredComponents());
+            data.addAll(config.getComponents());
         }
 
         @Override
@@ -255,13 +263,27 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
 
             @Override
             protected boolean removeItem(Target target) {
-                return false;
+                return true;
             }
 
             @Nullable
             @Override
             protected Target editItem(Target target) {
-                return null;
+                final String dir = target.getOutputDir();
+
+                final VirtualFile chooseFile = FileChooser.chooseFile(
+                        BrowseFilesListener.SINGLE_DIRECTORY_DESCRIPTOR,
+                        editorContext.getProject(),
+                        dir == null ? null : LocalFileFinder.findFile(dir)
+                );
+
+                if (chooseFile == null) {
+                    return null;
+                }
+
+                target.setOutputDir(chooseFile.getPath());
+
+                return target;
             }
 
             private class GeneratorListGroup extends ActionGroup {
@@ -275,8 +297,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                     int i = 0;
                     while (i < types.length) {
                         final IceComponent type = types[i];
-                        final CreateTargetAction action = new CreateTargetAction(type);
-                        action.setEnabled(exists.contains(type));
+                        final CreateTargetAction action = new CreateTargetAction(type, exists.contains(type));
                         actions[i] = action;
                         i++;
                     }
@@ -289,17 +310,29 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                 }
             }
 
-            private class CreateTargetAction extends AnActionButton {
+            private class CreateTargetAction extends AnAction {
                 private final IceComponent myType;
+                private final boolean enabled;
 
-                public CreateTargetAction(IceComponent type) {
+                public CreateTargetAction(IceComponent type, boolean enabled) {
                     super(type.name(), "", type.getIcon());
                     myType = type;
+                    this.enabled = enabled;
+                }
+
+                @Override
+                public void update(AnActionEvent e) {
+                    super.update(e);
+                    e.getPresentation().setEnabled(enabled);
                 }
 
                 @Override
                 public void actionPerformed(AnActionEvent e) {
-                    final Target o = editItem(new Target(myType, null));
+                    final Module module = editorContext.getModule();
+                    ModuleRootManager rootManager = ModuleRootManager.getInstance(module);
+                    final Collection<VirtualFile> roots = rootManager.getSourceRoots(JavaModuleSourceRootTypes.SOURCES);
+
+                    final Target o = editItem(new Target(myType, roots.isEmpty() ? null : roots.iterator().next().getPath()));
                     if (o == null) return;
 
                     getData().add(o);
