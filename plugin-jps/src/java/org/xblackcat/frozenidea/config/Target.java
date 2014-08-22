@@ -1,17 +1,21 @@
 package org.xblackcat.frozenidea.config;
 
-import org.xblackcat.frozenidea.util.Utils;
+import org.jetbrains.jps.util.JpsPathUtil;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  * 21.08.2014 11:26
  *
  * @author xBlackCat
  */
-public class Target {
+public class Target implements Serializable, Cloneable {
     private IceComponent component;
     private String outputDir;
+
+    public Target() {
+    }
 
     public Target(IceComponent component, String outputDir) {
         this.component = component;
@@ -35,6 +39,6 @@ public class Target {
     }
 
     public File getOutputFile() {
-        return Utils.ideaUrlToFile(outputDir);
+        return JpsPathUtil.urlToFile(outputDir);
     }
 }
