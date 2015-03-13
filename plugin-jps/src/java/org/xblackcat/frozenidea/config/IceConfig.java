@@ -4,7 +4,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.JpsElementChildRole;
-import org.jetbrains.jps.model.JpsProject;
 import org.jetbrains.jps.model.ex.JpsElementBase;
 import org.jetbrains.jps.model.ex.JpsElementChildRoleBase;
 
@@ -19,9 +18,11 @@ public class IceConfig extends JpsElementBase<IceConfig> {
     );
 
     private final String frameworkHomeUrl;
+    private final String[] includeUrls;
 
-    public IceConfig(String url) {
+    public IceConfig(String url, String... includeUrls) {
         frameworkHomeUrl = url;
+        this.includeUrls = includeUrls;
     }
 
     public VirtualFile getFrameworkHome() {
@@ -32,10 +33,25 @@ public class IceConfig extends JpsElementBase<IceConfig> {
         return frameworkHomeUrl;
     }
 
+    public String[] getIncludeUrls() {
+        return includeUrls.clone();
+    }
+
+    public VirtualFile[] getIncludePathFiles() {
+        VirtualFile[] files = new VirtualFile[includeUrls.length];
+        final VirtualFileManager fileManager = VirtualFileManager.getInstance();
+        int i = 0;
+        while (i < files.length) {
+            files[i] = fileManager.findFileByUrl(includeUrls[i]);
+        }
+
+        return files;
+    }
+
     @NotNull
     @Override
     public IceConfig createCopy() {
-        return new IceConfig(frameworkHomeUrl);
+        return new IceConfig(frameworkHomeUrl, includeUrls);
     }
 
     @Override
@@ -43,8 +59,4 @@ public class IceConfig extends JpsElementBase<IceConfig> {
 
     }
 
-    public static IceConfig getSettings(JpsProject project) {
-        final IceConfig config = project.getContainer().getChild(IceConfig.ROLE);
-        return config == null ? new IceConfig("") : config;
-    }
 }

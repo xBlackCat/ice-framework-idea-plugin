@@ -1,9 +1,9 @@
 package org.xblackcat.frozenidea.config;
 
 import com.intellij.ide.ui.UISettings;
+import com.intellij.ide.util.BrowseFilesListener;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.BaseConfigurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
@@ -15,18 +15,25 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.ui.AddEditRemovePanel;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.FrozenIdea;
 import org.xblackcat.frozenidea.util.IceChecker;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * 12.01.12 14:37
@@ -101,6 +108,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
         private final FrozenIdea plugin;
         private final JTextField iceHomeFolder;
         private VirtualFile selectedFolder;
+        private final AddEditRemovePanel<VirtualFile> includesListPane;
 
         public IceFrameworkConfigForm(FrozenIdea plugin) {
             super(new BorderLayout());
@@ -155,7 +163,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                     new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             final VirtualFile[] files = FileChooser.chooseFiles(
-                                    new FileChooserDescriptor(false, true, false, false, false, false),
+                                    BrowseFilesListener.SINGLE_DIRECTORY_DESCRIPTOR,
                                     IceFrameworkConfigForm.this,
                                     null,
                                     selectedFolder
@@ -171,6 +179,79 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                     }
             );
 
+            includesListPane = new AddEditRemovePanel<VirtualFile>(
+                    new AddEditRemovePanel.TableModel<VirtualFile>() {
+                        @Override
+                        public int getColumnCount() {
+                            return 1;
+                        }
+
+                        @Nullable
+                        @Override
+                        public String getColumnName(int columnIndex) {
+                            return "Include path";
+                        }
+
+                        @Override
+                        public Class getColumnClass(int columnIndex) {
+                            return VirtualFile.class;
+                        }
+
+                        @Override
+                        public Object getField(VirtualFile o, int columnIndex) {
+                            return o;
+                        }
+                    }, new ArrayList<VirtualFile>(), "Include list"
+            ) {
+                @Nullable
+                @Override
+                protected VirtualFile addItem() {
+                    return editItem(null);
+                }
+
+                @Override
+                protected boolean removeItem(VirtualFile o) {
+                    setModified(true);
+                    return true;
+                }
+
+                @Nullable
+                @Override
+                protected VirtualFile editItem(VirtualFile o) {
+                    VirtualFile[] files = FileChooser.chooseFiles(
+                            BrowseFilesListener.SINGLE_DIRECTORY_DESCRIPTOR, includesListPane, project, o
+                    );
+                    if (files.length == 0) {
+                        return null;
+                    }
+
+                    setModified(true);
+                    return files[0];
+                }
+            };
+            includesListPane.getTable().setShowColumns(true);
+            includesListPane.setRenderer(
+                    0,
+                    new DefaultTableCellRenderer() {
+                        @Override
+                        protected void setValue(Object value) {
+                            VirtualFile vf = (VirtualFile) value;
+
+                            if (vf.isValid()) {
+                                setForeground(JBColor.BLACK);
+                                setBackground(JBColor.WHITE);
+                            } else {
+                                setForeground(JBColor.RED);
+                                setBackground(JBColor.WHITE);
+                            }
+
+                            setText(vf.getPath());
+                        }
+                    }
+            );
+
+            add(includesListPane, BorderLayout.CENTER);
+
         }
 
         void reset() {
@@ -181,13 +262,30 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                 if (selectedFolder != null) {
                     iceHomeFolder.setText(selectedFolder.getPath());
                 }
+                final ArrayList<VirtualFile> files = new ArrayList<VirtualFile>();
+                final VirtualFileManager manager = VirtualFileManager.getInstance();
+
+                for (String url : config.getIncludeUrls()) {
+                    final VirtualFile file = manager.findFileByUrl(url);
+                    if (file != null) {
+                        files.add(file);
+                    }
+                }
+                includesListPane.setData(files);
             }
 
             setModified(false);
         }
 
         void apply() {
-            plugin.setConfig(new IceConfig(selectedFolder != null ? selectedFolder.getUrl() : null));
+            final List<VirtualFile> includesListPaneData = includesListPane.getData();
+            final String[] urls = new String[includesListPaneData.size()];
+            int i = 0;
+            for (VirtualFile vf : includesListPaneData) {
+                urls[i++] = vf.getUrl();
+            }
+            final IceConfig config = new IceConfig(selectedFolder != null ? selectedFolder.getUrl() : null, urls);
+            plugin.setConfig(config);
             setModified(false);
 
             UISettings.getInstance().fireUISettingsChanged();
@@ -241,6 +339,12 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                     selectedFolder = VfsUtil.findFileByIoFile(checkingFolder, true);
                     assert selectedFolder != null;
                     iceHomeFolder.setText(selectedFolder.getPath());
+                    final ArrayList<VirtualFile> includes = new ArrayList<VirtualFile>();
+                    final VirtualFile slice = selectedFolder.findFileByRelativePath("slice");
+                    if (slice != null) {
+                        includes.add(slice);
+                    }
+                    includesListPane.setData(includes);
 
                     if (version != null) {
                         Messages.showInfoMessage(

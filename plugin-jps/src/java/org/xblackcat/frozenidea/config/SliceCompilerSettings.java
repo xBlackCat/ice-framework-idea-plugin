@@ -83,9 +83,4 @@ public class SliceCompilerSettings extends JpsElementBase<SliceCompilerSettings>
     public void applyChanges(@NotNull SliceCompilerSettings modified) {
     }
 
-    @NotNull
-    public static SliceCompilerSettings getSettings(@NotNull JpsModule module) {
-        SliceCompilerSettings settings = module.getContainer().getChild(ROLE);
-        return settings == null ? new SliceCompilerSettings() : settings;
-    }
 }

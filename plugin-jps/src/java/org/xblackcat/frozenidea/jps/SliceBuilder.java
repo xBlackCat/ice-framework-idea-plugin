@@ -55,9 +55,14 @@ public class SliceBuilder extends ModuleLevelBuilder {
             DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder,
             OutputConsumer outputConsumer
     ) throws ProjectBuildException, IOException {
-        IceConfig iceConfig = IceConfig.getSettings(context.getProjectDescriptor().getProject());
+        final IceConfig config = context.getProjectDescriptor().getProject().getContainer().getChild(IceConfig.ROLE);
+        IceConfig iceConfig = config == null ? new IceConfig("") : config;
 
         File frameworkHome = JpsPathUtil.urlToFile(iceConfig.getFrameworkHomeUrl());
+        List<String> includes = new ArrayList<String>();
+        for (String include : iceConfig.getIncludeUrls()) {
+            includes.add(JpsPathUtil.urlToFile(include).getAbsolutePath());
+        }
 
         final Map<ModuleBuildTarget, List<File>> toCompile = collectChangedFiles(context, dirtyFilesHolder);
         if (toCompile.isEmpty()) {
@@ -67,7 +72,8 @@ public class SliceBuilder extends ModuleLevelBuilder {
         for (Map.Entry<ModuleBuildTarget, List<File>> e : toCompile.entrySet()) {
             final ModuleBuildTarget target = e.getKey();
             final JpsModule module = target.getModule();
-            final SliceCompilerSettings facetConfig = SliceCompilerSettings.getSettings(module);
+            SliceCompilerSettings settings = module.getContainer().getChild(SliceCompilerSettings.ROLE);
+            final SliceCompilerSettings facetConfig = settings == null ? new SliceCompilerSettings() : settings;
             final List<File> sourceFiles = e.getValue();
 
             List<Target> translators = facetConfig.getComponents();
@@ -75,11 +81,8 @@ public class SliceBuilder extends ModuleLevelBuilder {
             if (translators.isEmpty()) {
                 context.processMessage(
                         new CompilerMessage(
-                                getPresentableName(),
-                                BuildMessage.Kind.WARNING,
-                                "No valid translators found for module " +
-                                        module.getName() +
-                                        ". Check facet configuration."
+                                getPresentableName(), BuildMessage.Kind.WARNING,
+                                "No valid translators found for module " + module.getName() + ". Check facet configuration."
                         )
                 );
 
@@ -104,7 +107,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
                     }
                 }
 
-                compileFiles(context, frameworkHome, target, sourceFiles, c.getComponent(), outputDir);
+                compileFiles(context, frameworkHome, includes, target, sourceFiles, c.getComponent(), outputDir);
             }
         }
 
@@ -114,9 +117,11 @@ public class SliceBuilder extends ModuleLevelBuilder {
     private void compileFiles(
             final CompileContext context,
             File frameworkHome,
+            List<String> includes,
             ModuleBuildTarget buildTarget,
             List<File> sourceFiles,
-            IceComponent target, File outputDir
+            IceComponent target,
+            File outputDir
     ) throws StopBuildException {
         final JpsModule module = buildTarget.getModule();
 
@@ -124,12 +129,8 @@ public class SliceBuilder extends ModuleLevelBuilder {
         if (outputDir == null) {
             context.processMessage(
                     new CompilerMessage(
-                            getPresentableName(),
-                            BuildMessage.Kind.WARNING,
-                            "Output folder is not specified for " +
-                                    translatorName +
-                                    " in module " +
-                                    module.getName() +
+                            getPresentableName(), BuildMessage.Kind.WARNING,
+                            "Output folder is not specified for " + translatorName + " in module " + module.getName() +
                                     ". Check facet configuration."
                     )
             );
@@ -143,7 +144,9 @@ public class SliceBuilder extends ModuleLevelBuilder {
         command.add("--output-dir");
         final String outputDirPath = outputDir.getAbsolutePath();
         command.add(outputDirPath);
-        command.add("-I" + new File(frameworkHome, "slice").getAbsolutePath());
+        for (String include : includes) {
+            command.add("-I" + include);
+        }
         for (JpsModuleSourceRoot contentRoot : module.getSourceRoots()) {
             command.add("-I" + contentRoot.getFile().getAbsolutePath());
         }

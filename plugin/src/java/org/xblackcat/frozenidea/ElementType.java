@@ -1,8 +1,21 @@
 package org.xblackcat.frozenidea;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.Language;
+import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.java.JavaParserDefinition;
+import com.intellij.lang.java.parser.JavaParserUtil;
+import com.intellij.lang.java.parser.JavadocParser;
+import com.intellij.lexer.Lexer;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.LanguageLevelProjectExtension;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.impl.source.javadoc.PsiDocCommentImpl;
 import com.intellij.psi.tree.IFileElementType;
+import com.intellij.psi.tree.ILazyParseableElementType;
+import com.intellij.psi.tree.IReparseableElementType;
 import com.intellij.psi.tree.TokenSet;
+import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.psi.SliceTypes;
 
 /**
@@ -46,41 +59,42 @@ public interface ElementType {
     TokenSet WHITESPACE_BIT_SET = TokenSet.create(TokenType.WHITE_SPACE);
     TokenSet PLAIN_COMMENT_BIT_SET = TokenSet.create(
             SliceTypes.ICE_C_STYLE_COMMENT,
-            SliceTypes.ICE_END_OF_LINE_COMMENT
+            SliceTypes.ICE_END_OF_LINE_COMMENT,
+            SliceTypes.ICE_DOC_STYLE_COMMENT
     );
     TokenSet COMMENT_BIT_SET = TokenSet.orSet(PLAIN_COMMENT_BIT_SET, TokenSet.create(SliceTypes.ICE_DIRECTIVE));
 
-//    ILazyParseableElementType DOC_COMMENT = new IReparseableElementType("DOC_COMMENT", SliceLanguage.INSTANCE) {
-//      private final JavaParserUtil.ParserWrapper myParser = new JavaParserUtil.ParserWrapper() {
-//        @Override
-//        public void parse(final PsiBuilder builder) {
-//          JavadocParser.parseDocCommentText(builder);
-//        }
-//      };
-//
-//      @Override
-//      public ASTNode createNode(final CharSequence text) {
-//        return new PsiDocCommentImpl(text);
-//      }
-//
-//      @Nullable
-//      @Override
-//      public ASTNode parseContents(final ASTNode chameleon) {
-//        return JavaParserUtil.parseFragment(chameleon, myParser);
-//      }
-//
-//      @Override
-//      public boolean isParsable(final CharSequence buffer, Language fileLanguage, final Project project) {
-//        Lexer lexer = JavaParserDefinition.createLexer(LanguageLevelProjectExtension.getInstance(project).getLanguageLevel());
-//        lexer.start(buffer);
-//        if (lexer.getTokenType() == DOC_COMMENT) {
-//          lexer.advance();
-//          if (lexer.getTokenType() == null) {
-//            return true;
-//          }
-//        }
-//        return false;
-//      }
-//    };
+    ILazyParseableElementType DOC_COMMENT = new IReparseableElementType("DOC_COMMENT", SliceLanguage.INSTANCE) {
+      private final JavaParserUtil.ParserWrapper myParser = new JavaParserUtil.ParserWrapper() {
+        @Override
+        public void parse(final PsiBuilder builder) {
+          JavadocParser.parseDocCommentText(builder);
+        }
+      };
+
+      @Override
+      public ASTNode createNode(final CharSequence text) {
+        return new PsiDocCommentImpl(text);
+      }
+
+      @Nullable
+      @Override
+      public ASTNode parseContents(final ASTNode chameleon) {
+        return JavaParserUtil.parseFragment(chameleon, myParser);
+      }
+
+      @Override
+      public boolean isParsable(final CharSequence buffer, Language fileLanguage, final Project project) {
+        Lexer lexer = JavaParserDefinition.createLexer(LanguageLevelProjectExtension.getInstance(project).getLanguageLevel());
+        lexer.start(buffer);
+        if (lexer.getTokenType() == DOC_COMMENT) {
+          lexer.advance();
+          if (lexer.getTokenType() == null) {
+            return true;
+          }
+        }
+        return false;
+      }
+    };
 
 }
