@@ -1,16 +1,20 @@
 package org.xblackcat.frozenidea.jps;
 
+import org.apache.commons.lang.StringUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.JpsProject;
 import org.jetbrains.jps.model.serialization.JpsProjectExtensionSerializer;
 import org.xblackcat.frozenidea.config.IceConfig;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
-* 11.07.2014 09:38
-*
-* @author xBlackCat
-*/
+ * 11.07.2014 09:38
+ *
+ * @author xBlackCat
+ */
 public class IceProjectExtensionSerializer extends JpsProjectExtensionSerializer {
     public static final String NAME = "IceFramework";
     public static final String CONFIG_FILE_NAME = "projectIceFramework.xml";
@@ -23,22 +27,31 @@ public class IceProjectExtensionSerializer extends JpsProjectExtensionSerializer
     public void loadExtension(
             @NotNull JpsProject jpsProject, @NotNull Element componentTag
     ) {
+        String homeUrl = null;
+        List<String> includes = new ArrayList<String>();
         Element fwList = componentTag.getChild("ice-frameworks");
-        IceConfig iceConfig = null;
+        IceConfig iceConfig = new IceConfig("");
         if (fwList != null) {
             Element fw = fwList.getChild("item");
             if (fw != null) {
-                String url = fw.getAttributeValue("url");
-                if (url != null) {
-                    iceConfig = new IceConfig(url);
+                homeUrl = fw.getAttributeValue("url");
+
+                final Element includeList = fw.getChild("include");
+                if (includeList != null) {
+                    for (Element incl : includeList.getChildren("item")) {
+                        String includeUrl = incl.getAttributeValue("url");
+                        if (StringUtils.isNotBlank(includeUrl)) {
+                            includes.add(includeUrl);
+                        }
+                    }
                 }
             }
         }
-        if (iceConfig == null) {
-            iceConfig = new IceConfig("");
+        if (homeUrl != null) {
+            iceConfig = new IceConfig(homeUrl, includes.toArray(new String[includes.size()]));
         }
-        jpsProject.getContainer().setChild(IceConfig.ROLE, iceConfig);
 
+        jpsProject.getContainer().setChild(IceConfig.ROLE, iceConfig);
     }
 
     @Override

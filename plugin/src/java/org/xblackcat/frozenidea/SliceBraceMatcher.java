@@ -35,6 +35,7 @@ public class SliceBraceMatcher implements PairedBraceMatcher {
             @Nullable IElementType contextType
     ) {
         return !(contextType instanceof SliceTokenType) ||
+                contextType == SliceTypes.ICE_DOC_STYLE_COMMENT ||
                 contextType == SliceTypes.ICE_C_STYLE_COMMENT ||
                 contextType == SliceTypes.ICE_END_OF_LINE_COMMENT ||
                 contextType == SliceTypes.ICE_SEMICOLON ||

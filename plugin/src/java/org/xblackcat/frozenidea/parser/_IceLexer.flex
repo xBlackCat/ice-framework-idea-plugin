@@ -1,18 +1,18 @@
-package org.xblackcat.frozenice.parser;
+package org.xblackcat.frozenidea.parser;
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
-import static org.xblackcat.frozenice.psi.SliceTypes.*;
+import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 
 %%
 
 %{
-  public _SliceLexer() {
+  public _IceLexer() {
     this((java.io.Reader)null);
   }
 %}
 
 %public
-%class _SliceLexer
+%class _IceLexer
 %implements FlexLexer
 %function advance
 %type IElementType
@@ -31,6 +31,7 @@ HEXNUMERAL=0x{HEXDIGIT}+
 OCTALNUMERAL=0{OCTALDIGIT}+
 EXPONENTPART=(E|e)(\+|-)?{DIGIT}+
 FLOATTYPE=F|f|D|d
+DOC_STYLE_COMMENT=("/"\*\*("/"|[^/\*]{COMMENT_TAIL}))?
 C_STYLE_COMMENT=("/"\*[^\*]{COMMENT_TAIL})|"/"\*
 COMMENT_TAIL=([^\*]*(\*+[^\*/])?)*(\*"/")?
 END_OF_LINE_COMMENT="//"[^\r\n]*
@@ -40,7 +41,6 @@ STRING_LITERAL={BAD_STRING}\"
 ID=\\?[:letter:][a-zA-Z_0-9]*
 INTEGER_VALUE=({DECIMALNUMERAL}|{HEXNUMERAL}|{OCTALNUMERAL})(L|l)?
 FLOAT_VALUE={DIGIT}+\\.{DIGIT}*{EXPONENTPART}?{FLOATTYPE}?|\\.{DIGIT}+{EXPONENTPART}?{FLOATTYPE}?|{DIGIT}+{EXPONENTPART}{FLOATTYPE}?|{DIGIT}+{EXPONENTPART}?{FLOATTYPE}
-FILE_PATH=[^?*\\|]*
 DIRECTIVE=#.+
 
 %%
@@ -100,6 +100,7 @@ DIRECTIVE=#.+
   {OCTALNUMERAL}             { return ICE_OCTALNUMERAL; }
   {EXPONENTPART}             { return ICE_EXPONENTPART; }
   {FLOATTYPE}                { return ICE_FLOATTYPE; }
+  {DOC_STYLE_COMMENT}        { return ICE_DOC_STYLE_COMMENT; }
   {C_STYLE_COMMENT}          { return ICE_C_STYLE_COMMENT; }
   {COMMENT_TAIL}             { return ICE_COMMENT_TAIL; }
   {END_OF_LINE_COMMENT}      { return ICE_END_OF_LINE_COMMENT; }
@@ -109,8 +110,7 @@ DIRECTIVE=#.+
   {ID}                       { return ICE_ID; }
   {INTEGER_VALUE}            { return ICE_INTEGER_VALUE; }
   {FLOAT_VALUE}              { return ICE_FLOAT_VALUE; }
-  {FILE_PATH}                { return ICE_FILE_PATH; }
-  {DIRECTIVE}                { return ElementType.ICE_DIRECTIVE; }
+  {DIRECTIVE}                { return ICE_DIRECTIVE; }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

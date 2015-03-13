@@ -15,7 +15,8 @@
     elementTypePrefix="ICE_"
     elementTypeClass="org.xblackcat.frozenidea.psi.SliceCompositeElementType"
     tokenTypeClass="org.xblackcat.frozenidea.psi.SliceTokenType"
-
+//    elementTypeFactory="org.xblackcat.frozenidea.psi.TokenFactory.getElement"
+    tokenTypeFactory="org.xblackcat.frozenidea.psi.TokenFactory.getToken"
 
     // Tokens
     tokens=[
@@ -31,6 +32,7 @@
         exponentPart = "regexp:(E|e)(\+|-)?{DIGIT}+"
         floatType = "regexp:F|f|D|d"
 
+        doc_style_comment="regexp:(/\*\*(/|[^/\*]{COMMENT_TAIL}))?"
         c_style_comment="regexp:(/\*[^\*]{COMMENT_TAIL})|/\*"
         comment_tail="regexp:([^\*]*(\*+[^\*/])?)*(\*/)?"
         end_of_line_comment="regexp://[^\r\n]*"
@@ -134,7 +136,7 @@ private data_def_keywords ::= 'exception' | 'class' | 'interface' | 'struct' | '
 
 metadata_element ::= string_literal {recoverWhile=metadata_element_recovery}
 private metadata_body_recovery ::= !(']')
-private metadata_element_recovery ::= !(']]' | ']' | ',')
+private metadata_element_recovery ::= !(']]' | ']' | ',' | '\n')
 
 private data_definition ::= (class_def | interface_def | exception_def | struct_def | enum_def | sequence_def | dictionary_def )
 
