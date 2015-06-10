@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="frozenidea-jps:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/frozenidea_jps_jar</output-path>
+    <root id="root">
+      <element id="archive" name="frozenidea-jps-plugin.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/plugin-jps/src/res/META-INF/MANIFEST.MF" />
+          <element id="dir-copy" path="$PROJECT_DIR$/plugin-jps/src/res/META-INF" />
+        </element>
+        <element id="module-output" name="plugin-jps" />
+      </element>
+    </root>
+  </artifact>
+</component>

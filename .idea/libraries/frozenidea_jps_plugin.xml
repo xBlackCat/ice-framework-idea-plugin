@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="frozenidea-jps-plugin">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/artifacts/frozenidea_jps_jar/frozenidea-jps-plugin.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/plugin-jps/src/java" />
+    </SOURCES>
+  </library>
+</component>
