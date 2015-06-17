@@ -1,0 +1,32 @@
+{
+    parserClass="org.xblackcat.frozenidea.parser.SliceParser"
+    parserUtilClass="org.xblackcat.frozenidea.parser.SliceParserUtil"
+
+    implements="org.xblackcat.frozenidea.psi.SliceCompositeElement"
+    extends="org.xblackcat.frozenidea.psi.impl.SliceCompositeElementImpl"
+
+    psiClassPrefix="Slice"
+    psiImplClassSuffix="Impl"
+    psiPackage="org.xblackcat.frozenice.psi"
+    psiImplPackage="org.xblackcat.frozenice.psi.impl"
+    psiImplUtilClass="org.xblackcat.frozenidea.psi.impl.SlicePsiImplUtil"
+
+    elementTypeHolderClass="org.xblackcat.frozenidea.psi.SliceTypes"
+    elementTypePrefix="ICE_"
+    elementTypeClass="org.xblackcat.frozenidea.psi.SliceCompositeElementType"
+    tokenTypeClass="org.xblackcat.frozenidea.psi.SliceTokenType"
+
+    tokens=[
+        file_path="regexp:[^?*\\|]*"
+    ]
+}
+
+directive ::= '#' (include | conditional | pragma) {pin=1}
+private directive_end_recovery ::= (!'\n')
+include ::= 'include' (local_include | global_include) {pin=1 recoverWhile=directive_end_recovery}
+private local_include ::= '"' file_path '"';
+private global_include ::= '<' file_path '>';
+
+conditional ::= ('ifdef'| 'ifndef'| 'if'| 'endif'| 'else'| 'elif') (!'\n')* {pin=1 recoverWhile=directive_end_recovery}
+
+pragma ::= 'pragma' (!'\n')*  {pin=1 recoverWhile=directive_end_recovery}

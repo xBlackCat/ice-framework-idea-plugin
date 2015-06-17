@@ -8,7 +8,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.ElementType;
-import org.xblackcat.frozenidea.parser.IceLexer;
+import org.xblackcat.frozenidea.parser.SliceLexer;
 import org.xblackcat.frozenidea.psi.SliceTypes;
 
 import java.util.HashMap;
@@ -30,8 +30,7 @@ public class SliceSyntaxHighlighter extends SyntaxHighlighterBase {
         SyntaxHighlighterBase.fillMap(keys1, ElementType.KEYWORD_BIT_SET, DefaultLanguageHighlighterColors.KEYWORD);
 
         keys1.put(SliceTypes.ICE_STRING_LITERAL, DefaultLanguageHighlighterColors.STRING);
-        keys1.put(SliceTypes.ICE_INTEGER_VALUE, DefaultLanguageHighlighterColors.NUMBER);
-        keys1.put(SliceTypes.ICE_FLOAT_VALUE, DefaultLanguageHighlighterColors.NUMBER);
+        keys1.put(SliceTypes.ICE_NUMBER, DefaultLanguageHighlighterColors.NUMBER);
 
         keys1.put(SliceTypes.ICE_DOC_STYLE_COMMENT, DefaultLanguageHighlighterColors.BLOCK_COMMENT);
         keys1.put(SliceTypes.ICE_C_STYLE_COMMENT, DefaultLanguageHighlighterColors.BLOCK_COMMENT);
@@ -53,7 +52,7 @@ public class SliceSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new IceLexer();
+        return new SliceLexer();
     }
 
     @NotNull

@@ -12,7 +12,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenidea.parser.IceLexer;
+import org.xblackcat.frozenidea.parser.SliceLexer;
 import org.xblackcat.frozenidea.parser.SliceParser;
 import org.xblackcat.frozenidea.psi.SliceTypes;
 import org.xblackcat.frozenidea.psi.impl.SliceFileImpl;
@@ -27,7 +27,7 @@ public class SliceParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new IceLexer();
+        return new SliceLexer();
     }
 
     @Override

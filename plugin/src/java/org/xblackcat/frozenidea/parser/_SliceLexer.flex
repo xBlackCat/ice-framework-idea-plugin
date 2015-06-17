@@ -22,15 +22,6 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 
-DIGIT=[0-9]
-NONZERODIGIT=[1-9]
-OCTALDIGIT=[0-7]
-HEXDIGIT=[0-9A-Fa-f]
-DECIMALNUMERAL=0|{NONZERODIGIT}{DIGIT}*
-HEXNUMERAL=0x{HEXDIGIT}+
-OCTALNUMERAL=0{OCTALDIGIT}+
-EXPONENTPART=(E|e)(\+|-)?{DIGIT}+
-FLOATTYPE=F|f|D|d
 END_OF_LINE_COMMENT="//".*
 DOC_STYLE_COMMENT="/"\*\*([^*]|\*+[^*/])*(\*+"/")?
 C_STYLE_COMMENT="/"\*[^*]([^*]|\*+[^*/])*(\*+"/")?
@@ -38,8 +29,10 @@ ESCAPE_SEQUENCE=\\[^\n\r]
 BAD_STRING=\"([^\\\"\r\n]|{ESCAPE_SEQUENCE})*
 STRING_LITERAL={BAD_STRING}\"
 ID=\\?[:letter:][a-zA-Z_0-9]*
-INTEGER_VALUE=({DECIMALNUMERAL}|{HEXNUMERAL}|{OCTALNUMERAL})(L|l)?
-FLOAT_VALUE=({DIGIT}+\\.{DIGIT}*{EXPONENTPART}?{FLOATTYPE}?)|(\\.{DIGIT}+{EXPONENTPART}?{FLOATTYPE}?)|({DIGIT}+{EXPONENTPART}{FLOATTYPE}?)|({DIGIT}+{EXPONENTPART}?{FLOATTYPE})
+FLOAT_VALUE=(((\\.[0-9]+)|([0-9]+\\.[0-9]*){EXPONENTPART}?)|([0-9]+{EXPONENTPART}){FLOATTYPE}?)|([0-9]+{FLOATTYPE})
+INTEGER_VALUE=((0|([1-9][0-9]*))|(0x[0-9A-Fa-f]+)|(0[0-7]+))(L|l)?
+EXPONENTPART=(E|e)(\+|-)?[0-9]+
+FLOATTYPE=F|f|D|d
 DIRECTIVE=#.+
 
 %%
@@ -92,15 +85,6 @@ DIRECTIVE=#.+
   "EOL"                      { return ICE_EOL; }
   "number"                   { return ICE_NUMBER; }
 
-  {DIGIT}                    { return ICE_DIGIT; }
-  {NONZERODIGIT}             { return ICE_NONZERODIGIT; }
-  {OCTALDIGIT}               { return ICE_OCTALDIGIT; }
-  {HEXDIGIT}                 { return ICE_HEXDIGIT; }
-  {DECIMALNUMERAL}           { return ICE_DECIMALNUMERAL; }
-  {HEXNUMERAL}               { return ICE_HEXNUMERAL; }
-  {OCTALNUMERAL}             { return ICE_OCTALNUMERAL; }
-  {EXPONENTPART}             { return ICE_EXPONENTPART; }
-  {FLOATTYPE}                { return ICE_FLOATTYPE; }
   {END_OF_LINE_COMMENT}      { return ICE_END_OF_LINE_COMMENT; }
   {DOC_STYLE_COMMENT}        { return ICE_DOC_STYLE_COMMENT; }
   {C_STYLE_COMMENT}          { return ICE_C_STYLE_COMMENT; }
@@ -108,8 +92,10 @@ DIRECTIVE=#.+
   {BAD_STRING}               { return ICE_BAD_STRING; }
   {STRING_LITERAL}           { return ICE_STRING_LITERAL; }
   {ID}                       { return ICE_ID; }
-  {INTEGER_VALUE}            { return ICE_INTEGER_VALUE; }
   {FLOAT_VALUE}              { return ICE_FLOAT_VALUE; }
+  {INTEGER_VALUE}            { return ICE_INTEGER_VALUE; }
+  {EXPONENTPART}             { return ICE_EXPONENTPART; }
+  {FLOATTYPE}                { return ICE_FLOATTYPE; }
   {DIRECTIVE}                { return ICE_DIRECTIVE; }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
