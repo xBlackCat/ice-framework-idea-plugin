@@ -29,10 +29,10 @@ ESCAPE_SEQUENCE=\\[^\n\r]
 BAD_STRING=\"([^\\\"\r\n]|{ESCAPE_SEQUENCE})*
 STRING_LITERAL={BAD_STRING}\"
 ID=\\?[:letter:][a-zA-Z_0-9]*
-FLOAT_VALUE=(((\\.[0-9]+)|([0-9]+\\.[0-9]*){EXPONENTPART}?)|([0-9]+{EXPONENTPART}){FLOATTYPE}?)|([0-9]+{FLOATTYPE})
+FLOAT_VALUE=(((\.[0-9]+)|([0-9]+\.[0-9]*)){EXPONENTPART}?{FLOATTYPE}?)|([0-9]+{EXPONENTPART}{FLOATTYPE}?)|([0-9]+{FLOATTYPE})
 INTEGER_VALUE=((0|([1-9][0-9]*))|(0x[0-9A-Fa-f]+)|(0[0-7]+))(L|l)?
-EXPONENTPART=(E|e)(\+|-)?[0-9]+
-FLOATTYPE=F|f|D|d
+EXPONENTPART=[Ee][+-]?[0-9]+
+FLOATTYPE=[FfDd]
 DIRECTIVE=#.+
 
 %%

@@ -2,9 +2,9 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.2.3</version>
+    <version>0.0.2.4</version>
     <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
-    <idea-version since-build="133.1"/>
+    <idea-version since-build="142.1"/>
 
     <depends>com.intellij.modules.lang</depends>
 
@@ -42,8 +42,7 @@
         <frameworkSupport implementation="org.xblackcat.frozenidea.facet.IceFacetSupportProvider"/>
         <facetType implementation="org.xblackcat.frozenidea.facet.IceFacetType"/>
 
-        <lang.syntaxHighlighterFactory key="SLICE"
-                                       implementationClass="org.xblackcat.frozenidea.SliceSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory implementationClass="org.xblackcat.frozenidea.SliceSyntaxHighlighterFactory" language="SLICE"/>
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceParserDefinition"/>
         <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceBraceMatcher"/>
         <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceFoldingBuilder"/>

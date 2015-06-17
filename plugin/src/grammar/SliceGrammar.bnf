@@ -28,11 +28,11 @@
         string_literal="regexp:{BAD_STRING}\""
 
         id="regexp:\\?\p{Alpha}\w*"
-        float_value="regexp:(((\\.\d+)|(\d+\\.\d*){EXPONENTPART}?)|(\d+{EXPONENTPART}){FLOATTYPE}?)|(\d+{FLOATTYPE})"
+        float_value="regexp:(((\.\d+)|(\d+\.\d*)){EXPONENTPART}?{FLOATTYPE}?)|(\d+{EXPONENTPART}{FLOATTYPE}?)|(\d+{FLOATTYPE})"
         integer_value="regexp:((0|([1-9]\d*))|(0x[0-9A-Fa-f]+)|(0[0-7]+))(L|l)?"
 
-        exponentPart = "regexp:(E|e)(\+|-)?\d+"
-        floatType = "regexp:F|f|D|d"
+        exponentPart = "regexp:[Ee][+-]?\d+"
+        floatType = "regexp:[FfDd]"
 
         directive="regexp:#.+"
 
