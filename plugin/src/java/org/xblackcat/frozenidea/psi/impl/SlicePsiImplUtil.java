@@ -1,6 +1,7 @@
 package org.xblackcat.frozenidea.psi.impl;
 
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
@@ -40,6 +41,29 @@ public class SlicePsiImplUtil {
     @NotNull
     public static PsiReference getReference(SliceEnumConstantReference o) {
         return new SliceEnumConstRefImpl(o);
+    }
+
+    @NotNull
+    public static String getValue(SliceStringLiteral o) {
+        return StringUtil.unescapeStringCharacters(o.getText());
+    }
+
+    @NotNull
+    public static String getValue(SliceIntegerLiteral o) {
+        // TODO: fix
+        return StringUtil.unescapeStringCharacters(o.getText());
+    }
+
+    @NotNull
+    public static String getValue(SliceFloatLiteral o) {
+        // TODO: fix
+        return StringUtil.unescapeStringCharacters(o.getText());
+    }
+
+    @NotNull
+    public static String getValue(SliceBoolLiteral o) {
+        // TODO: fix
+        return StringUtil.unescapeStringCharacters(o.getText());
     }
 
     protected static PsiElement resolveDataType(SliceCompositeElement element, TextRange rangeInElement) {

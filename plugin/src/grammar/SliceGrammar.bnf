@@ -25,14 +25,11 @@
         c_style_comment="regexp:/\*[^*]([^*]|\*+[^*/])*(\*+/)?"
         escape_sequence="regexp:\\[^\n\r]"
         bad_string="regexp:\"([^\\\"\r\n]|{ESCAPE_SEQUENCE})*"
-        string_literal="regexp:{BAD_STRING}\""
+        string_value="regexp:{BAD_STRING}\""
 
         id="regexp:\\?\p{Alpha}\w*"
-        float_value="regexp:(((\.\d+)|(\d+\.\d*)){EXPONENTPART}?{FLOATTYPE}?)|(\d+{EXPONENTPART}{FLOATTYPE}?)|(\d+{FLOATTYPE})"
+        float_value="regexp:(((\.\d+)|(\d+\.\d*))([Ee][+-]?\d+)?[FfDd]?)|(\d+([Ee][+-]?\d+)[FfDd]?)|(\d+[FfDd])"
         integer_value="regexp:((0|([1-9]\d*))|(0x[0-9A-Fa-f]+)|(0[0-7]+))(L|l)?"
-
-        exponentPart = "regexp:[Ee][+-]?\d+"
-        floatType = "regexp:[FfDd]"
 
         directive="regexp:#.+"
 
@@ -124,6 +121,33 @@ metadata ::= '[' metadata_body? ']' {pin=1 recoverWhile=metadata_recovery}
 private metadata_body ::= metadata_element (',' metadata_element)*
 private metadata_recovery ::= !(data_definition | module | metadata | EOL)
 
+string_literal ::= string_value {
+    methods=[
+        getValue
+    ]
+}
+
+integer_literal ::= integer_value {
+    methods=[
+        getValue
+    ]
+}
+
+float_literal ::= float_value {
+    methods=[
+        getValue
+    ]
+}
+
+number_literal ::= integer_literal | float_literal;
+
+// Boolean data type allowed values
+bool_literal ::= 'false' | 'true' {
+    methods=[
+        getValue
+    ]
+}
+
 metadata_element ::= string_literal {recoverWhile=metadata_element_recovery}
 private metadata_element_recovery ::= !(']' | ',' | ']]' | EOL)
 
@@ -157,7 +181,7 @@ private structure_element_recovery ::= !( structure_element | '}')
 // --- Enums ---
 enum_def ::='enum' id '{' enum_constant_list? '}' ';' {pin=1}
 enum_constant_list ::= enum_constant (',' enum_constant) * {pin=1 recoverWhile=enum_constant_list_recovery}
-enum_constant ::= id ( '=' number)? {pin = 1 recoverWhile=enum_constant_recovery}
+enum_constant ::= id ( '=' number_literal)? {pin = 1 recoverWhile=enum_constant_recovery}
 private enum_constant_list_recovery ::= !('}')
 private enum_constant_recovery ::= !(',' | '}')
 
@@ -198,7 +222,7 @@ parameter ::= parameter_modifier* data_type id {pin=2 recoverWhile=parameter_rec
 private parameter_list_recovery ::= !(')')
 private parameter_recovery ::= !(')' | ',')
 
-constant_value ::= (integer_value | float_value | bool_value | string_literal | enum_constant_reference)
+constant_value ::= (number_literal | bool_literal | string_literal | enum_constant_reference)
 
 variable_type ::= data_type
 
@@ -218,5 +242,3 @@ private primitive_data_types ::= 'float' | 'double' | 'bool' | 'byte' | 'short' 
 // Simple data types
 private simple_data_types ::= 'LocalObject' | 'string' | 'Object'
 
-// Boolean data type allowed values
-private bool_value ::= 'false' | 'true'

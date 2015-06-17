@@ -27,12 +27,10 @@ DOC_STYLE_COMMENT="/"\*\*([^*]|\*+[^*/])*(\*+"/")?
 C_STYLE_COMMENT="/"\*[^*]([^*]|\*+[^*/])*(\*+"/")?
 ESCAPE_SEQUENCE=\\[^\n\r]
 BAD_STRING=\"([^\\\"\r\n]|{ESCAPE_SEQUENCE})*
-STRING_LITERAL={BAD_STRING}\"
+STRING_VALUE={BAD_STRING}\"
 ID=\\?[:letter:][a-zA-Z_0-9]*
-FLOAT_VALUE=(((\.[0-9]+)|([0-9]+\.[0-9]*)){EXPONENTPART}?{FLOATTYPE}?)|([0-9]+{EXPONENTPART}{FLOATTYPE}?)|([0-9]+{FLOATTYPE})
+FLOAT_VALUE=(((\.[0-9]+)|([0-9]+\.[0-9]*))([Ee][+-]?[0-9]+)?[FfDd]?)|([0-9]+([Ee][+-]?[0-9]+)[FfDd]?)|([0-9]+[FfDd])
 INTEGER_VALUE=((0|([1-9][0-9]*))|(0x[0-9A-Fa-f]+)|(0[0-7]+))(L|l)?
-EXPONENTPART=[Ee][+-]?[0-9]+
-FLOATTYPE=[FfDd]
 DIRECTIVE=#.+
 
 %%
@@ -83,19 +81,16 @@ DIRECTIVE=#.+
   "extends"                  { return ICE_KW_EXTENDS; }
   "implements"               { return ICE_KW_IMPLEMENTS; }
   "EOL"                      { return ICE_EOL; }
-  "number"                   { return ICE_NUMBER; }
 
   {END_OF_LINE_COMMENT}      { return ICE_END_OF_LINE_COMMENT; }
   {DOC_STYLE_COMMENT}        { return ICE_DOC_STYLE_COMMENT; }
   {C_STYLE_COMMENT}          { return ICE_C_STYLE_COMMENT; }
   {ESCAPE_SEQUENCE}          { return ICE_ESCAPE_SEQUENCE; }
   {BAD_STRING}               { return ICE_BAD_STRING; }
-  {STRING_LITERAL}           { return ICE_STRING_LITERAL; }
+  {STRING_VALUE}             { return ICE_STRING_VALUE; }
   {ID}                       { return ICE_ID; }
   {FLOAT_VALUE}              { return ICE_FLOAT_VALUE; }
   {INTEGER_VALUE}            { return ICE_INTEGER_VALUE; }
-  {EXPONENTPART}             { return ICE_EXPONENTPART; }
-  {FLOATTYPE}                { return ICE_FLOATTYPE; }
   {DIRECTIVE}                { return ICE_DIRECTIVE; }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }

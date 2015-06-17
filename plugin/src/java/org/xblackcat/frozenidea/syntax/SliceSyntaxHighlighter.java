@@ -30,7 +30,8 @@ public class SliceSyntaxHighlighter extends SyntaxHighlighterBase {
         SyntaxHighlighterBase.fillMap(keys1, ElementType.KEYWORD_BIT_SET, DefaultLanguageHighlighterColors.KEYWORD);
 
         keys1.put(SliceTypes.ICE_STRING_LITERAL, DefaultLanguageHighlighterColors.STRING);
-        keys1.put(SliceTypes.ICE_NUMBER, DefaultLanguageHighlighterColors.NUMBER);
+        keys1.put(SliceTypes.ICE_FLOAT_LITERAL, DefaultLanguageHighlighterColors.NUMBER);
+        keys1.put(SliceTypes.ICE_INTEGER_LITERAL, DefaultLanguageHighlighterColors.NUMBER);
 
         keys1.put(SliceTypes.ICE_DOC_STYLE_COMMENT, DefaultLanguageHighlighterColors.BLOCK_COMMENT);
         keys1.put(SliceTypes.ICE_C_STYLE_COMMENT, DefaultLanguageHighlighterColors.BLOCK_COMMENT);
