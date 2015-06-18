@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SliceMetadataCompletionContributor extends CompletionContributor {
     public SliceMetadataCompletionContributor() {
-        extend(CompletionType.BASIC, PsiIcePatterns.metadataDirective(), new MetadataDirectivesProvider());
+        extend(CompletionType.BASIC, SlicePatterns.metadataDirective(), new MetadataDirectivesProvider());
     }
 
     @Override
