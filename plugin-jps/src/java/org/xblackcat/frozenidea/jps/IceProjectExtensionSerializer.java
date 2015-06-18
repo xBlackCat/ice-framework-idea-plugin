@@ -1,6 +1,5 @@
 package org.xblackcat.frozenidea.jps;
 
-import org.apache.commons.lang.StringUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.JpsProject;
@@ -40,7 +39,7 @@ public class IceProjectExtensionSerializer extends JpsProjectExtensionSerializer
                 if (includeList != null) {
                     for (Element incl : includeList.getChildren("item")) {
                         String includeUrl = incl.getAttributeValue("url");
-                        if (StringUtils.isNotBlank(includeUrl)) {
+                        if (includeUrl != null && includeUrl.trim().length() != 0) {
                             includes.add(includeUrl);
                         }
                     }
