@@ -4,7 +4,7 @@
     <description>ICE framework support.</description>
     <version>0.0.2.4</version>
     <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
-    <idea-version since-build="142.1"/>
+    <idea-version since-build="139.1"/>
 
     <depends>com.intellij.modules.lang</depends>
 
@@ -21,6 +21,7 @@
             <li><b>0.0.2.2</b> - Rework slice file parser. Implement basic completion for data type places (in implement/extends/etc. list).</li>
             <li><b>0.0.2.3</b> - Add line markers for implemented/overridden slice data types. Show line makers for slice data types which are used in java.</li>
             <li><b>0.0.2.4</b> - Default include path was added to compiler command line</li>
+            <li><b>0.0.2.5</b> - Fix language parser (constants in enum and JavaDoc like comments)</li>
             </ul>]]>
     </change-notes>
 
