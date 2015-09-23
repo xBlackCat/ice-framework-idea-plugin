@@ -43,7 +43,8 @@
         <frameworkSupport implementation="org.xblackcat.frozenidea.facet.IceFacetSupportProvider"/>
         <facetType implementation="org.xblackcat.frozenidea.facet.IceFacetType"/>
 
-        <lang.syntaxHighlighterFactory implementationClass="org.xblackcat.frozenidea.SliceSyntaxHighlighterFactory" language="SLICE"/>
+        <colorSettingsPage implementation="org.xblackcat.frozenidea.highlight.SliceColorSettingsPage"/>
+        <lang.syntaxHighlighterFactory implementationClass="org.xblackcat.frozenidea.highlight.SliceSyntaxHighlighterFactory" language="SLICE"/>
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceParserDefinition"/>
         <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceBraceMatcher"/>
         <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceFoldingBuilder"/>
