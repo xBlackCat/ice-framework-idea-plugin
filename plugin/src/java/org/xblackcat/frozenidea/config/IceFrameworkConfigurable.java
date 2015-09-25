@@ -2,7 +2,6 @@ package org.xblackcat.frozenidea.config;
 
 import com.intellij.ide.ui.UISettings;
 import com.intellij.ide.util.BrowseFilesListener;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.options.BaseConfigurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -62,7 +61,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
     @Override
     public JComponent createComponent() {
         if (configForm == null) {
-            final FrozenIdea plugin = ServiceManager.getService(project, FrozenIdea.class);
+            final FrozenIdea plugin = project.getComponent(FrozenIdea.class);
             configForm = new IceFrameworkConfigForm(plugin);
         }
 

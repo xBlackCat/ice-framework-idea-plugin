@@ -50,11 +50,11 @@ public enum IceComponent {
     private final boolean hasLibrary;
     private final IconLoader.LazyIcon icon;
 
-    private IceComponent(String translatorName, String iconName) {
+    IceComponent(String translatorName, String iconName) {
         this(translatorName, false, iconName);
     }
 
-    private IceComponent(String translatorName, boolean hasLibrary, final String iconName) {
+    IceComponent(String translatorName, boolean hasLibrary, final String iconName) {
         this.translatorName = translatorName;
         this.hasLibrary = hasLibrary;
         icon = new IconLoader.LazyIcon() {
@@ -90,6 +90,10 @@ public enum IceComponent {
 
     public File getLibraryPath(File home) {
         return null;
+    }
+
+    public String getFileExtension() {
+        return translatorName.substring(6);
     }
 
     public String extractPackageName(String text) {

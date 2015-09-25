@@ -1,12 +1,18 @@
 package org.xblackcat.frozenidea.psi.impl;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.indexing.FileBasedIndex;
 import org.jetbrains.annotations.NotNull;
+import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.psi.*;
 
 import java.util.Collection;
@@ -35,7 +41,7 @@ public class SlicePsiImplUtil {
 
     @NotNull
     public static PsiReference getReference(SliceTypeReference o) {
-        return new SliceReferenceImpl<SliceCompositeElement>(o, TextRange.from(0, o.getTextLength()));
+        return new SliceReferenceImpl<SliceTypeReference>(o, TextRange.from(0, o.getTextLength()));
     }
 
     @NotNull
@@ -74,6 +80,7 @@ public class SlicePsiImplUtil {
             return null;
         }
 
+        // Search in current file and module
         for (PsiElement c : module.getChildren()) {
             if (c instanceof SliceDataTypeElement) {
                 if (referenceName.equals(((SliceDataTypeElement) c).getName())) {
@@ -91,6 +98,14 @@ public class SlicePsiImplUtil {
                 }
             }
         }
+
+        final Project project = element.getProject();
+        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(
+                FileTypeIndex.NAME,
+                IceFileType.INSTANCE,
+                GlobalSearchScope.allScope(project)
+        );
+
 
         return null;
     }

@@ -7,7 +7,6 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
@@ -104,7 +103,7 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
 
         @Override
         public void run() {
-            final FrozenIdea plugin = ServiceManager.getService(project, FrozenIdea.class);
+            final FrozenIdea plugin = project.getComponent(FrozenIdea.class);
 
             if (plugin == null) {
                 // How it could be??

@@ -2,7 +2,7 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.2.5</version>
+    <version>0.0.2.6</version>
     <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
     <idea-version since-build="139.1"/>
 
@@ -22,6 +22,7 @@
             <li><b>0.0.2.3</b> - Add line markers for implemented/overridden slice data types. Show line makers for slice data types which are used in java.</li>
             <li><b>0.0.2.4</b> - Default include path was added to compiler command line</li>
             <li><b>0.0.2.5</b> - Fix language parser (constants in enum and JavaDoc like comments)</li>
+            <li><b>0.0.2.6</b> - Fix translator for non-java languages. Fix warnings. Implement Color settings page for the language</li>
             </ul>]]>
     </change-notes>
 
@@ -55,6 +56,7 @@
                         serviceImplementation="org.xblackcat.frozenidea.psi.impl.SlicePsiFacadeImpl"/>
 
         <compileServer.plugin classpath="frozenidea-jps-plugin.jar"/>
+        <compileServer.plugin classpath="commons-io-2.4.jar"/>
 
         <lang.commenter language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceCommenter"/>
         <lang.findUsagesProvider language="SLICE"

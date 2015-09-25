@@ -1,6 +1,5 @@
 package org.xblackcat.frozenidea.util;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VfsUtil;
 import org.apache.sanselan.util.IOUtils;
@@ -67,7 +66,7 @@ public class IceChecker {
     }
 
     public static EnumSet<IceComponent> getAvailableTranslators(Module module) {
-        FrozenIdea plugin = ServiceManager.getService(module.getProject(), FrozenIdea.class);
+        FrozenIdea plugin = module.getProject().getComponent(FrozenIdea.class);
         IceConfig pluginConfig = plugin.getConfig();
 
         return getInstalledComponents(

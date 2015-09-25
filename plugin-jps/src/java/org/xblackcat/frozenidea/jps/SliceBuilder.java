@@ -1,16 +1,9 @@
 package org.xblackcat.frozenidea.jps;
 
 import com.intellij.execution.process.BaseOSProcessHandler;
-import com.intellij.execution.process.ProcessAdapter;
-import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessOutputTypes;
-import com.intellij.openapi.util.JDOMUtil;
-import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import org.apache.commons.io.FileUtils;
-import org.jdom.Document;
-import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
@@ -19,7 +12,6 @@ import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
-import org.jetbrains.jps.incremental.messages.FileGeneratedEvent;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
 import org.jetbrains.jps.util.JpsPathUtil;
@@ -30,11 +22,7 @@ import org.xblackcat.frozenidea.config.Target;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.*;
 
 /**
  * 10.09.13 17:01
@@ -42,10 +30,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author xBlackCat
  */
 public class SliceBuilder extends ModuleLevelBuilder {
-    private static final String BUILDER_NAME = "SliceTranslator";
+    static final String BUILDER_NAME = "SliceTranslator";
 
     protected SliceBuilder() {
         super(BuilderCategory.SOURCE_GENERATOR);
+    }
+
+    @Override
+    public List<String> getCompilableFileExtensions() {
+        return Arrays.asList("ice", "slice");
     }
 
     @Override
@@ -140,7 +133,9 @@ public class SliceBuilder extends ModuleLevelBuilder {
 
         List<String> command = new ArrayList<String>();
         command.add(target.getTranslatorPath(frameworkHome).getAbsolutePath());
-        command.add("--list-generated");
+        if (target == IceComponent.Java) {
+            command.add("--list-generated");
+        }
         command.add("--output-dir");
         final String outputDirPath = outputDir.getAbsolutePath();
         command.add(outputDirPath);
@@ -161,123 +156,16 @@ public class SliceBuilder extends ModuleLevelBuilder {
 
 
             BaseOSProcessHandler handler = new BaseOSProcessHandler(process, StringUtil.join(command, " "), CharsetToolkit.UTF8_CHARSET);
-            final AtomicBoolean hasErrors = new AtomicBoolean();
-            handler.addProcessListener(
-                    new ProcessAdapter() {
-                        final StringBuilder errorOutput = new StringBuilder();
-                        final StringBuilder stdOutput = new StringBuilder();
-
-                        @Override
-                        public void onTextAvailable(ProcessEvent event, Key outputType) {
-                            if (outputType == ProcessOutputTypes.STDERR) {
-                                errorOutput.append(event.getText());
-                            } else if (outputType == ProcessOutputTypes.STDOUT) {
-                                stdOutput.append(event.getText());
-                            }
-                        }
-
-                        @Override
-                        public void processTerminated(ProcessEvent event) {
-                            Document res;
-                            final String stdout = stdOutput.toString();
-                            try {
-                                res = JDOMUtil.loadDocument(stdout);
-                            } catch (Exception e) {
-                                context.processMessage(
-                                        new CompilerMessage(
-                                                BUILDER_NAME,
-                                                BuildMessage.Kind.ERROR,
-                                                "Can't process compiler output: " + stdout
-                                        )
-                                );
-                                hasErrors.set(true);
-                                return;
-                            }
-
-
-                            int exitCode = event.getExitCode();
-                            if (exitCode != 0) {
-                                for (Element source : res.getRootElement().getChildren("source")) {
-                                    final Element output = source.getChild("output");
-                                    if (output != null) {
-                                        String message = output.getTextTrim();
-
-                                        for (String line : message.split("\n")) {
-                                            int separatorIndex = line.indexOf(": ");
-                                            final String path;
-                                            final long lineNumber;
-                                            if (separatorIndex <= 0) {
-                                                path = null;
-                                                lineNumber = -1L;
-                                            } else {
-                                                int lineSep = line.lastIndexOf(':', separatorIndex - 1);
-                                                if (lineSep == -1) {
-                                                    path = null;
-                                                    lineNumber = -1L;
-                                                } else {
-                                                    path = line.substring(0, lineSep);
-                                                    long l;
-                                                    try {
-                                                        l = Long.parseLong(line.substring(lineSep + 1, separatorIndex));
-                                                    } catch (NumberFormatException e) {
-                                                        l = -1L;
-                                                    }
-                                                    lineNumber = l;
-                                                }
-                                            }
-
-                                            context.processMessage(
-                                                    new CompilerMessage(
-                                                            BUILDER_NAME,
-                                                            BuildMessage.Kind.ERROR,
-                                                            line,
-                                                            path,
-                                                            -1L,
-                                                            -1L,
-                                                            -1L,
-                                                            lineNumber,
-                                                            -1L
-                                                    )
-                                            );
-                                        }
-                                    }
-                                }
-
-                                final String stdErr = errorOutput.toString();
-                                if (stdErr.length() > 0) {
-                                    context.processMessage(new CompilerMessage(BUILDER_NAME, BuildMessage.Kind.ERROR, stdErr));
-                                }
-                                context.processMessage(
-                                        new CompilerMessage(
-                                                BUILDER_NAME,
-                                                BuildMessage.Kind.ERROR,
-                                                "translator '" + translatorName + "' for '" + module.getName() +
-                                                        "' finished with exit code " + exitCode
-                                        )
-                                );
-                                hasErrors.set(true);
-                            } else {
-                                final FileGeneratedEvent msg = new FileGeneratedEvent();
-
-                                for (Element source : res.getRootElement().getChildren("source")) {
-                                    for (Element file : source.getChildren("file")) {
-                                        final String fileName = file.getAttributeValue("name");
-
-                                        if (fileName.startsWith(outputDirPath)) {
-                                            msg.add(outputDirPath, fileName.substring(outputDirPath.length() + 1));
-                                        }
-                                    }
-                                }
-
-                                context.processMessage(msg);
-
-                            }
-                        }
-                    }
-            );
+            final ATranslatorProcessAdapter processAdapter;
+            if (target == IceComponent.Java) {
+                processAdapter = new JavaProcessAdapter(context, target, module, outputDirPath);
+            } else {
+                processAdapter = new SliceProcessAdapter(context, target, module, outputDirPath, sourceFiles);
+            }
+            handler.addProcessListener(processAdapter);
             handler.startNotify();
             handler.waitFor();
-            if (hasErrors.get()) {
+            if (processAdapter.hasErrors()) {
                 throw new StopBuildException();
             }
 
@@ -307,7 +195,9 @@ public class SliceBuilder extends ModuleLevelBuilder {
                             File file,
                             JavaSourceRootDescriptor sourceRoot
                     ) throws IOException {
-                        if (file.getName().endsWith(".ice")) {
+                        final String fileName = file.getName();
+
+                        if (fileName.endsWith(".ice") || fileName.endsWith(".slice")) {
                             List<File> files = toCompile.get(target);
                             if (files == null) {
                                 files = new ArrayList<File>();
@@ -327,4 +217,5 @@ public class SliceBuilder extends ModuleLevelBuilder {
     public String getPresentableName() {
         return "Slice compiler";
     }
+
 }
