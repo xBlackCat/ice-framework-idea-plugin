@@ -32,7 +32,7 @@ public class SliceFoldingBuilder extends FoldingBuilderEx implements DumbAware {
 
         SliceFileImpl file = (SliceFileImpl) root;
 
-        List<FoldingDescriptor> result = new ArrayList<FoldingDescriptor>();
+        List<FoldingDescriptor> result = new ArrayList<>();
 
 
         return result.toArray(new FoldingDescriptor[result.size()]);

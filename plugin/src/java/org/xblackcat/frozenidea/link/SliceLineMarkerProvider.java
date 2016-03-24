@@ -26,7 +26,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Collection<? super RelatedItemLineMarkerInfo> result,
             boolean forNavigation
     ) {
-        Set<PsiElement> visited = forNavigation ? new THashSet<PsiElement>() : null;
+        Set<PsiElement> visited = forNavigation ? new THashSet<>() : null;
 
         for (PsiElement element : elements) {
             if (element instanceof SliceNamedElement) {
@@ -48,7 +48,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Set<PsiElement> visited,
             SliceExceptionDef element
     ) {
-        List<PsiElement> items = new ArrayList<PsiElement>();
+        List<PsiElement> items = new ArrayList<>();
         SliceModule module = SliceHelper.getContainerSliceModule(element);
         if (module == null) {
             return;
@@ -76,7 +76,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Set<PsiElement> visited,
             SliceClassDef element
     ) {
-        List<PsiElement> items = new ArrayList<PsiElement>();
+        List<PsiElement> items = new ArrayList<>();
         SliceModule module = SliceHelper.getContainerSliceModule(element);
         if (module == null) {
             return;
@@ -128,7 +128,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Set<PsiElement> visited,
             SliceDataTypeElement element
     ) {
-        List<PsiElement> items = new ArrayList<PsiElement>();
+        List<PsiElement> items = new ArrayList<>();
         SliceModule module = SliceHelper.getContainerSliceModule(element);
         if (module == null) {
             return;

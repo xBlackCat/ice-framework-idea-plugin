@@ -26,7 +26,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             Collection<? super RelatedItemLineMarkerInfo> result,
             boolean forNavigation
     ) {
-        Set<PsiElement> visited = forNavigation ? new THashSet<PsiElement>() : null;
+        Set<PsiElement> visited = forNavigation ? new THashSet<>() : null;
 
         for (PsiElement element : elements) {
             if (element instanceof SliceNamedElement) {
@@ -46,7 +46,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             Set<PsiElement> visited,
             SliceDataTypeElement element
     ) {
-        List<PsiElement> items = new ArrayList<PsiElement>();
+        List<PsiElement> items = new ArrayList<>();
         PsiClass classImplClass = SliceHelper.searchImplementation(element);
 
         if (classImplClass != null) {
@@ -70,7 +70,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             Set<PsiElement> visited,
             SliceMethodDef element
     ) {
-        List<PsiElement> items = new ArrayList<PsiElement>();
+        List<PsiElement> items = new ArrayList<>();
 
         final PsiElement body = element.getParent();
         if (!(body instanceof SliceClassBody) && !(body instanceof SliceInterfaceBody)) {
@@ -115,7 +115,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             return Collections.emptySet();
         }
 
-        final Set<SliceDataTypeElement> elements = new HashSet<SliceDataTypeElement>();
+        final Set<SliceDataTypeElement> elements = new HashSet<>();
         elements.add(element);
         if (element instanceof SliceClassDef) {
             SliceHelper.findAllSubclasses(elements, module, (SliceClassDef) element);
@@ -125,7 +125,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             return Collections.emptySet();
         }
 
-        Set<PsiClass> items = new HashSet<PsiClass>(classes);
+        Set<PsiClass> items = new HashSet<>(classes);
         for (PsiClass clazz : classes) {
             final String clazzName = clazz.getName();
             if (clazzName == null) {

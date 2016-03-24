@@ -7,8 +7,8 @@
 
     psiClassPrefix="Slice"
     psiImplClassSuffix="Impl"
-    psiPackage="org.xblackcat.frozenice.psi"
-    psiImplPackage="org.xblackcat.frozenice.psi.impl"
+    psiPackage="org.xblackcat.frozenidea.psi"
+    psiImplPackage="org.xblackcat.frozenidea.psi.impl"
     psiImplUtilClass="org.xblackcat.frozenidea.psi.impl.SlicePsiImplUtil"
 
     elementTypeHolderClass="org.xblackcat.frozenidea.psi.SliceTypes"

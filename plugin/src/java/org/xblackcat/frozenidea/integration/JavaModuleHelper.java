@@ -141,7 +141,7 @@ public class JavaModuleHelper {
             if (aClass == null) {
                 return Collections.emptyList();
             }
-            final ArrayList<NavigatablePsiElement> result = new ArrayList<NavigatablePsiElement>();
+            final ArrayList<NavigatablePsiElement> result = new ArrayList<>();
             for (PsiMethod method : aClass.getAllMethods()) {
                 PsiModifierList modifierList = method.getModifierList();
                 if (modifierList.hasExplicitModifier(PsiModifier.PUBLIC) &&
@@ -160,7 +160,7 @@ public class JavaModuleHelper {
             }
             PsiMethod psiMethod = (PsiMethod) method;
             PsiType returnType = psiMethod.getReturnType();
-            List<String> strings = new ArrayList<String>();
+            List<String> strings = new ArrayList<>();
             strings.add(returnType == null ? "void" : returnType.getCanonicalText());
             for (PsiParameter parameter : psiMethod.getParameterList().getParameters()) {
                 strings.add(parameter.getType().getCanonicalText());
@@ -179,7 +179,7 @@ public class JavaModuleHelper {
             if (modifierList == null) {
                 return super.getAnnotations(element);
             }
-            List<String> strings = new ArrayList<String>();
+            List<String> strings = new ArrayList<>();
             for (PsiAnnotation annotation : modifierList.getAnnotations()) {
                 if (annotation.getParameterList().getAttributes().length > 0) {
                     continue;

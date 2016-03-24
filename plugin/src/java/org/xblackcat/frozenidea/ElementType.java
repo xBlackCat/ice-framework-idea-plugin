@@ -2,7 +2,6 @@ package org.xblackcat.frozenidea;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
-import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.java.JavaParserDefinition;
 import com.intellij.lang.java.parser.JavaParserUtil;
 import com.intellij.lang.java.parser.JavadocParser;
@@ -65,36 +64,31 @@ public interface ElementType {
     TokenSet COMMENT_BIT_SET = TokenSet.orSet(PLAIN_COMMENT_BIT_SET, TokenSet.create(SliceTypes.ICE_DIRECTIVE));
 
     ILazyParseableElementType DOC_COMMENT = new IReparseableElementType("DOC_COMMENT", SliceLanguage.INSTANCE) {
-      private final JavaParserUtil.ParserWrapper myParser = new JavaParserUtil.ParserWrapper() {
+        private final JavaParserUtil.ParserWrapper myParser = JavadocParser::parseDocCommentText;
+
         @Override
-        public void parse(final PsiBuilder builder) {
-          JavadocParser.parseDocCommentText(builder);
+        public ASTNode createNode(final CharSequence text) {
+            return new PsiDocCommentImpl(text);
         }
-      };
 
-      @Override
-      public ASTNode createNode(final CharSequence text) {
-        return new PsiDocCommentImpl(text);
-      }
-
-      @Nullable
-      @Override
-      public ASTNode parseContents(final ASTNode chameleon) {
-        return JavaParserUtil.parseFragment(chameleon, myParser);
-      }
-
-      @Override
-      public boolean isParsable(final CharSequence buffer, Language fileLanguage, final Project project) {
-        Lexer lexer = JavaParserDefinition.createLexer(LanguageLevelProjectExtension.getInstance(project).getLanguageLevel());
-        lexer.start(buffer);
-        if (lexer.getTokenType() == DOC_COMMENT) {
-          lexer.advance();
-          if (lexer.getTokenType() == null) {
-            return true;
-          }
+        @Nullable
+        @Override
+        public ASTNode parseContents(final ASTNode chameleon) {
+            return JavaParserUtil.parseFragment(chameleon, myParser);
         }
-        return false;
-      }
+
+        @Override
+        public boolean isParsable(final CharSequence buffer, Language fileLanguage, final Project project) {
+            Lexer lexer = JavaParserDefinition.createLexer(LanguageLevelProjectExtension.getInstance(project).getLanguageLevel());
+            lexer.start(buffer);
+            if (lexer.getTokenType() == DOC_COMMENT) {
+                lexer.advance();
+                if (lexer.getTokenType() == null) {
+                    return true;
+                }
+            }
+            return false;
+        }
     };
 
 }

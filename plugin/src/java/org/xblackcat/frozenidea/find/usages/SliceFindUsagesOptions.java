@@ -47,7 +47,7 @@ public abstract class SliceFindUsagesOptions extends FindUsagesOptions {
     @Override
     public final String generateUsagesString() {
         String suffix = " " + FindBundle.message("find.usages.panel.title.separator") + " ";
-        LinkedHashSet<String> strings = new LinkedHashSet<String>();
+        LinkedHashSet<String> strings = new LinkedHashSet<>();
         addUsageTypes(strings);
         if (strings.isEmpty()) {
             strings.add(FindBundle.message("find.usages.panel.title.usages"));

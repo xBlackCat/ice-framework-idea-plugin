@@ -123,6 +123,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
             return "Ice";
         }
 
+        @NotNull
         @Override
         public JComponent createComponent() {
             return pane;
@@ -162,7 +163,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
 
         private class TargetsListPanel extends AddEditRemovePanel<Target> {
             public TargetsListPanel() {
-                super(new TargetTableModel(), new ArrayList<Target>());
+                super(new TargetTableModel(), new ArrayList<>());
                 setRenderer(
                         0, new ColoredTableCellRenderer() {
                             @Override
@@ -226,23 +227,15 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                                 }
                         )
                         .setRemoveAction(
-                                new AnActionButtonRunnable() {
-                                    @Override
-                                    public void run(AnActionButton button) {
-                                        doRemove();
-                                    }
-                                }
+                                button -> doRemove()
                         )
                         .setEditAction(
-                                new AnActionButtonRunnable() {
-                                    @Override
-                                    public void run(AnActionButton button) {
-                                        if (getTable().isEditing()) {
-                                            getTable().getCellEditor().stopCellEditing();
-                                            return;
-                                        }
-                                        doEdit();
+                                button -> {
+                                    if (getTable().isEditing()) {
+                                        getTable().getCellEditor().stopCellEditing();
+                                        return;
                                     }
+                                    doEdit();
                                 }
                         )
                         .disableUpAction()

@@ -47,14 +47,11 @@ public class IceChecker {
             process.waitFor();
 
             byte[] stdOut;
-            InputStream stdOutIS = process.getErrorStream();
-            try {
+            try (InputStream stdOutIS = process.getErrorStream()) {
                 stdOut = IOUtils.getInputStreamBytes(stdOutIS);
-                if (stdOut == null || stdOut.length == 0) {
-                    return null;
-                }
-            } finally {
-                stdOutIS.close();
+            }
+            if (stdOut == null || stdOut.length == 0) {
+                return null;
             }
 
             return new String(stdOut);

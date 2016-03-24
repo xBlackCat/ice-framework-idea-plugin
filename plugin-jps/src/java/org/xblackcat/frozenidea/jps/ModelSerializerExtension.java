@@ -5,7 +5,7 @@ import org.jetbrains.jps.model.serialization.JpsModelSerializerExtension;
 import org.jetbrains.jps.model.serialization.JpsProjectExtensionSerializer;
 import org.jetbrains.jps.model.serialization.facet.JpsFacetConfigurationSerializer;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,13 +17,13 @@ public class ModelSerializerExtension extends JpsModelSerializerExtension {
     @NotNull
     @Override
     public List<? extends JpsFacetConfigurationSerializer<?>> getFacetConfigurationSerializers() {
-        return Arrays.asList(new IceFacetConfigurationSerializer());
+        return Collections.singletonList(new IceFacetConfigurationSerializer());
     }
 
     @NotNull
     @Override
     public List<? extends JpsProjectExtensionSerializer> getProjectExtensionSerializers() {
-        return Arrays.asList(new IceProjectExtensionSerializer());
+        return Collections.singletonList(new IceProjectExtensionSerializer());
     }
 
 }

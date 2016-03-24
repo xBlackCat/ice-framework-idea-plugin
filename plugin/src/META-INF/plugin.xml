@@ -2,9 +2,9 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ICE framework support.</description>
-    <version>0.0.2.6</version>
+    <version>0.1</version>
     <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
-    <idea-version since-build="139.1"/>
+    <idea-version since-build="145.1"/>
 
     <depends>com.intellij.modules.lang</depends>
 

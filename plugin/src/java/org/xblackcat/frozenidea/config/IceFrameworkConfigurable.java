@@ -27,8 +27,6 @@ import org.xblackcat.frozenidea.util.IceChecker;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -159,21 +157,19 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
 
             TextFieldWithBrowseButton.MyDoClickAction.addTo(browseDirectoryButton, iceHomeFolder);
             browseDirectoryButton.addActionListener(
-                    new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            final VirtualFile[] files = FileChooser.chooseFiles(
-                                    BrowseFilesListener.SINGLE_DIRECTORY_DESCRIPTOR,
-                                    IceFrameworkConfigForm.this,
-                                    null,
-                                    selectedFolder
+                    e -> {
+                        final VirtualFile[] files = FileChooser.chooseFiles(
+                                BrowseFilesListener.SINGLE_DIRECTORY_DESCRIPTOR,
+                                IceFrameworkConfigForm.this,
+                                null,
+                                selectedFolder
+                        );
+                        if (files.length != 0) {
+                            final Task.Modal checkTask = new IceFrameworkVersionChecker(
+                                    VfsUtil.virtualToIoFile(files[0])
                             );
-                            if (files.length != 0) {
-                                final Task.Modal checkTask = new IceFrameworkVersionChecker(
-                                        VfsUtil.virtualToIoFile(files[0])
-                                );
 
-                                checkTask.queue();
-                            }
+                            checkTask.queue();
                         }
                     }
             );
@@ -200,7 +196,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                         public Object getField(VirtualFile o, int columnIndex) {
                             return o;
                         }
-                    }, new ArrayList<VirtualFile>(), "Include list"
+                    }, new ArrayList<>(), "Include list"
             ) {
                 @Nullable
                 @Override
@@ -261,7 +257,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                 if (selectedFolder != null) {
                     iceHomeFolder.setText(selectedFolder.getPath());
                 }
-                final ArrayList<VirtualFile> files = new ArrayList<VirtualFile>();
+                final ArrayList<VirtualFile> files = new ArrayList<>();
                 final VirtualFileManager manager = VirtualFileManager.getInstance();
 
                 for (String url : config.getIncludeUrls()) {
@@ -338,7 +334,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
                     selectedFolder = VfsUtil.findFileByIoFile(checkingFolder, true);
                     assert selectedFolder != null;
                     iceHomeFolder.setText(selectedFolder.getPath());
-                    final ArrayList<VirtualFile> includes = new ArrayList<VirtualFile>();
+                    final ArrayList<VirtualFile> includes = new ArrayList<>();
                     final VirtualFile slice = selectedFolder.findFileByRelativePath("slice");
                     if (slice != null) {
                         includes.add(slice);

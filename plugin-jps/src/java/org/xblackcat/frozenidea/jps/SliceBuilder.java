@@ -7,13 +7,11 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
 import org.jetbrains.jps.builders.DirtyFilesHolder;
-import org.jetbrains.jps.builders.FileProcessor;
 import org.jetbrains.jps.builders.java.JavaSourceRootDescriptor;
 import org.jetbrains.jps.incremental.*;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.model.module.JpsModule;
-import org.jetbrains.jps.model.module.JpsModuleSourceRoot;
 import org.jetbrains.jps.util.JpsPathUtil;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.config.IceConfig;
@@ -52,7 +50,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
         IceConfig iceConfig = config == null ? new IceConfig("") : config;
 
         File frameworkHome = JpsPathUtil.urlToFile(iceConfig.getFrameworkHomeUrl());
-        List<String> includes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
         for (String include : iceConfig.getIncludeUrls()) {
             includes.add(JpsPathUtil.urlToFile(include).getAbsolutePath());
         }
@@ -131,7 +129,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
             return;
         }
 
-        List<String> command = new ArrayList<String>();
+        List<String> command = new ArrayList<>();
         command.add(target.getTranslatorPath(frameworkHome).getAbsolutePath());
         if (target == IceComponent.Java) {
             command.add("--list-generated");
@@ -139,15 +137,11 @@ public class SliceBuilder extends ModuleLevelBuilder {
         command.add("--output-dir");
         final String outputDirPath = outputDir.getAbsolutePath();
         command.add(outputDirPath);
-        for (String include : includes) {
-            command.add("-I" + include);
-        }
-        for (JpsModuleSourceRoot contentRoot : module.getSourceRoots()) {
-            command.add("-I" + contentRoot.getFile().getAbsolutePath());
-        }
-        for (File source : sourceFiles) {
-            command.add(source.getAbsolutePath());
-        }
+        includes.stream().map(include -> "-I" + include).forEachOrdered(command::add);
+
+        module.getSourceRoots().stream().map(contentRoot -> "-I" + contentRoot.getFile().getAbsolutePath()).forEachOrdered(command::add);
+
+        sourceFiles.stream().map(File::getAbsolutePath).forEachOrdered(command::add);
 
         try {
             Process process = new ProcessBuilder()
@@ -174,10 +168,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
                     new CompilerMessage(
                             getPresentableName(),
                             BuildMessage.Kind.ERROR,
-                            "Failed to translate files with " +
-                                    translatorName +
-                                    ". Error: " +
-                                    e.getMessage()
+                            "Failed to translate files with " + translatorName + ". Error: " + e.getMessage()
                     )
             );
         }
@@ -187,26 +178,20 @@ public class SliceBuilder extends ModuleLevelBuilder {
             CompileContext context,
             DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder
     ) throws IOException {
-        final Map<ModuleBuildTarget, List<File>> toCompile = new HashMap<ModuleBuildTarget, List<File>>();
+        final Map<ModuleBuildTarget, List<File>> toCompile = new HashMap<>();
         dirtyFilesHolder.processDirtyFiles(
-                new FileProcessor<JavaSourceRootDescriptor, ModuleBuildTarget>() {
-                    public boolean apply(
-                            ModuleBuildTarget target,
-                            File file,
-                            JavaSourceRootDescriptor sourceRoot
-                    ) throws IOException {
-                        final String fileName = file.getName();
+                (target, file, sourceRoot) -> {
+                    final String fileName = file.getName();
 
-                        if (fileName.endsWith(".ice") || fileName.endsWith(".slice")) {
-                            List<File> files = toCompile.get(target);
-                            if (files == null) {
-                                files = new ArrayList<File>();
-                                toCompile.put(target, files);
-                            }
-                            files.add(file);
+                    if (fileName.endsWith(".ice") || fileName.endsWith(".slice")) {
+                        List<File> files = toCompile.get(target);
+                        if (files == null) {
+                            files = new ArrayList<>();
+                            toCompile.put(target, files);
                         }
-                        return true;
+                        files.add(file);
                     }
+                    return true;
                 }
         );
         return toCompile;

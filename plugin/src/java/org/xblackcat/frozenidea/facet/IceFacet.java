@@ -3,7 +3,6 @@ package org.xblackcat.frozenidea.facet;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetTypeId;
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
@@ -21,7 +20,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.FrozenIdea;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.config.IceConfig;
@@ -39,7 +37,7 @@ import java.util.EnumSet;
  * @author xBlackCat
  */
 public class IceFacet extends Facet<IceFacetConfiguration> {
-    public static final FacetTypeId<IceFacet> ID = new FacetTypeId<IceFacet>("ice");
+    public static final FacetTypeId<IceFacet> ID = new FacetTypeId<>("ice");
     public static final IceFacetType TYPE = new IceFacetType();
 
     public IceFacet(
@@ -127,19 +125,12 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                                 IceMessages.message("ICE.library.not.added"),
                                 IceMessages.message("ICE.library.not.added.message"),
                                 NotificationType.ERROR,
-                                new NotificationListener() {
-                                    @Override
-                                    public void hyperlinkUpdate(
-                                            @NotNull final Notification notification,
-                                            @NotNull HyperlinkEvent event
-                                    ) {
-                                        Computable<Boolean> runnable = new LibraryInstaller(frameworkHome);
+                                (notification1, event) -> {
+                                    Computable<Boolean> runnable = new LibraryInstaller(frameworkHome);
 
-                                        if (ApplicationManager.getApplication().runWriteAction(runnable)) {
-                                            notification.expire();
-                                        }
+                                    if (ApplicationManager.getApplication().runWriteAction(runnable)) {
+                                        notification1.expire();
                                     }
-
                                 }
                         );
                         Notifications.Bus.notify(notification, project);
@@ -154,20 +145,13 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                     IceMessages.message("ICE.not.configured"),
                     IceMessages.message("ICE.not.configured.message"),
                     NotificationType.ERROR,
-                    new NotificationListener() {
-                        @Override
-                        public void hyperlinkUpdate(
-                                @NotNull Notification notification,
-                                @NotNull HyperlinkEvent event
-                        ) {
-                            if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                                notification.expire();
+                    (notification1, event) -> {
+                        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                            notification1.expire();
 
-                                IceFrameworkConfigurable configurable = new IceFrameworkConfigurable(project);
-                                ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
-                            }
+                            IceFrameworkConfigurable configurable = new IceFrameworkConfigurable(project);
+                            ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
                         }
-
                     }
             );
             Notifications.Bus.notify(notification, project);

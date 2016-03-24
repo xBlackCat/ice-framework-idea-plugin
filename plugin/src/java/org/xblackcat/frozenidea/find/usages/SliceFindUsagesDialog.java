@@ -29,6 +29,7 @@ import com.intellij.psi.util.MethodSignatureUtil;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.StateRestoringCheckBox;
 import com.intellij.usageView.UsageViewUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
@@ -109,7 +110,7 @@ public abstract class SliceFindUsagesDialog<T extends SliceFindUsagesOptions> ex
     }
 
     @Override
-    public void configureLabelComponent(final SimpleColoredComponent coloredComponent) {
+    public void configureLabelComponent(@NotNull final SimpleColoredComponent coloredComponent) {
         coloredComponent.append(StringUtil.capitalize(UsageViewUtil.getType(myPsiElement)));
         coloredComponent.append(" ");
         coloredComponent.append(UsageViewUtil.getLongName(myPsiElement));

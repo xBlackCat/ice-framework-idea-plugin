@@ -15,17 +15,8 @@ import java.util.List;
  */
 @State(
         name = IceProjectExtensionSerializer.NAME,
-        storages = {
-                @Storage(
-                        id = "default",
-                        file = StoragePathMacros.PROJECT_FILE
-                ),
-                @Storage(
-                        id = "dir",
-                        file = StoragePathMacros.PROJECT_CONFIG_DIR + "/" + IceProjectExtensionSerializer.CONFIG_FILE_NAME,
-                        scheme = StorageScheme.DIRECTORY_BASED
-                )
-        }
+        storages = @Storage(IceProjectExtensionSerializer.CONFIG_FILE_NAME)
+
 )
 public class FrozenIdea implements BaseComponent, PersistentStateComponent<Element>, ProjectComponent {
     private IceConfig iceConfig;
@@ -81,7 +72,7 @@ public class FrozenIdea implements BaseComponent, PersistentStateComponent<Eleme
     @Override
     public void loadState(Element state) {
         String homeUrl = null;
-        List<String> includes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
         Element fwList = state.getChild("ice-frameworks");
         if (fwList != null) {
             Element fw = fwList.getChild("item");

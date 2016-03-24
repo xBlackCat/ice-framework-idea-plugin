@@ -27,7 +27,7 @@ public class IceProjectExtensionSerializer extends JpsProjectExtensionSerializer
             @NotNull JpsProject jpsProject, @NotNull Element componentTag
     ) {
         String homeUrl = null;
-        List<String> includes = new ArrayList<String>();
+        List<String> includes = new ArrayList<>();
         Element fwList = componentTag.getChild("ice-frameworks");
         IceConfig iceConfig = new IceConfig("");
         if (fwList != null) {

@@ -141,7 +141,7 @@ public class SliceHelper {
             SliceModule module,
             SliceClassDef element
     ) {
-        final HashSet<SliceClassDef> set = new HashSet<SliceClassDef>();
+        final HashSet<SliceClassDef> set = new HashSet<>();
         set.add(element);
         findAllSubclasses(elements, module, set);
     }
@@ -177,9 +177,9 @@ public class SliceHelper {
     }
 
     public static void findAllImplementations(Set<SliceDataTypeElement> elements, SliceModule module, SliceInterfaceDef element) {
-        Set<SliceClassDef> supers = new HashSet<SliceClassDef>();
+        Set<SliceClassDef> supers = new HashSet<>();
 
-        Set<SliceInterfaceDef> hierarchy = new HashSet<SliceInterfaceDef>();
+        Set<SliceInterfaceDef> hierarchy = new HashSet<>();
         hierarchy.add(element);
 
         for (SliceInterfaceDef interfaceDef : module.getInterfaceDefList()) {

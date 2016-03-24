@@ -8,10 +8,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 /**
  * 30.01.12 9:22
@@ -38,12 +34,9 @@ class TranslatorItemConfig extends JPanel {
         outputFolder.setEditable(false);
 
         compilationEnabled.addItemListener(
-                new ItemListener() {
-                    @Override
-                    public void itemStateChanged(ItemEvent e) {
-                        outputFolder.setEnabled(compilationEnabled.isSelected());
-                        browseDirectoryButton.setEnabled(compilationEnabled.isSelected());
-                    }
+                e -> {
+                    outputFolder.setEnabled(compilationEnabled.isSelected());
+                    browseDirectoryButton.setEnabled(compilationEnabled.isSelected());
                 }
         );
 
@@ -53,18 +46,16 @@ class TranslatorItemConfig extends JPanel {
 
         TextFieldWithBrowseButton.MyDoClickAction.addTo(browseDirectoryButton, outputFolder);
         browseDirectoryButton.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        final VirtualFile[] files = FileChooser.chooseFiles(
-                                new FileChooserDescriptor(false, true, false, false, false, false),
-                                TranslatorItemConfig.this.getParent(),
-                                null,
-                                selectedFolder
-                        );
-                        if (files.length != 0) {
-                            selectedFolder = files[0];
-                            outputFolder.setText(selectedFolder.getPath());
-                        }
+                e -> {
+                    final VirtualFile[] files = FileChooser.chooseFiles(
+                            new FileChooserDescriptor(false, true, false, false, false, false),
+                            TranslatorItemConfig.this.getParent(),
+                            null,
+                            selectedFolder
+                    );
+                    if (files.length != 0) {
+                        selectedFolder = files[0];
+                        outputFolder.setText(selectedFolder.getPath());
                     }
                 }
         );

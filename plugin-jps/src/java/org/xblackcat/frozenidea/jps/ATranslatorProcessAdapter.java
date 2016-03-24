@@ -9,7 +9,6 @@ import org.jetbrains.jps.incremental.CompileContext;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.model.module.JpsModule;
-import org.xblackcat.frozenidea.config.IceComponent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

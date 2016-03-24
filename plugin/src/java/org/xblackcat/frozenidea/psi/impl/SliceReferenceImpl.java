@@ -35,7 +35,7 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
             return EMPTY_ARRAY;
         }
 
-        Map<String, PsiNamedElement> references = new HashMap<String, PsiNamedElement>();
+        Map<String, PsiNamedElement> references = new HashMap<>();
 
         final PsiElement parent = myElement.getParent();
 

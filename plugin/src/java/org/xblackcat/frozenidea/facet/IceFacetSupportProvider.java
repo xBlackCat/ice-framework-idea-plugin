@@ -4,7 +4,6 @@ import com.intellij.facet.FacetManager;
 import com.intellij.facet.ui.FacetBasedFrameworkSupportProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkVersion;
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.module.Module;
@@ -13,8 +12,6 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.util.IceMessages;
-
-import javax.swing.event.HyperlinkEvent;
 
 /**
  * 08.01.12 12:58
@@ -48,11 +45,7 @@ public class IceFacetSupportProvider extends FacetBasedFrameworkSupportProvider<
                     IceMessages.message("ICE.library.not.added"),
                     IceMessages.message("ICE.library.not.added.message"),
                     NotificationType.ERROR,
-                    new NotificationListener() {
-                        @Override
-                        public void hyperlinkUpdate(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
-                        }
-
+                    (notification1, event) -> {
                     }
             );
             Notifications.Bus.notify(notification, project);

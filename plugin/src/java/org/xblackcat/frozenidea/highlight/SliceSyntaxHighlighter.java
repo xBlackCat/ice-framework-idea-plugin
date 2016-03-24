@@ -23,8 +23,8 @@ public class SliceSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final Map<IElementType, TextAttributesKey> keys2;
 
     static {
-        keys1 = new HashMap<IElementType, TextAttributesKey>();
-        keys2 = new HashMap<IElementType, TextAttributesKey>();
+        keys1 = new HashMap<>();
+        keys2 = new HashMap<>();
 
         SyntaxHighlighterBase.fillMap(keys1, ElementType.KEYWORD_BIT_SET, SliceHighlighterColors.ICE_KEYWORD);
 

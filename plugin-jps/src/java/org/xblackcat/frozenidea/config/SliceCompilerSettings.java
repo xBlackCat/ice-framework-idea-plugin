@@ -21,7 +21,7 @@ public class SliceCompilerSettings extends JpsElementBase<SliceCompilerSettings>
     );
 
     private boolean cleanOutput;
-    private List<Target> components = new ArrayList<Target>();
+    private List<Target> components = new ArrayList<>();
 
     public SliceCompilerSettings() {
     }

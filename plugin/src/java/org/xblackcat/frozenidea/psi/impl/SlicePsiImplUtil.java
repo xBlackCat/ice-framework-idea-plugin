@@ -41,7 +41,7 @@ public class SlicePsiImplUtil {
 
     @NotNull
     public static PsiReference getReference(SliceTypeReference o) {
-        return new SliceReferenceImpl<SliceTypeReference>(o, TextRange.from(0, o.getTextLength()));
+        return new SliceReferenceImpl<>(o, TextRange.from(0, o.getTextLength()));
     }
 
     @NotNull
