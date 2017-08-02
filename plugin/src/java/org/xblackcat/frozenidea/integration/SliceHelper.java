@@ -5,6 +5,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.usageView.UsageViewBundle;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.psi.*;
@@ -19,6 +20,17 @@ import java.util.Set;
  * @author xBlackCat
  */
 public class SliceHelper {
+    private static final String DEFAULT_FQN = UsageViewBundle.message("default.package.presentable.name");
+
+    public static String packageName(SliceModulePath path) {
+        final PsiElement[] children = path.getChildren();
+        if (children.length == 0) {
+            return null;
+        }
+
+        return "";
+    }
+
     public static String getPackageName(PsiFile file, IceComponent target) {
         List<SliceGlobalMetadata> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(
                 file,
@@ -56,17 +68,17 @@ public class SliceHelper {
     public static String getFQN(SliceNamedElement element) {
         final PsiElement id = element.getId();
         if (id == null) {
-            return null;
+            return DEFAULT_FQN;
         }
         String name = id.getText();
 
         if (name == null) {
-            return null;
+            return DEFAULT_FQN;
         }
 
         SliceModule module = getContainerSliceModule(element);
         if (module == null) {
-            return null;
+            return DEFAULT_FQN;
         }
         return buildFQN(name, module);
     }

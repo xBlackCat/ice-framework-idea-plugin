@@ -10,6 +10,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.FileTypeIndex;
@@ -22,8 +23,7 @@ import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.psi.*;
 
 import javax.swing.*;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -92,32 +92,20 @@ public class SlicePsiImplUtil {
         return StringUtil.unescapeStringCharacters(o.getText());
     }
 
-    protected static PsiElement resolveDataType(SliceCompositeElement element, TextRange rangeInElement) {
-        String referenceName = rangeInElement.substring(element.getText());
+    public static PsiElement resolveDataType(SliceTypeReference constType, TextRange from) {
+        final List<PsiElement> elements = resolveDataTypes(constType, from);
+        return elements.size() == 1 ? elements.get(0) : null;
+    }
+
+    protected static List<PsiElement> resolveDataTypes(SliceCompositeElement element, TextRange rangeInElement) {
         SliceModule module = PsiTreeUtil.getParentOfType(element, SliceModule.class);
-
         if (module == null) {
-            return null;
+            return Collections.emptyList();
         }
 
-        // Search in current file and module
-        for (PsiElement c : module.getChildren()) {
-            if (c instanceof SliceDataTypeElement) {
-                if (referenceName.equals(((SliceDataTypeElement) c).getName())) {
-                    if (c instanceof SliceClassDef) {
-                        if (((SliceClassDef) c).getClassBody() != null) {
-                            return c;
-                        }
-                    } else if (c instanceof SliceInterfaceDef) {
-                        if (((SliceInterfaceDef) c).getInterfaceBody() != null) {
-                            return c;
-                        }
-                    } else {
-                        return c;
-                    }
-                }
-            }
-        }
+        FQN referenceName = FQN.buildFQN(rangeInElement.substring(element.getText()), module);
+
+        List<PsiElement> result = new ArrayList<>();
 
         final Project project = element.getProject();
         Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(
@@ -126,8 +114,42 @@ public class SlicePsiImplUtil {
                 GlobalSearchScope.allScope(project)
         );
 
+        for (VirtualFile virtualFile : virtualFiles) {
+            SliceFile simpleFile = (SliceFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (simpleFile != null) {
+                SliceModule[] modules = PsiTreeUtil.getChildrenOfType(simpleFile, SliceModule.class);
+                if (modules != null) {
+                    for (SliceModule m : modules) {
+                        searchThroughModule(referenceName, m, result);
+                    }
+                }
+            }
+        }
+        return result.isEmpty() ? Collections.emptyList() : result;
+    }
 
-        return null;
+    private static void searchThroughModule(FQN referenceName, SliceModule m, List<PsiElement> result) {
+        // Search in current file and module
+        for (PsiElement c : m.getChildren()) {
+            if (c instanceof SliceDataTypeElement) {
+                if (referenceName.equals(FQN.buildFQN((SliceDataTypeElement) c))) {
+                    if (c instanceof SliceClassDef) {
+                        if (((SliceClassDef) c).getClassBody() != null) {
+                            result.add(c);
+                        }
+                    } else if (c instanceof SliceInterfaceDef) {
+                        if (((SliceInterfaceDef) c).getInterfaceBody() != null) {
+                            result.add(c);
+                        }
+                    } else {
+                        result.add(c);
+                    }
+                }
+            }
+        }
+        for (SliceModule mm : m.getModuleList()) {
+            searchThroughModule(referenceName, mm, result);
+        }
     }
 
     public static <T extends PsiNamedElement> void addAll(Map<String, T> map, Collection<? extends T> collection) {

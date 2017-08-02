@@ -1,30 +1,38 @@
 package org.xblackcat.frozenidea.psi.impl;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
-import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.psi.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 15.06.12 15:37
  *
  * @author xBlackCat
  */
-public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiReferenceBase<T> {
+public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiReferenceBase<T> implements PsiPolyVariantReference {
     public SliceReferenceImpl(T element, TextRange range) {
         super(element, range);
     }
 
+    @NotNull
+    @Override
+    public ResolveResult[] multiResolve(boolean incompleteCode) {
+        final List<PsiElement> dataTypes = SlicePsiImplUtil.resolveDataTypes(myElement, getRangeInElement());
+        List<ResolveResult> results = new ArrayList<>();
+        for (PsiElement property : dataTypes) {
+            results.add(new PsiElementResolveResult(property));
+        }
+        return results.toArray(new ResolveResult[results.size()]);
+    }
+
     @Override
     public PsiElement resolve() {
-        return SlicePsiImplUtil.resolveDataType(myElement, getRangeInElement());
+        ResolveResult[] resolveResults = multiResolve(false);
+        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
 
     @NotNull

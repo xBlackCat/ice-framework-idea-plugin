@@ -8,6 +8,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.xblackcat.frozenidea.IceFileType;
+import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
 import org.xblackcat.frozenidea.psi.SliceFile;
 import org.xblackcat.frozenidea.psi.SliceNamedElement;
@@ -23,7 +24,7 @@ import java.util.List;
  * @author xBlackCat
  */
 public class SliceUtil {
-    public static List<SliceDataTypeElement> findDataTypes(Project project, String key) {
+    public static List<SliceDataTypeElement> findDataTypes(Project project, String fqn) {
         List<SliceDataTypeElement> result = null;
         Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, IceFileType.INSTANCE,
                                                                                                GlobalSearchScope.allScope(project)
@@ -34,7 +35,7 @@ public class SliceUtil {
                 SliceDataTypeElement[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, SliceDataTypeElement.class);
                 if (properties != null) {
                     for (SliceDataTypeElement dataTypeElement : properties) {
-                        if (key.equals(dataTypeElement.getName())) {
+                        if (fqn.equals(SliceHelper.getFQN(dataTypeElement))) {
                             if (result == null) {
                                 result = new ArrayList<>();
                             }
@@ -63,7 +64,7 @@ public class SliceUtil {
         }
         return result;
     }
-    public static List<SliceNamedElement> findNamedItems(Project project, String key) {
+    public static List<SliceNamedElement> findNamedItems(Project project, String fqn) {
         List<SliceNamedElement> result = null;
         Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, IceFileType.INSTANCE,
                                                                                                GlobalSearchScope.allScope(project)
@@ -74,7 +75,7 @@ public class SliceUtil {
                 SliceNamedElement[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, SliceNamedElement.class);
                 if (properties != null) {
                     for (SliceNamedElement dataTypeElement : properties) {
-                        if (key.equals(dataTypeElement.getName())) {
+                        if (fqn.equals(dataTypeElement.getName())) {
                             if (result == null) {
                                 result = new ArrayList<>();
                             }

@@ -5,8 +5,8 @@ import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.integration.JavaModuleHelper;
-import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
+import org.xblackcat.frozenidea.psi.impl.FQN;
 
 /**
  * 06.07.12 15:07
@@ -65,7 +65,7 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
 
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(classDef);
 
-            PsiElement javaClass = javaHelper.findClass(SliceHelper.getFQN(classDef));
+            PsiElement javaClass = javaHelper.findClass(FQN.buildFQN(classDef).getJavaFQN());
             if (javaClass != null) {
                 return new PsiElement[]{
                         element,

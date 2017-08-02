@@ -7,11 +7,10 @@ import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.ElementDescriptionUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageViewLongNameLocation;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.psi.impl.FQN;
 
 public class SliceFindUsagesProvider implements FindUsagesProvider {
     @Override
@@ -81,18 +80,11 @@ public class SliceFindUsagesProvider implements FindUsagesProvider {
     @Override
     public String getNodeText(@NotNull PsiElement element, boolean useFullName) {
         if (element instanceof SliceDataTypeElement || element instanceof SliceModule) {
-            return SliceHelper.getFQN((SliceNamedElement) element);
+            return FQN.buildFQN((SliceNamedElement) element).getFQN();
         }
 
         if (element instanceof SliceTypeReference) {
-            // Try to find a class
-            SliceModule module = PsiTreeUtil.getParentOfType(element, SliceModule.class);
-            if (module != null) {
-                String moduleFQN = SliceHelper.getFQN(module);
-                String fqn = moduleFQN + "." + element.getText();
-                System.err.println(fqn);
-                return fqn;
-            }
+            return FQN.buildFQN((SliceTypeReference) element).getFQN();
         }
 
         return "";
