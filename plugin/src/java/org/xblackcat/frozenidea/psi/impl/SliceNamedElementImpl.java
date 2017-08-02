@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.util.SliceIcons;
 
 import javax.swing.*;
 
@@ -83,21 +84,21 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
         if (this instanceof SliceModule) {
             return AllIcons.Nodes.Package;
         } else if (this instanceof SliceMethodDef) {
-            return AllIcons.Nodes.AbstractMethod;
+            return SliceIcons.METHOD_ICON;
         } else if (this instanceof SliceFieldDef) {
-            return AllIcons.Nodes.Field;
-        } else if (this instanceof SliceConstant) {
-            return AllIcons.Nodes.Field;
+            return SliceIcons.FIELD_ICON;
+        } else if (this instanceof SliceConstantDef) {
+            return SliceIcons.FIELD_ICON;
         } else if (this instanceof SliceClassDef) {
-            return AllIcons.Nodes.Class;
+            return SliceIcons.CLASS_ICON;
         } else if (this instanceof SliceInterfaceDef) {
-            return AllIcons.Nodes.Interface;
+            return SliceIcons.INTERFACE_ICON;
         } else if (this instanceof SliceExceptionDef) {
-            return AllIcons.Nodes.ExceptionClass;
+            return SliceIcons.EXCEPTION_ICON;
         } else if (this instanceof SliceStructDef) {
-            return AllIcons.Nodes.AnonymousClass;
+            return SliceIcons.CLASS_ICON;
         } else if (this instanceof SliceEnumDef) {
-            return AllIcons.Nodes.Enum;
+            return SliceIcons.ENUM_ICON;
         } else if (this instanceof SliceDictionaryDef) {
             return AllIcons.Nodes.Advice;
         } else if (this instanceof SliceSequenceDef) {

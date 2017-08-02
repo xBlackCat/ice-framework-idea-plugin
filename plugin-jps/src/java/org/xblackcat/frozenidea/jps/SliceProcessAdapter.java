@@ -1,7 +1,9 @@
 package org.xblackcat.frozenidea.jps;
 
 import com.intellij.execution.process.ProcessEvent;
+import org.jetbrains.jps.builders.java.JavaModuleBuildTargetType;
 import org.jetbrains.jps.incremental.CompileContext;
+import org.jetbrains.jps.incremental.ModuleBuildTarget;
 import org.jetbrains.jps.incremental.messages.FileGeneratedEvent;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.xblackcat.frozenidea.config.IceComponent;
@@ -41,7 +43,7 @@ class SliceProcessAdapter extends ATranslatorProcessAdapter {
                 hasErrors.set(true);
             }
         } else {
-            final FileGeneratedEvent msg = new FileGeneratedEvent();
+            final FileGeneratedEvent msg = new FileGeneratedEvent(new ModuleBuildTarget(module, JavaModuleBuildTargetType.PRODUCTION));
 
             for (File source : sourceFiles) {
                 final String name = source.getName();

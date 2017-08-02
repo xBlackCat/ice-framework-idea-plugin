@@ -1,6 +1,10 @@
 package org.xblackcat.frozenidea.parser;
-import com.intellij.lexer.*;
+
+import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
+
+import static com.intellij.psi.TokenType.BAD_CHARACTER;
+import static com.intellij.psi.TokenType.WHITE_SPACE;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 
 %%
@@ -18,9 +22,8 @@ import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 %type IElementType
 %unicode
 
-EOL="\r"|"\n"|"\r\n"
-LINE_WS=[\ \t\f]
-WHITE_SPACE=({LINE_WS}|{EOL})+
+EOL=\R
+WHITE_SPACE=\s+
 
 END_OF_LINE_COMMENT="//".*
 DOC_STYLE_COMMENT="/"\*\*([^*]|\*+[^*/])*(\*+"/")?
@@ -35,7 +38,7 @@ DIRECTIVE=#.+
 
 %%
 <YYINITIAL> {
-  {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  {WHITE_SPACE}              { return WHITE_SPACE; }
 
   "="                        { return ICE_EQ; }
   ";"                        { return ICE_SEMICOLON; }
@@ -80,7 +83,7 @@ DIRECTIVE=#.+
   "throws"                   { return ICE_KW_THROWS; }
   "extends"                  { return ICE_KW_EXTENDS; }
   "implements"               { return ICE_KW_IMPLEMENTS; }
-  "EOL"                      { return ICE_EOL; }
+  "implements"               { return ICE_IMPLEMENTS; }
 
   {END_OF_LINE_COMMENT}      { return ICE_END_OF_LINE_COMMENT; }
   {DOC_STYLE_COMMENT}        { return ICE_DOC_STYLE_COMMENT; }
@@ -93,5 +96,6 @@ DIRECTIVE=#.+
   {INTEGER_VALUE}            { return ICE_INTEGER_VALUE; }
   {DIRECTIVE}                { return ICE_DIRECTIVE; }
 
-  [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
+
+[^] { return BAD_CHARACTER; }

@@ -157,7 +157,11 @@ public class SliceHelper {
                 continue;
             }
 
-            SliceExtendsList extendsList = clazz.getExtendsList();
+            SliceExtendsDef extendsDef = clazz.getExtendsDef();
+            if (extendsDef == null) {
+                continue;
+            }
+            SliceExtendsList extendsList = extendsDef.getExtendsList();
             if (extendsList == null) {
                 continue;
             }
@@ -191,7 +195,11 @@ public class SliceHelper {
                 continue;
             }
 
-            SliceExtendsList extendsList = interfaceDef.getExtendsList();
+            SliceExtendsDef extendsDef = interfaceDef.getExtendsDef();
+            if (extendsDef == null) {
+                continue;
+            }
+            SliceExtendsList extendsList = extendsDef.getExtendsList();
             if (extendsList == null) {
                 continue;
             }
@@ -215,16 +223,22 @@ public class SliceHelper {
                 continue;
             }
 
-            SliceImplementsList implementsList = clazz.getImplementsList();
-            if (implementsList != null) {
-                for (SliceTypeReference tr : implementsList.getTypeReferenceList()) {
-                    final PsiElement psiElement = tr.getReference().resolve();
+            SliceImplementsDef implementsDef = clazz.getImplementsDef();
+            if (implementsDef == null) {
+                continue;
+            }
+            SliceExtendsList implementsList = implementsDef.getExtendsList();
+            if (implementsList == null) {
+                continue;
+            }
 
-                    if (psiElement instanceof SliceInterfaceDef) {
-                        if (hierarchy.contains(psiElement)) {
-                            elements.add(clazz);
-                            supers.add(clazz);
-                        }
+            for (SliceTypeReference tr : implementsList.getTypeReferenceList()) {
+                final PsiElement psiElement = tr.getReference().resolve();
+
+                if (psiElement instanceof SliceInterfaceDef) {
+                    if (hierarchy.contains(psiElement)) {
+                        elements.add(clazz);
+                        supers.add(clazz);
                     }
                 }
             }

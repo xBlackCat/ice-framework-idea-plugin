@@ -71,6 +71,10 @@
                                   id="slice"
                                   order="last, before default"/>
 
+        <gotoSymbolContributor implementation="org.xblackcat.frozenidea.code.SliceGotoSymbolContributor"/>
+
+        <fileBasedIndex implementation="org.xblackcat.frozenidea.stubs.index.SliceDataTypeIndex"/>
+
         <projectService serviceInterface="org.xblackcat.frozenidea.integration.JavaHelper"
                         serviceImplementation="org.xblackcat.frozenidea.integration.JavaHelper$Impl"/>
         <moduleService serviceInterface="org.xblackcat.frozenidea.integration.JavaModuleHelper"

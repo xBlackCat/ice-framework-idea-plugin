@@ -60,7 +60,7 @@ public class SliceFindUsagesProvider implements FindUsagesProvider {
         if (element instanceof SliceMethodDef) {
             return LangBundle.message("java.terms.method");
         }
-        if (element instanceof SliceConstant) {
+        if (element instanceof SliceConstantDef) {
             return LangBundle.message("java.terms.variable");
         }
 

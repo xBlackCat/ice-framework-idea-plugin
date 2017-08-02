@@ -2,9 +2,10 @@ package org.xblackcat.frozenidea.jps;
 
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.openapi.util.JDOMUtil;
-import org.jdom.Document;
 import org.jdom.Element;
+import org.jetbrains.jps.builders.java.JavaModuleBuildTargetType;
 import org.jetbrains.jps.incremental.CompileContext;
+import org.jetbrains.jps.incremental.ModuleBuildTarget;
 import org.jetbrains.jps.incremental.messages.BuildMessage;
 import org.jetbrains.jps.incremental.messages.CompilerMessage;
 import org.jetbrains.jps.incremental.messages.FileGeneratedEvent;
@@ -31,10 +32,10 @@ class JavaProcessAdapter extends ATranslatorProcessAdapter {
 
     @Override
     public void processTerminated(ProcessEvent event) {
-        Document res;
+        Element res;
         final String stdout = stdOutput.toString();
         try {
-            res = JDOMUtil.loadDocument(stdout);
+            res = JDOMUtil.load(stdout);
         } catch (Exception e) {
             context.processMessage(
                     new CompilerMessage(
@@ -50,7 +51,7 @@ class JavaProcessAdapter extends ATranslatorProcessAdapter {
 
         int exitCode = event.getExitCode();
         if (exitCode != 0) {
-            for (Element source : res.getRootElement().getChildren("source")) {
+            for (Element source : res.getChildren("source")) {
                 final Element output = source.getChild("output");
                 if (output != null) {
                     String message = output.getTextTrim();
@@ -75,9 +76,9 @@ class JavaProcessAdapter extends ATranslatorProcessAdapter {
             );
             hasErrors.set(true);
         } else {
-            final FileGeneratedEvent msg = new FileGeneratedEvent();
+            final FileGeneratedEvent msg = new FileGeneratedEvent(new ModuleBuildTarget(module, JavaModuleBuildTargetType.PRODUCTION));
 
-            for (Element source : res.getRootElement().getChildren("source")) {
+            for (Element source : res.getChildren("source")) {
                 for (Element file : source.getChildren("file")) {
                     final String fileName = file.getAttributeValue("name");
 

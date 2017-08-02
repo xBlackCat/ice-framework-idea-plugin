@@ -1,6 +1,11 @@
 package org.xblackcat.frozenidea.psi.impl;
 
+import com.intellij.navigation.ColoredItemPresentation;
+import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -12,9 +17,11 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.psi.*;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -52,6 +59,19 @@ public class SlicePsiImplUtil {
     @NotNull
     public static String getValue(SliceStringLiteral o) {
         return StringUtil.unescapeStringCharacters(o.getText());
+    }
+
+    public static Integer getConstant(SliceEnumConstantInitializer o) {
+        final String text = o.getText();
+        if (text == null || text.isEmpty()) {
+            return null;
+        }
+        try {
+            // TODO: check modifiers for other than decimal base
+            return Integer.parseInt(StringUtil.unescapeStringCharacters(text));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     @NotNull
@@ -114,5 +134,37 @@ public class SlicePsiImplUtil {
         for (T el : collection) {
             map.put(el.getName(), el);
         }
+    }
+
+    public static ItemPresentation getPresentation(final SliceNamedElement element) {
+        return new ColoredItemPresentation() {
+            @Nullable
+            @Override
+            public TextAttributesKey getTextAttributesKey() {
+                return isDeprecated() ? CodeInsightColors.DEPRECATED_ATTRIBUTES : null;
+            }
+
+            private boolean isDeprecated() {
+                return false;
+            }
+
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return element.getName();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                return element.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean unused) {
+                return element.getIcon(Iconable.ICON_FLAG_VISIBILITY);
+            }
+        };
     }
 }

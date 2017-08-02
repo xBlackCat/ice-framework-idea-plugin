@@ -40,14 +40,27 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
         final PsiElement parent = myElement.getParent();
 
         if (parent instanceof SliceExtendsList) {
-            PsiElement declaration = parent.getParent();
+            PsiElement block = parent.getParent();
 
-            if (declaration instanceof SliceClassDef) {
-                SlicePsiImplUtil.addAll(references, module.getClassDefList());
-            } else if (declaration instanceof SliceInterfaceDef) {
-                SlicePsiImplUtil.addAll(references, module.getInterfaceDefList());
-            } else if (declaration instanceof SliceExceptionDef) {
-                SlicePsiImplUtil.addAll(references, module.getExceptionDefList());
+            final PsiElement declaration;
+            if (block instanceof SliceImplementsDef) {
+                declaration = block.getParent();
+                if (declaration instanceof SliceClassDef) {
+                    SlicePsiImplUtil.addAll(references, module.getInterfaceDefList());
+                } else {
+                    return EMPTY_ARRAY;
+                }
+            } else if (block instanceof SliceExtendsDef) {
+                declaration = block.getParent();
+                if (declaration instanceof SliceClassDef) {
+                    SlicePsiImplUtil.addAll(references, module.getClassDefList());
+                } else if (declaration instanceof SliceInterfaceDef) {
+                    SlicePsiImplUtil.addAll(references, module.getInterfaceDefList());
+                } else if (declaration instanceof SliceExceptionDef) {
+                    SlicePsiImplUtil.addAll(references, module.getExceptionDefList());
+                } else {
+                    return EMPTY_ARRAY;
+                }
             } else {
                 return EMPTY_ARRAY;
             }
@@ -56,7 +69,7 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
             if (declaration.equals(references.get(referenceName))) {
                 references.remove(referenceName);
             }
-        } else if (parent instanceof SliceImplementsList) {
+        } else if (parent instanceof SliceImplementsDef) {
             SlicePsiImplUtil.addAll(references, module.getInterfaceDefList());
         } else if (parent instanceof SliceThrowsList) {
             SlicePsiImplUtil.addAll(references, module.getExceptionDefList());

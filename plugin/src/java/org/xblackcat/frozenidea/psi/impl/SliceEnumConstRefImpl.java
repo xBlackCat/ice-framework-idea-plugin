@@ -39,7 +39,7 @@ class SliceEnumConstRefImpl extends PsiReferenceBase<SliceEnumConstantReference>
 
     protected SliceEnumConstantList obtainEnumConstantList() {
         @SuppressWarnings("unchecked")
-        final SliceCompositeElement constantDef = PsiTreeUtil.getParentOfType(myElement, SliceConstant.class, SliceFieldDef.class);
+        final SliceCompositeElement constantDef = PsiTreeUtil.getParentOfType(myElement, SliceConstantDef.class, SliceFieldDef.class);
         if (constantDef == null) {
             return null;
         }
