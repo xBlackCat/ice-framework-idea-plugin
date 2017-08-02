@@ -83,7 +83,6 @@ DIRECTIVE=#.+
   "throws"                   { return ICE_KW_THROWS; }
   "extends"                  { return ICE_KW_EXTENDS; }
   "implements"               { return ICE_KW_IMPLEMENTS; }
-  "implements"               { return ICE_IMPLEMENTS; }
 
   {END_OF_LINE_COMMENT}      { return ICE_END_OF_LINE_COMMENT; }
   {DOC_STYLE_COMMENT}        { return ICE_DOC_STYLE_COMMENT; }

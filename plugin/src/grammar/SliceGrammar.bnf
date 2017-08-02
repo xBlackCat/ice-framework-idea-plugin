@@ -219,7 +219,8 @@ method_return_type ::= data_type | 'void'
 
 method_def ::= metadata* modifier* method_return_type id '(' parameters_list ')' (throws_def)? ';' {pin=5}
 throws_def ::= 'throws' throws_list {pin=1}
-throws_list ::= type_reference (',' type_reference) * {recoverWhile=body_element_recovery}
+throws_list ::= type_reference (',' type_reference) * {recoverWhile=throws_list_recovery}
+private throws_list_recovery ::= !(';' | '{')
 
 parameter_modifier ::= 'out'
 
