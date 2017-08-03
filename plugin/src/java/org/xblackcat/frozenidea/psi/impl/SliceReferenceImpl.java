@@ -1,12 +1,20 @@
 package org.xblackcat.frozenidea.psi.impl;
 
+import com.intellij.codeInsight.lookup.AutoCompletionPolicy;
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.psi.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 15.06.12 15:37
@@ -21,7 +29,7 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        final List<PsiElement> dataTypes = SlicePsiImplUtil.resolveDataTypes(myElement, getRangeInElement());
+        final List<SliceNamedElement> dataTypes = SlicePsiImplUtil.resolveDataTypes(myElement, getRangeInElement());
         List<ResolveResult> results = new ArrayList<>();
         for (PsiElement property : dataTypes) {
             results.add(new PsiElementResolveResult(property));
@@ -43,9 +51,11 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
             return EMPTY_ARRAY;
         }
 
-        Map<String, PsiNamedElement> references = new HashMap<>();
+        FQN modulePath = FQN.buildFQN(module);
+        Map<FQN, SliceNamedElement> references = new HashMap<>();
 
         final PsiElement parent = myElement.getParent();
+        final Project project = myElement.getProject();
 
         if (parent instanceof SliceExtendsList) {
             PsiElement block = parent.getParent();
@@ -54,18 +64,18 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
             if (block instanceof SliceImplementsDef) {
                 declaration = block.getParent();
                 if (declaration instanceof SliceClassDef) {
-                    SlicePsiImplUtil.addAll(references, module.getInterfaceDefList());
+                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, c -> c instanceof SliceInterfaceDef));
                 } else {
                     return EMPTY_ARRAY;
                 }
             } else if (block instanceof SliceExtendsDef) {
                 declaration = block.getParent();
                 if (declaration instanceof SliceClassDef) {
-                    SlicePsiImplUtil.addAll(references, module.getClassDefList());
+                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, c -> c instanceof SliceClassDef));
                 } else if (declaration instanceof SliceInterfaceDef) {
-                    SlicePsiImplUtil.addAll(references, module.getInterfaceDefList());
+                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, c -> c instanceof SliceInterfaceDef));
                 } else if (declaration instanceof SliceExceptionDef) {
-                    SlicePsiImplUtil.addAll(references, module.getExceptionDefList());
+                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, c -> c instanceof SliceExceptionDef));
                 } else {
                     return EMPTY_ARRAY;
                 }
@@ -73,25 +83,39 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
                 return EMPTY_ARRAY;
             }
 
-            String referenceName = ((SliceNamedElement) declaration).getName();
+            FQN referenceName = FQN.buildFQN((SliceNamedElement) declaration);
             if (declaration.equals(references.get(referenceName))) {
                 references.remove(referenceName);
             }
         } else if (parent instanceof SliceImplementsDef) {
-            SlicePsiImplUtil.addAll(references, module.getInterfaceDefList());
+            SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, c -> c instanceof SliceInterfaceDef));
         } else if (parent instanceof SliceThrowsList) {
-            SlicePsiImplUtil.addAll(references, module.getExceptionDefList());
+            SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, c -> c instanceof SliceExceptionDef));
         } else {
-            SlicePsiImplUtil.addAll(references, module.getClassDefList());
-            SlicePsiImplUtil.addAll(references, module.getInterfaceDefList());
-            SlicePsiImplUtil.addAll(references, module.getExceptionDefList());
-            SlicePsiImplUtil.addAll(references, module.getEnumDefList());
-            SlicePsiImplUtil.addAll(references, module.getStructDefList());
-            SlicePsiImplUtil.addAll(references, module.getDictionaryDefList());
-            SlicePsiImplUtil.addAll(references, module.getSequenceDefList());
+            SlicePsiImplUtil.addAll(
+                    references,
+                    SlicePsiImplUtil.searchElements(
+                            project,
+                            c -> c instanceof SliceDataTypeElement && !(c instanceof SliceExceptionDef)
+                    )
+            );
         }
 
-        final Collection<PsiNamedElement> ref = references.values();
-        return ref.toArray(new PsiNamedElement[ref.size()]);
+        return references.entrySet()
+                         .stream()
+                         .map(
+                                 e -> {
+                                     final FQN fqn = e.getKey();
+                                     return LookupElementBuilder
+                                             .createWithSmartPointer(
+                                                     fqn.startWith(modulePath) ? fqn.getName() : fqn.getFQN(), e.getValue()
+                                             )
+                                             .withPresentableText(fqn.getName())
+                                             .withIcon(e.getValue().getIcon(Iconable.ICON_FLAG_VISIBILITY))
+                                             .withTailText(" (" + fqn.getPathString() + ")", true)
+                                             .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE);
+                                 }
+                         )
+                         .toArray(LookupElement[]::new);
     }
 }

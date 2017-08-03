@@ -36,8 +36,53 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
             "class", "interface", "exception", "struct", "enum", "module"};
     private static final String[] keywordsGR = new String[]{
             "sequence", "dictionary"};
+    private static final String[] primitiveTypes = new String[]{
+            "bool", "byte", "short", "int", "long", "float", "double", "string", "Object", "LocalObject"
+    };
 
     public SliceBasicCompletionContributor() {
+        extend(CompletionType.BASIC, SlicePatterns.parameterList(), new CompletionProvider<CompletionParameters>() {
+            @Override
+            protected void addCompletions(
+                    @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
+            ) {
+                for (String kw : primitiveTypes) {
+                    result.addElement(
+                            TailTypeDecorator.withTail(
+                                    LookupElementBuilder.create(kw)
+                                                        .withBoldness(true)
+                                                        .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
+                                    TailType.SPACE
+                            )
+                    );
+                }
+            }
+        });
+        extend(CompletionType.BASIC, SlicePatterns.classBody(), new CompletionProvider<CompletionParameters>() {
+            @Override
+            protected void addCompletions(
+                    @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
+            ) {
+                result.addElement(
+                        TailTypeDecorator.withTail(
+                                LookupElementBuilder.create("void")
+                                                    .withBoldness(true)
+                                                    .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
+                                TailType.SPACE
+                        )
+                );
+                for (String kw : primitiveTypes) {
+                    result.addElement(
+                            TailTypeDecorator.withTail(
+                                    LookupElementBuilder.create(kw)
+                                                        .withBoldness(true)
+                                                        .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
+                                    TailType.SPACE
+                            )
+                    );
+                }
+            }
+        });
         extend(CompletionType.BASIC, SlicePatterns.elementDef(), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(

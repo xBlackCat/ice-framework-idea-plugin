@@ -9,6 +9,7 @@ import org.xblackcat.frozenidea.psi.SliceTypeReference;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.StringJoiner;
 
 /**
  * 02.08.2017 14:52
@@ -60,7 +61,7 @@ public class FQN {
 
     private final String[] elements;
 
-    public FQN(String... elements) {
+    private FQN(String... elements) {
         this.elements = elements;
     }
 
@@ -72,6 +73,21 @@ public class FQN {
         return elements[elements.length - 1];
     }
 
+    public boolean startWith(FQN path) {
+        if (path.elements.length >= elements.length) {
+            return false;
+        }
+
+        int i = path.elements.length - 1;
+        while (i >= 0) {
+            if (!path.elements[i].equals(elements[i])) {
+                return false;
+            }
+            i--;
+        }
+
+        return true;
+    }
 
     @Override
     public String toString() {
@@ -101,5 +117,29 @@ public class FQN {
     @Override
     public int hashCode() {
         return Arrays.hashCode(elements);
+    }
+
+    /**
+     * Returns a path object. If the FQN object represents a root element null will be returned
+     *
+     * @return path FQN object or null if this object is top level object
+     */
+    public FQN getPath() {
+        if (elements.length == 1) {
+            return null;
+        }
+        return new FQN(getModules());
+    }
+
+    public String getPathString() {
+        // Number of elements not likely worth Arrays.stream overhead.
+        StringJoiner joiner = new StringJoiner("::");
+        int i = 0, elementsLength = elements.length - 1;
+        while (i < elementsLength) {
+            final String cs = elements[i];
+            joiner.add(cs);
+            i++;
+        }
+        return joiner.toString();
     }
 }
