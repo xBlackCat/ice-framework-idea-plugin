@@ -65,12 +65,7 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
             SliceMethodDef methodDef = (SliceMethodDef) element;
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(methodDef);
 
-            PsiElement javaMethod = javaHelper.findClassMethod(methodDef);
-            if (javaMethod != null) {
-                return new PsiElement[]{
-                        javaMethod
-                };
-            }
+            return javaHelper.findClassMethod(methodDef);
         }  else if (element instanceof SliceFieldDef) {
             SliceFieldDef fieldDef = (SliceFieldDef) element;
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(fieldDef);

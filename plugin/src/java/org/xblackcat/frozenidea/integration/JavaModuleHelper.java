@@ -96,7 +96,7 @@ public class JavaModuleHelper {
         return Collections.emptyList();
     }
 
-    public PsiElement findClassMethod(SliceMethodDef methodDef) {
+    public PsiElement[] findClassMethod(SliceMethodDef methodDef) {
         return null;
     }
 
@@ -143,7 +143,7 @@ public class JavaModuleHelper {
         }
 
         @Override
-        public PsiElement findClassMethod(SliceMethodDef methodDef) {
+        public PsiElement[] findClassMethod(SliceMethodDef methodDef) {
             PsiClass iceClass = myFacade.findClass(
                     "com.zeroc.Ice.Current",
                     GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module)
@@ -153,12 +153,33 @@ public class JavaModuleHelper {
             }
 
             final String className = FQN.buildFQN(methodDef.getDeclarationType()).getJavaFQN();
+            final List<PsiElement> result = new ArrayList<>();
             PsiClass aClass = findClass(className);
-            PsiMethod[] methods = aClass == null ? PsiMethod.EMPTY_ARRAY : aClass.findMethodsByName(methodDef.getName(), true);
+            if (aClass != null) {
+                checkObjectMethods(methodDef, iceClass, result, aClass, "");
+            }
+
+            PsiClass aClassPrx = findClass(className + "Prx");
+            if (aClassPrx != null) {
+                checkProxyMethods(methodDef, iceClass, result, aClassPrx, "");
+                checkProxyMethods(methodDef, iceClass, result, aClassPrx, "Async");
+            }
+
+            return result.toArray(PsiElement.EMPTY_ARRAY);
+        }
+
+        private void checkObjectMethods(
+                SliceMethodDef methodDef,
+                PsiClass iceClass,
+                List<PsiElement> result,
+                PsiClass aClass,
+                String suffix
+        ) {
+            PsiMethod[] methods = aClass.findMethodsByName(methodDef.getName() + suffix, true);
             final SliceParametersList parametersList = methodDef.getParametersList();
             final int paramsCount = parametersList == null ? 0 : parametersList.getParameterList().size();
 
-            nextMethod:
+
             for (PsiMethod method : methods) {
                 final PsiParameter[] javaParameters = method.getParameterList().getParameters();
                 if (javaParameters.length == paramsCount + 1) {
@@ -166,19 +187,60 @@ public class JavaModuleHelper {
                         continue;
                     }
 
-                    for (int i = 0; i < paramsCount; i++) {
-                        final SliceDataType dataType = parametersList.getParameterList().get(i).getDataType();
-                        final String type = JavaHelper.getJavaHelper(iceClass.getProject()).toJavaParameter(dataType);
-
-                        if (!javaParameters[i].getType().getCanonicalText().equals(type)) {
-                            continue nextMethod;
-                        }
+                    if (checkMethodParams(iceClass, parametersList, paramsCount, javaParameters)) {
+                        continue;
                     }
 
-                    return method;
+                    result.add(method);
                 }
             }
-            return null;
+        }
+
+        private void checkProxyMethods(
+                SliceMethodDef methodDef,
+                PsiClass iceClass,
+                List<PsiElement> result,
+                PsiClass aClassPrx,
+                String suffix
+        ) {
+            PsiMethod[] methods = aClassPrx.findMethodsByName(methodDef.getName() + suffix, true);
+            final SliceParametersList parametersList = methodDef.getParametersList();
+            final int paramsCount = parametersList == null ? 0 : parametersList.getParameterList().size();
+
+
+            for (PsiMethod method : methods) {
+                final PsiParameter[] javaParameters = method.getParameterList().getParameters();
+                if (javaParameters.length == paramsCount + 1) {
+                    if (!javaParameters[paramsCount].getType().getCanonicalText().equals("java.util.Map<java.lang.String,java.lang.String>")) {
+                        continue;
+                    }
+                } else if (javaParameters.length != paramsCount) {
+                    continue;
+                }
+
+                if (checkMethodParams(iceClass, parametersList, paramsCount, javaParameters)) {
+                    continue;
+                }
+
+                result.add(method);
+            }
+        }
+
+        private boolean checkMethodParams(
+                PsiClass iceClass,
+                SliceParametersList parametersList,
+                int paramsCount,
+                PsiParameter[] javaParameters
+        ) {
+            for (int i = 0; i < paramsCount; i++) {
+                final SliceDataType dataType = parametersList.getParameterList().get(i).getDataType();
+                final String type = JavaHelper.getJavaHelper(iceClass.getProject()).toJavaParameter(dataType);
+
+                if (!javaParameters[i].getType().getCanonicalText().equals(type)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
