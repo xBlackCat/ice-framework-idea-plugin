@@ -17,6 +17,7 @@ package org.xblackcat.frozenidea.psi.impl;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;

@@ -3,9 +3,13 @@ package org.xblackcat.frozenidea.find.usages;
 import com.intellij.find.findUsages.AbstractFindUsagesDialog;
 import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.integration.JavaModuleHelper;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
+import org.xblackcat.frozenidea.psi.SliceMethodDef;
+import org.xblackcat.frozenidea.psi.SliceModule;
+import org.xblackcat.frozenidea.psi.SliceParametersList;
 import org.xblackcat.frozenidea.psi.impl.FQN;
 
 /**
@@ -56,6 +60,16 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(classDef);
 
             PsiElement javaClass = javaHelper.findClass(FQN.buildFQN(classDef).getJavaFQN());
+            if (javaClass != null) {
+                return new PsiElement[]{
+                        javaClass
+                };
+            }
+        } else if (element instanceof SliceMethodDef) {
+            SliceMethodDef methodDef = (SliceMethodDef) element;
+            JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(methodDef);
+
+            PsiElement javaClass = javaHelper.findClassMethod(methodDef);
             if (javaClass != null) {
                 return new PsiElement[]{
                         javaClass

@@ -25,6 +25,12 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassRe
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.xblackcat.frozenidea.psi.SliceDataType;
+import org.xblackcat.frozenidea.psi.SliceMethodDef;
+import org.xblackcat.frozenidea.psi.SliceParametersList;
+import org.xblackcat.frozenidea.psi.SliceTypeReference;
+import org.xblackcat.frozenidea.psi.impl.FQN;
+import org.xblackcat.frozenidea.psi.impl.SliceDataTypeImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,6 +100,10 @@ public class JavaModuleHelper {
         return Collections.emptyList();
     }
 
+    public PsiElement findClassMethod(SliceMethodDef methodDef) {
+        return null;
+    }
+
     private static class Impl extends JavaModuleHelper {
         private final JavaPsiFacade myFacade;
 
@@ -120,6 +130,45 @@ public class JavaModuleHelper {
         @Override
         public NavigationItem findPackage(String packageName) {
             return myFacade.findPackage(packageName);
+        }
+
+        @Override
+        public PsiElement findClassMethod(SliceMethodDef methodDef) {
+            PsiClass iceClass = myFacade.findClass(
+                    "com.zeroc.Ice.Current",
+                    GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module)
+            );
+            if (iceClass == null) {
+                return null;
+            }
+
+            final String className = FQN.buildFQN(methodDef.getDeclarationType()).getJavaFQN();
+            PsiClass aClass = findClass(className);
+            PsiMethod[] methods = aClass == null ? PsiMethod.EMPTY_ARRAY : aClass.findMethodsByName(methodDef.getName(), true);
+            final SliceParametersList parametersList = methodDef.getParametersList();
+            final int paramsCount = parametersList == null ? 0 : parametersList.getParameterList().size();
+
+            nextMethod:
+            for (PsiMethod method : methods) {
+                final PsiParameter[] javaParameters = method.getParameterList().getParameters();
+                if (javaParameters.length == paramsCount + 1) {
+                    if (!javaParameters[paramsCount].getType().getCanonicalText().equals(iceClass.getQualifiedName())) {
+                        continue;
+                    }
+
+                    for (int i = 0; i < paramsCount; i++) {
+                        final SliceDataType dataType = parametersList.getParameterList().get(i).getDataType();
+                        final String type = JavaHelper.getJavaHelper(iceClass.getProject()).toJavaParameter(dataType);
+
+                        if (!javaParameters[i].getType().getCanonicalText().equals(type)) {
+                            continue nextMethod;
+                        }
+                    }
+
+                    return method;
+                }
+            }
+            return null;
         }
 
         @Override

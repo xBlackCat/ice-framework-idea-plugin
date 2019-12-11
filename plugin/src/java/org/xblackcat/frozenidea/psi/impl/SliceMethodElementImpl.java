@@ -19,10 +19,11 @@ import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
-import org.xblackcat.frozenidea.psi.SliceModule;
+import org.xblackcat.frozenidea.psi.*;
 
 import javax.swing.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,14 +31,14 @@ import javax.swing.*;
  * Date: 14.07.11
  * Time: 20:04
  */
-public abstract class SliceDataTypeElementImpl extends SliceNamedElementImpl implements SliceDataTypeElement {
-    protected SliceDataTypeElementImpl(ASTNode node) {
+public abstract class SliceMethodElementImpl extends SliceNamedElementImpl implements SliceMethodElement {
+    protected SliceMethodElementImpl(ASTNode node) {
         super(node);
     }
 
     @Override
-    public SliceModule getModule() {
-        return PsiTreeUtil.getParentOfType(this, SliceModule.class);
+    public SliceDataTypeElement getDeclarationType() {
+        return PsiTreeUtil.getParentOfType(this, SliceDataTypeElement.class);
     }
 
     @Override
@@ -46,13 +47,23 @@ public abstract class SliceDataTypeElementImpl extends SliceNamedElementImpl imp
             @Nullable
             @Override
             public String getPresentableText() {
-                return getName();
+                if (!(SliceMethodElementImpl.this instanceof SliceMethodDef)) {
+                    return null;
+                }
+                final SliceParametersList list = ((SliceMethodDef) SliceMethodElementImpl.this).getParametersList();
+                final String params;
+                if (list == null || list.getParameterList().isEmpty()) {
+                    params = "";
+                } else {
+                    params = list.getParameterList().stream().map(p -> p.getDataType().getText()).collect(Collectors.joining(", "));
+                }
+                return getName() + "(" + params + ")";
             }
 
             @Nullable
             @Override
             public String getLocationString() {
-                final FQN path = FQN.buildFQN(SliceDataTypeElementImpl.this).getPath();
+                final FQN path = FQN.buildFQN(SliceMethodElementImpl.this).getPath();
                 return path == null ? null : path.getFQN();
             }
 

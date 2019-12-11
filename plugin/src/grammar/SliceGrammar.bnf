@@ -99,6 +99,8 @@
 
     implements("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenidea.psi.SliceDataTypeElement"
     extends("class_def|interface_def|exception_def|enum_def|struct_def|sequence_def|dictionary_def")="org.xblackcat.frozenidea.psi.impl.SliceDataTypeElementImpl"
+    extends("method_def")="org.xblackcat.frozenidea.psi.impl.SliceMethodElementImpl"
+    implements("method_def")="org.xblackcat.frozenidea.psi.SliceMethodElement"
     implements(".*_def|module|enum_constant")="org.xblackcat.frozenidea.psi.SliceNamedElement"
     extends(".*_def|module|enum_constant")="org.xblackcat.frozenidea.psi.impl.SliceNamedElementImpl"
 }

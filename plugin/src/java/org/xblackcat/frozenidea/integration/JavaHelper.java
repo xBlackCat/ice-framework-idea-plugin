@@ -24,6 +24,8 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassRe
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.psi.impl.FQN;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,6 +73,10 @@ public class JavaHelper {
     @NotNull
     public List<String> getAnnotations(NavigatablePsiElement element) {
         return Collections.emptyList();
+    }
+
+    public String toJavaParameter(SliceDataType param) {
+        return null;
     }
 
     private static class Impl extends JavaHelper {
@@ -153,6 +159,35 @@ public class JavaHelper {
                 strings.add(annotation.getQualifiedName());
             }
             return strings;
+        }
+
+        @Override
+        public String toJavaParameter(SliceDataType param) {
+            final SliceTypeReference reference = param.getTypeReference();
+            if (reference == null) {
+                final String dataTypeText = param.getText();
+                if (dataTypeText.equals("string")) {
+                    return "java.lang.String";
+                } else {
+                    return dataTypeText;
+                }
+            } else {
+                final PsiElement element = reference.getReference().resolve();
+                if (element == null) {
+                    return null;
+                }
+                if (!(element instanceof SliceDataTypeElement)) {
+                    return null;
+                }
+                if (element instanceof SliceSequenceDef) {
+                    final SliceSequenceTypeList typeList = ((SliceSequenceDef) element).getSequenceTypeList();
+                    if (typeList == null) {
+                        return null;
+                    }
+                    return toJavaParameter(typeList.getElementType().getDataType()) + "[]";
+                }
+                return FQN.buildFQN((SliceNamedElement) element).getJavaFQN();
+            }
         }
     }
 }
