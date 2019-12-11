@@ -35,7 +35,7 @@ public class SliceFoldingBuilder extends FoldingBuilderEx implements DumbAware {
         List<FoldingDescriptor> result = new ArrayList<>();
 
 
-        return result.toArray(new FoldingDescriptor[result.size()]);
+        return result.toArray(new FoldingDescriptor[0]);
     }
 
     @Override

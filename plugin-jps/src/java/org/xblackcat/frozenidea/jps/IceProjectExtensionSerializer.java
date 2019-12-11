@@ -47,7 +47,7 @@ public class IceProjectExtensionSerializer extends JpsProjectExtensionSerializer
             }
         }
         if (homeUrl != null) {
-            iceConfig = new IceConfig(homeUrl, includes.toArray(new String[includes.size()]));
+            iceConfig = new IceConfig(homeUrl, includes.toArray(new String[0]));
         }
 
         jpsProject.getContainer().setChild(IceConfig.ROLE, iceConfig);

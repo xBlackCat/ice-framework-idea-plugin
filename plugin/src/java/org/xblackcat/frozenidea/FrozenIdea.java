@@ -91,7 +91,7 @@ public class FrozenIdea implements BaseComponent, PersistentStateComponent<Eleme
             }
         }
         if (homeUrl != null) {
-            iceConfig = new IceConfig(homeUrl, includes.toArray(new String[includes.size()]));
+            iceConfig = new IceConfig(homeUrl, includes.toArray(new String[0]));
         }
     }
 

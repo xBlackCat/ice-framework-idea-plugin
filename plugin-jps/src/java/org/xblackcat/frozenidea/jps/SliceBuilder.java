@@ -196,11 +196,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
                     final String fileName = file.getName();
 
                     if (fileName.endsWith(".ice") || fileName.endsWith(".slice")) {
-                        List<File> files = toCompile.get(target);
-                        if (files == null) {
-                            files = new ArrayList<>();
-                            toCompile.put(target, files);
-                        }
+                        List<File> files = toCompile.computeIfAbsent(target, k -> new ArrayList<>());
                         files.add(file);
                     }
                     return true;

@@ -71,6 +71,6 @@ class SliceEnumConstRefImpl extends PsiReferenceBase<SliceEnumConstantReference>
         }
 
         final List<SliceEnumConstant> list = constantList.getEnumConstantList();
-        return list.toArray(new PsiElement[list.size()]);
+        return list.toArray(new PsiElement[0]);
     }
 }

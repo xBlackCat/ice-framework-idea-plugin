@@ -34,7 +34,7 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
         for (PsiElement property : dataTypes) {
             results.add(new PsiElementResolveResult(property));
         }
-        return results.toArray(new ResolveResult[results.size()]);
+        return results.toArray(new ResolveResult[0]);
     }
 
     @Override
