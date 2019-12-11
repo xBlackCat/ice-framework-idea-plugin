@@ -23,7 +23,6 @@ import org.xblackcat.frozenidea.psi.*;
 
 import javax.swing.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,8 +30,8 @@ import java.util.stream.Stream;
  * Date: 14.07.11
  * Time: 20:04
  */
-public abstract class SliceMethodElementImpl extends SliceNamedElementImpl implements SliceMethodElement {
-    protected SliceMethodElementImpl(ASTNode node) {
+public abstract class SliceInnerElementImpl extends SliceNamedElementImpl implements SliceInnerElement {
+    protected SliceInnerElementImpl(ASTNode node) {
         super(node);
     }
 
@@ -43,14 +42,13 @@ public abstract class SliceMethodElementImpl extends SliceNamedElementImpl imple
 
     @Override
     public ItemPresentation getPresentation() {
+        if (!(SliceInnerElementImpl.this instanceof SliceMethodDef)) {
+            return super.getPresentation();
+        }
         return new ItemPresentation() {
-            @Nullable
             @Override
             public String getPresentableText() {
-                if (!(SliceMethodElementImpl.this instanceof SliceMethodDef)) {
-                    return null;
-                }
-                final SliceParametersList list = ((SliceMethodDef) SliceMethodElementImpl.this).getParametersList();
+                final SliceParametersList list = ((SliceMethodDef) SliceInnerElementImpl.this).getParametersList();
                 final String params;
                 if (list == null || list.getParameterList().isEmpty()) {
                     params = "";
@@ -63,7 +61,7 @@ public abstract class SliceMethodElementImpl extends SliceNamedElementImpl imple
             @Nullable
             @Override
             public String getLocationString() {
-                final FQN path = FQN.buildFQN(SliceMethodElementImpl.this).getPath();
+                final FQN path = FQN.buildFQN(SliceInnerElementImpl.this).getPath();
                 return path == null ? null : path.getFQN();
             }
 

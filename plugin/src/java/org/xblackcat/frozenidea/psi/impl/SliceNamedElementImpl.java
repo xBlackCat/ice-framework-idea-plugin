@@ -58,6 +58,30 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
     }
 
     @Override
+    public ItemPresentation getPresentation() {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return getName();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                final FQN path = FQN.buildFQN(SliceNamedElementImpl.this).getPath();
+                return path == null ? null : path.getFQN();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean unused) {
+                return getElementIcon(0);
+            }
+        };
+    }
+
+    @Override
     public PsiElement setName(@NonNls @NotNull String s) throws IncorrectOperationException {
 //    getId().replace(BnfElementFactory.createLeafFromText(getProject(), s));
         return this;
@@ -89,6 +113,8 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
         } else if (this instanceof SliceFieldDef) {
             return SliceIcons.FIELD_ICON;
         } else if (this instanceof SliceConstantDef) {
+            return SliceIcons.FIELD_ICON;
+        } else if (this instanceof SliceEnumConstant) {
             return SliceIcons.FIELD_ICON;
         } else if (this instanceof SliceClassDef) {
             return SliceIcons.CLASS_ICON;

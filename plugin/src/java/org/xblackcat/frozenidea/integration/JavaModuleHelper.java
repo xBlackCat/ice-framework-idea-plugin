@@ -25,12 +25,8 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassRe
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.psi.SliceDataType;
-import org.xblackcat.frozenidea.psi.SliceMethodDef;
-import org.xblackcat.frozenidea.psi.SliceParametersList;
-import org.xblackcat.frozenidea.psi.SliceTypeReference;
+import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.psi.impl.FQN;
-import org.xblackcat.frozenidea.psi.impl.SliceDataTypeImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -104,6 +100,10 @@ public class JavaModuleHelper {
         return null;
     }
 
+    public PsiElement findClassField(String className, String name) {
+        return null;
+    }
+
     private static class Impl extends JavaModuleHelper {
         private final JavaPsiFacade myFacade;
 
@@ -130,6 +130,16 @@ public class JavaModuleHelper {
         @Override
         public NavigationItem findPackage(String packageName) {
             return myFacade.findPackage(packageName);
+        }
+
+        @Override
+        public PsiElement findClassField(String className, String name) {
+            PsiClass aClass = findClass(className);
+            if (aClass == null) {
+                return null;
+            }
+
+            return aClass.findFieldByName(name, false);
         }
 
         @Override

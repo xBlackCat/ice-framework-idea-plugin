@@ -1,5 +1,5 @@
 package org.xblackcat.frozenidea.psi;
 
-public interface SliceMethodElement extends SliceNamedElement {
+public interface SliceInnerElement extends SliceNamedElement {
     SliceDataTypeElement getDeclarationType();
 }

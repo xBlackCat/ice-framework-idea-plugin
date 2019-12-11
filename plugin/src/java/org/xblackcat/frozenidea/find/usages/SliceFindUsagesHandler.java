@@ -3,13 +3,9 @@ package org.xblackcat.frozenidea.find.usages;
 import com.intellij.find.findUsages.AbstractFindUsagesDialog;
 import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.integration.JavaModuleHelper;
-import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
-import org.xblackcat.frozenidea.psi.SliceMethodDef;
-import org.xblackcat.frozenidea.psi.SliceModule;
-import org.xblackcat.frozenidea.psi.SliceParametersList;
+import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.psi.impl.FQN;
 
 /**
@@ -69,10 +65,30 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
             SliceMethodDef methodDef = (SliceMethodDef) element;
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(methodDef);
 
-            PsiElement javaClass = javaHelper.findClassMethod(methodDef);
-            if (javaClass != null) {
+            PsiElement javaMethod = javaHelper.findClassMethod(methodDef);
+            if (javaMethod != null) {
                 return new PsiElement[]{
-                        javaClass
+                        javaMethod
+                };
+            }
+        }  else if (element instanceof SliceFieldDef) {
+            SliceFieldDef fieldDef = (SliceFieldDef) element;
+            JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(fieldDef);
+
+            PsiElement javaField = javaHelper.findClassField(FQN.buildFQN(fieldDef.getDeclarationType()).getJavaFQN(), fieldDef.getName());
+            if (javaField != null) {
+                return new PsiElement[]{
+                        javaField
+                };
+            }
+        }  else if (element instanceof SliceEnumConstant) {
+            SliceEnumConstant fieldDef = (SliceEnumConstant) element;
+            JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(fieldDef);
+
+            PsiElement javaField = javaHelper.findClassField(FQN.buildFQN(fieldDef.getDeclarationType()).getJavaFQN(), fieldDef.getName());
+            if (javaField != null) {
+                return new PsiElement[]{
+                        javaField
                 };
             }
         }

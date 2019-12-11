@@ -39,29 +39,4 @@ public abstract class SliceDataTypeElementImpl extends SliceNamedElementImpl imp
     public SliceModule getModule() {
         return PsiTreeUtil.getParentOfType(this, SliceModule.class);
     }
-
-    @Override
-    public ItemPresentation getPresentation() {
-        return new ItemPresentation() {
-            @Nullable
-            @Override
-            public String getPresentableText() {
-                return getName();
-            }
-
-            @Nullable
-            @Override
-            public String getLocationString() {
-                final FQN path = FQN.buildFQN(SliceDataTypeElementImpl.this).getPath();
-                return path == null ? null : path.getFQN();
-            }
-
-            @Nullable
-            @Override
-            public Icon getIcon(boolean unused) {
-                return getElementIcon(0);
-            }
-        };
-    }
-
 }
