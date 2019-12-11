@@ -1,10 +1,10 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
-    <description>ICE framework support.</description>
+    <description>ZeroC ICE framework support - code generator and navigation</description>
     <version>0.1</version>
     <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
-    <idea-version since-build="145.1"/>
+    <idea-version since-build="193.1"/>
 
     <depends>com.intellij.modules.lang</depends>
 
@@ -34,7 +34,11 @@
     </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileTypeFactory implementation="org.xblackcat.frozenidea.IceFileTypeFactory"/>
+        <fileType implementationClass="org.xblackcat.frozenidea.IceFileType"
+                  language="SLICE"
+                  name="SLICE"
+                  extensions="ice;slice"
+                  fieldName="INSTANCE"/>
 
         <projectConfigurable instance="org.xblackcat.frozenidea.config.IceFrameworkConfigurable"
                              id="frozenidea"

@@ -84,6 +84,18 @@ public class SliceBuilder extends ModuleLevelBuilder {
             for (Target c : translators) {
                 final File outputDir = c.getOutputFile();
 
+                if (!outputDir.isDirectory() && !outputDir.mkdirs()) {
+                    context.processMessage(
+                            new CompilerMessage(
+                                    getPresentableName(),
+                                    BuildMessage.Kind.ERROR,
+                                    "Failed to create output directory " + outputDir.getAbsolutePath() + " for file output in module " + module.getName()
+                            )
+                    );
+                    return ExitCode.ABORT;
+                }
+
+
                 if (facetConfig.isCleanOutput()) {
                     try {
                         FileUtils.cleanDirectory(outputDir);
