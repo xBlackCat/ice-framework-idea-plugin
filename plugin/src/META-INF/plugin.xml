@@ -2,7 +2,7 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ZeroC ICE framework support - code generator and navigation</description>
-    <version>0.0.3.0</version>
+    <version>0.0.3.1</version>
     <vendor email="xblackcat@gmail.com" url="http://code.google.com/p/ice-framework-idea-plugin/">xBlackCat</vendor>
     <idea-version since-build="193.1"/>
 
@@ -24,6 +24,7 @@
             <li><b>0.0.2.5</b> - Fix language parser (constants in enum and JavaDoc like comments)</li>
             <li><b>0.0.2.6</b> - Fix translator for non-java languages. Fix warnings. Implement Color settings page for the language</li>
             <li><b>0.0.3.0</b> - Support latest versions of IntelliJ code base. Support only ZeroC ICE v3.7.x. Improve find usages in java code from ICE code (methods/fields/classes)
+            <li><b>0.0.3.1</b> - Fix method usages search
             </ul>]]>
     </change-notes>
 

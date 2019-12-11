@@ -8,10 +8,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="IDEA IU" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="RUNTIME" name="frozenidea-jps-plugin" level="project" />
-    <orderEntry type="module" module-name="plugin-jps" />
+    <orderEntry type="module" module-name="plugin-jps" scope="PROVIDED" />
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
@@ -21,5 +20,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" scope="RUNTIME" name="frozenidea-jps-plugin" level="project" />
   </component>
 </module>

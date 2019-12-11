@@ -168,6 +168,8 @@ public class JavaHelper {
                 final String dataTypeText = param.getText();
                 if (dataTypeText.equals("string")) {
                     return "java.lang.String";
+                } else if (dataTypeText.equals("bool")) {
+                    return "boolean";
                 } else {
                     return dataTypeText;
                 }
