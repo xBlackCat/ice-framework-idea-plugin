@@ -104,7 +104,7 @@ public abstract class SliceFindUsagesDialog<T extends SliceFindUsagesOptions> ex
     @Override
     protected boolean isInFileOnly() {
         return super.isInFileOnly() ||
-                myPsiElement != null && PsiSearchHelper.SERVICE.getInstance(myPsiElement.getProject()).getUseScope(
+                myPsiElement != null && PsiSearchHelper.getInstance(myPsiElement.getProject()).getUseScope(
                         myPsiElement
                 ) instanceof LocalSearchScope;
     }
@@ -125,6 +125,7 @@ public abstract class SliceFindUsagesDialog<T extends SliceFindUsagesOptions> ex
         HelpManager.getInstance().invokeHelp(FindUsagesManager.getHelpID(myPsiElement));
     }
 
+    @SuppressWarnings("unchecked")
     protected T getFindUsagesOptions() {
         return (T) myFindUsagesOptions;
     }

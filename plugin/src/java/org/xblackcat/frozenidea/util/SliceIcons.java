@@ -22,7 +22,8 @@ public interface SliceIcons {
     Icon PROPERTY_ICON = IconLoader.getIcon("/icons/property.png");
 
 
-    Icon TRANSLATED = IconLoader.getIcon("/actions/compile.png");
+    Icon TRANSLATED_JAVA_CLASS = IconLoader.getIcon("/icons/translateJavaClass.svg");
+    Icon TRANSLATED_JAVA_METHOD = IconLoader.getIcon("/icons/translateJavaMethod.svg");
     Icon IMPLEMENTED = IconLoader.getIcon("/gutter/implementedMethod.png");
     Icon IMPLEMENTING = IconLoader.getIcon("/gutter/implementingMethod.png");
     Icon OVERRIDDEN = IconLoader.getIcon("/gutter/overridenMethod.png");

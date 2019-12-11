@@ -1,11 +1,10 @@
 package org.xblackcat.frozenidea.config;
 
-import com.intellij.util.xmlb.annotations.AbstractCollection;
+import com.intellij.util.xmlb.annotations.XCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.JpsElementChildRole;
 import org.jetbrains.jps.model.ex.JpsElementBase;
 import org.jetbrains.jps.model.ex.JpsElementChildRoleBase;
-import org.jetbrains.jps.model.module.JpsModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +59,7 @@ public class SliceCompilerSettings extends JpsElementBase<SliceCompilerSettings>
         return result;
     }
 
-    @AbstractCollection(surroundWithTag = false, elementTypes = Target.class)
+    @XCollection(elementTypes = Target.class)
     public List<Target> getComponents() {
         return components;
     }

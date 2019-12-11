@@ -1,9 +1,7 @@
 package org.xblackcat.frozenidea.config;
 
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.SystemInfo;
 
-import javax.swing.*;
 import java.io.File;
 
 /**
@@ -12,22 +10,7 @@ import java.io.File;
  * @author xBlackCat
  */
 public enum IceComponent {
-    Java("slice2java", true, "/fileTypes/java.png") {
-        @Override
-        public File getLibraryPath(File home) {
-            File lib = new File(home, "lib");
-            if (!lib.isDirectory()) {
-                return null;
-            }
-
-            File iceLib = new File(lib, "Ice.jar");
-            if (!iceLib.isFile()) {
-                return null;
-            }
-
-            return iceLib;
-        }
-
+    Java("slice2java", "/fileTypes/java.png") {
         @Override
         public String extractPackageName(String text) {
             if (text != null && text.startsWith("java:package:")) {
@@ -47,22 +30,11 @@ public enum IceComponent {
     FreezeJ("slice2freezej", "/icons/types/slice.png");
 
     private final String translatorName;
-    private final boolean hasLibrary;
-    private final IconLoader.LazyIcon icon;
+    private final String iconName;
 
-    IceComponent(String translatorName, String iconName) {
-        this(translatorName, false, iconName);
-    }
-
-    IceComponent(String translatorName, boolean hasLibrary, final String iconName) {
+    IceComponent(String translatorName, final String iconName) {
         this.translatorName = translatorName;
-        this.hasLibrary = hasLibrary;
-        icon = new IconLoader.LazyIcon() {
-            @Override
-            protected Icon compute() {
-                return IconLoader.getIcon(iconName);
-            }
-        };
+        this.iconName = iconName;
     }
 
     public String getTranslatorName() {
@@ -74,10 +46,6 @@ public enum IceComponent {
         File translator = getTranslatorPath(home);
 
         if (!translator.canExecute()) {
-            return false;
-        }
-
-        if (hasLibrary && getLibraryPath(home) == null) {
             return false;
         }
 
@@ -100,7 +68,7 @@ public enum IceComponent {
         return null;
     }
 
-    public Icon getIcon() {
-        return icon;
+    public String getIconName() {
+        return iconName;
     }
 }

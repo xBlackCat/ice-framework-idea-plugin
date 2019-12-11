@@ -16,9 +16,15 @@
 
 package org.xblackcat.frozenidea.completion;
 
+import com.intellij.application.options.CodeStyle;
 import com.intellij.codeInsight.TailType;
+import com.intellij.lang.Language;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
+import com.intellij.psi.util.PsiUtilCore;
 
 /**
  * @author peter
@@ -45,6 +51,16 @@ public abstract class PointyBracketsTailType extends TailType {
             moveCaret(editor, tailOffset, -1);
         }
         return tailOffset;
+    }
+
+    protected static CommonCodeStyleSettings getLocalCodeStyleSettings(Editor editor, int tailOffset) {
+        final Project project = editor.getProject();
+        assert project != null;
+        final PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+        assert psiFile != null;
+        Language language = PsiUtilCore.getLanguageAtOffset(psiFile, tailOffset);
+
+        return CodeStyle.getLanguageSettings(psiFile, language);
     }
 
 }

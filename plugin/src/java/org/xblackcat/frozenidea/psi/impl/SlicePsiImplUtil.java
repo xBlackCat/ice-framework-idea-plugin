@@ -113,8 +113,7 @@ public class SlicePsiImplUtil {
     public static List<SliceNamedElement> searchElements(Project project, Predicate<SliceNamedElement> matcher) {
         List<SliceNamedElement> result = new ArrayList<>();
 
-        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(
-                FileTypeIndex.NAME,
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(
                 IceFileType.INSTANCE,
                 GlobalSearchScope.allScope(project)
         );

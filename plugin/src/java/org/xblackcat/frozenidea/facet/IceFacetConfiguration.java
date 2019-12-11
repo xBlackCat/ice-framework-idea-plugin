@@ -18,15 +18,13 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
-import com.intellij.openapi.util.InvalidDataException;
-import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.*;
 import com.intellij.ui.popup.PopupFactoryImpl;
 import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang.NotImplementedException;
-import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,10 +51,7 @@ import java.util.EnumSet;
 @State(
         name = "IceFacetConfiguration",
         storages = {
-                @Storage(
-                        id = "default",
-                        file = "$MODULE_FILE$"
-                )
+                @Storage("$MODULE_FILE$")
         }
 )
 public class IceFacetConfiguration implements FacetConfiguration, PersistentStateComponent<SliceCompilerSettings> {
@@ -71,16 +66,6 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
     }
 
     @Override
-    @Deprecated
-    public void readExternal(Element element) throws InvalidDataException {
-    }
-
-    @Override
-    @Deprecated
-    public void writeExternal(Element element) throws WriteExternalException {
-    }
-
-    @Override
     public SliceCompilerSettings getState() {
         return config;
     }
@@ -90,6 +75,15 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
         if (state != null) {
             config = state;
         }
+    }
+
+    private static Icon getIcon(IceComponent type) {
+        return new IconLoader.LazyIcon() {
+            @Override
+            protected Icon compute() {
+                return IconLoader.getIcon(type.getIconName());
+            }
+        };
     }
 
     private class IceFacetEditor extends FacetEditorTab {
@@ -178,7 +172,12 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                                 assert value != null;
 
                                 IceComponent type = (IceComponent) value;
-                                setIcon(type.getIcon());
+                                setIcon(new IconLoader.LazyIcon() {
+                                    @Override
+                                    protected Icon compute() {
+                                        return IconLoader.getIcon(type.getIconName());
+                                    }
+                                });
                                 append(type.name(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                             }
                         }
@@ -308,10 +307,11 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                 private final boolean enabled;
 
                 public CreateTargetAction(IceComponent type, boolean enabled) {
-                    super(type.name(), "", type.getIcon());
+                    super(type.name(), "", getIcon(type));
                     myType = type;
                     this.enabled = enabled;
                 }
+
 
                 @Override
                 public void update(AnActionEvent e) {
@@ -335,7 +335,5 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                 }
             }
         }
-
-
     }
 }

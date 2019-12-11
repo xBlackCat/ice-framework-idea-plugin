@@ -100,9 +100,9 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
         } else if (this instanceof SliceEnumDef) {
             return SliceIcons.ENUM_ICON;
         } else if (this instanceof SliceDictionaryDef) {
-            return AllIcons.Nodes.Advice;
+            return AllIcons.Nodes.Tag;
         } else if (this instanceof SliceSequenceDef) {
-            return AllIcons.Nodes.Advice;
+            return AllIcons.Nodes.Tag;
         }
 
         return super.getElementIcon(flags);

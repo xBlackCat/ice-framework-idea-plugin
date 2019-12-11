@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class SliceLanguage extends Language {
     public static SliceLanguage INSTANCE = new SliceLanguage();
 
-    public SliceLanguage() {
+    private SliceLanguage() {
         super("SLICE", "text/slice", "application/x-slice", "text/x-slice");
     }
 

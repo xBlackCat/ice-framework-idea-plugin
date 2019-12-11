@@ -6,7 +6,6 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.indexing.FileBasedIndex;
 import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
@@ -26,8 +25,9 @@ import java.util.List;
 public class SliceUtil {
     public static List<SliceDataTypeElement> findDataTypes(Project project, String fqn) {
         List<SliceDataTypeElement> result = null;
-        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, IceFileType.INSTANCE,
-                                                                                               GlobalSearchScope.allScope(project)
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(
+                IceFileType.INSTANCE,
+                GlobalSearchScope.allScope(project)
         );
         for (VirtualFile virtualFile : virtualFiles) {
             SliceFile simpleFile = (SliceFile) PsiManager.getInstance(project).findFile(virtualFile);
@@ -50,8 +50,9 @@ public class SliceUtil {
 
     public static List<SliceDataTypeElement> findDataTypes(Project project) {
         List<SliceDataTypeElement> result = new ArrayList<>();
-        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, IceFileType.INSTANCE,
-                                                                                               GlobalSearchScope.allScope(project)
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(
+                IceFileType.INSTANCE,
+                GlobalSearchScope.allScope(project)
         );
         for (VirtualFile virtualFile : virtualFiles) {
             SliceFile simpleFile = (SliceFile) PsiManager.getInstance(project).findFile(virtualFile);
@@ -66,8 +67,9 @@ public class SliceUtil {
     }
     public static List<SliceNamedElement> findNamedItems(Project project, String fqn) {
         List<SliceNamedElement> result = null;
-        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, IceFileType.INSTANCE,
-                                                                                               GlobalSearchScope.allScope(project)
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(
+                IceFileType.INSTANCE,
+                GlobalSearchScope.allScope(project)
         );
         for (VirtualFile virtualFile : virtualFiles) {
             SliceFile simpleFile = (SliceFile) PsiManager.getInstance(project).findFile(virtualFile);
@@ -90,8 +92,9 @@ public class SliceUtil {
 
     public static List<SliceNamedElement> findNamedItems(Project project) {
         List<SliceNamedElement> result = new ArrayList<>();
-        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, IceFileType.INSTANCE,
-                                                                                               GlobalSearchScope.allScope(project)
+        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(
+                IceFileType.INSTANCE,
+                GlobalSearchScope.allScope(project)
         );
         for (VirtualFile virtualFile : virtualFiles) {
             SliceFile simpleFile = (SliceFile) PsiManager.getInstance(project).findFile(virtualFile);

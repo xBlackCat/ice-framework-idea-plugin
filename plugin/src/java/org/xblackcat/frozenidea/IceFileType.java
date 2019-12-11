@@ -29,7 +29,7 @@ public class IceFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getDescription() {
-        return "ICE definition file";
+        return "ZeroC ICE definition file";
     }
 
     @NotNull

@@ -17,7 +17,6 @@ package org.xblackcat.frozenidea.find.usages;
 
 import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.find.findUsages.FindUsagesHandlerFactory;
-import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.ContainerUtil;
@@ -31,7 +30,7 @@ public class SliceFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
 
     public static SliceFindUsagesHandlerFactory getInstance(@NotNull Project project) {
         return ContainerUtil.findInstance(
-                Extensions.getExtensions(EP_NAME, project),
+                EP_NAME.getExtensions(project),
                 SliceFindUsagesHandlerFactory.class
         );
     }

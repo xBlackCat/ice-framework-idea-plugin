@@ -132,7 +132,7 @@ public class SliceHelper {
         if (module == null) {
             return null;
         }
-        final String implFQN = buildFQN("_" + name + "Operations", module);
+        final String implFQN = buildFQN(name, module);
 
         return checkJavaClass(element, implFQN);
     }

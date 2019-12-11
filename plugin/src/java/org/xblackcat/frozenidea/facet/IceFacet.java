@@ -116,7 +116,7 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                     JavaPsiFacade facade = JavaPsiFacade.getInstance(project);
 
                     final GlobalSearchScope allLibraryScope = getModule().getModuleWithDependenciesAndLibrariesScope(false);
-                    PsiClass iceClass = facade.findClass("Ice.Object", allLibraryScope);
+                    PsiClass iceClass = facade.findClass("com.zeroc.Ice.Object", allLibraryScope);
 
                     if (iceClass == null) {
                         // No class found!

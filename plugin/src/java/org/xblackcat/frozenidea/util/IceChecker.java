@@ -1,8 +1,8 @@
 package org.xblackcat.frozenidea.util;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
-import org.apache.sanselan.util.IOUtils;
 import org.xblackcat.frozenidea.FrozenIdea;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.config.IceConfig;
@@ -48,9 +48,9 @@ public class IceChecker {
 
             byte[] stdOut;
             try (InputStream stdOutIS = process.getErrorStream()) {
-                stdOut = IOUtils.getInputStreamBytes(stdOutIS);
+                stdOut = FileUtil.loadBytes(stdOutIS);
             }
-            if (stdOut == null || stdOut.length == 0) {
+            if (stdOut.length == 0) {
                 return null;
             }
 

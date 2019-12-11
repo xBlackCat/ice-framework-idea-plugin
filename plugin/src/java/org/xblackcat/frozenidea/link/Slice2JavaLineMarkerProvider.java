@@ -58,7 +58,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         }
 
         if (!items.isEmpty()) {
-            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.TRANSLATED).
+            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.TRANSLATED_JAVA_CLASS).
                     setTargets(items).setTooltipText("Used");
             result.add(builder.createLineMarkerInfo(element));
         }
@@ -102,7 +102,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
         if (!items.isEmpty()) {
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
-                    .create(SliceIcons.TRANSLATED)
+                    .create(SliceIcons.TRANSLATED_JAVA_METHOD)
                     .setTargets(items)
                     .setTooltipText("Used");
             result.add(builder.createLineMarkerInfo(element));
