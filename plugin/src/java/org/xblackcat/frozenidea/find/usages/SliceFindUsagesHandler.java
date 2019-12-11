@@ -15,20 +15,10 @@ import org.xblackcat.frozenidea.psi.impl.FQN;
  */
 public class SliceFindUsagesHandler extends FindUsagesHandler {
     private final SliceFindUsagesHandlerFactory factory;
-    private final PsiElement[] myElementsToSearch;
 
     public SliceFindUsagesHandler(@NotNull PsiElement psiElement, SliceFindUsagesHandlerFactory factory) {
-        this(psiElement, PsiElement.EMPTY_ARRAY, factory);
-    }
-
-    public SliceFindUsagesHandler(
-            @NotNull PsiElement psiElement,
-            @NotNull PsiElement[] elementsToSearch,
-            SliceFindUsagesHandlerFactory factory
-    ) {
         super(psiElement);
         this.factory = factory;
-        myElementsToSearch = elementsToSearch;
     }
 
     @NotNull
@@ -57,7 +47,7 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
 
     @NotNull
     @Override
-    public PsiElement[] getPrimaryElements() {
+    public PsiElement[] getSecondaryElements() {
         PsiElement element = getPsiElement();
 
         if (element instanceof SliceDataTypeElement) {
@@ -68,12 +58,10 @@ public class SliceFindUsagesHandler extends FindUsagesHandler {
             PsiElement javaClass = javaHelper.findClass(FQN.buildFQN(classDef).getJavaFQN());
             if (javaClass != null) {
                 return new PsiElement[]{
-                        element,
                         javaClass
                 };
             }
         }
-
-        return myElementsToSearch.length == 0 ? new PsiElement[]{element} : myElementsToSearch;
+        return super.getSecondaryElements();
     }
 }

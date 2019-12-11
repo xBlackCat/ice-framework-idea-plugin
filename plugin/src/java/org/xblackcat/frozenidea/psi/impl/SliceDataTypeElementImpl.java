@@ -17,8 +17,11 @@ package org.xblackcat.frozenidea.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
 import org.xblackcat.frozenidea.psi.SliceModule;
+
+import javax.swing.*;
 
 /**
  * Created by IntelliJ IDEA.

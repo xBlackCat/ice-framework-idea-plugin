@@ -1,7 +1,10 @@
 package org.xblackcat.frozenidea.psi.impl;
 
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.xblackcat.frozenidea.config.IceComponent;
+import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.SliceModule;
 import org.xblackcat.frozenidea.psi.SliceNamedElement;
 import org.xblackcat.frozenidea.psi.SliceTypeReference;
@@ -19,7 +22,7 @@ import java.util.StringJoiner;
 public class FQN {
     public static FQN buildFQN(String ref, @NotNull SliceModule module) {
         if (ref.contains("::")) {
-            return new FQN(ref.split("::"));
+            return new FQN(module.getContainingFile(), ref.split("::"));
         } else {
             Deque<String> fqn = new ArrayDeque<>(10);
             fqn.addFirst(ref);
@@ -30,7 +33,7 @@ public class FQN {
                 m = PsiTreeUtil.getParentOfType(m, SliceModule.class);
             } while (m != null);
 
-            return new FQN(fqn.toArray(new String[0]));
+            return new FQN(module.getContainingFile(), fqn.toArray(new String[0]));
         }
     }
 
@@ -40,10 +43,10 @@ public class FQN {
             final String[] elements = text.split("::");
             final String[] copy = Arrays.copyOf(elements, elements.length + 1);
             copy[copy.length - 1] = ref.getId().getText();
-            return new FQN(elements);
+            return new FQN(ref.getContainingFile(), copy);
         }
 
-        return new FQN(ref.getId().getText());
+        return new FQN(ref.getContainingFile(), ref.getId().getText());
     }
 
     public static FQN buildFQN(SliceNamedElement element) {
@@ -56,12 +59,14 @@ public class FQN {
             m = PsiTreeUtil.getParentOfType(m, SliceModule.class);
         }
 
-        return new FQN(fqn.toArray(new String[0]));
+        return new FQN(element.getContainingFile(), fqn.toArray(new String[0]));
     }
 
+    private final PsiFile psiFile;
     private final String[] elements;
 
-    private FQN(String... elements) {
+    private FQN(PsiFile psiFile, String... elements) {
+        this.psiFile = psiFile;
         this.elements = elements;
     }
 
@@ -99,7 +104,12 @@ public class FQN {
     }
 
     public String getJavaFQN() {
-        return String.join(".", elements);
+        final String packageName = SliceHelper.getPackageName(psiFile, IceComponent.Java);
+        if (packageName != null && !packageName.isEmpty()) {
+            return packageName + "." + String.join(".", elements);
+        } else {
+            return String.join(".", elements);
+        }
     }
 
     @Override
@@ -128,7 +138,7 @@ public class FQN {
         if (elements.length == 1) {
             return null;
         }
-        return new FQN(getModules());
+        return new FQN(psiFile, getModules());
     }
 
     public String getPathString() {
