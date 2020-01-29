@@ -47,13 +47,13 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             SliceDataTypeElement element
     ) {
         List<PsiElement> items = new ArrayList<>();
-        PsiClass classImplClass = SliceHelper.searchImplementation(element);
+        List<PsiClass> classes = SliceHelper.searchGeneratedJavaClasses(element);
 
-        if (classImplClass != null) {
+        for (PsiClass classImplClass : classes) {
             if (!forNavigation || visited.add(element)) {
                 // Search for implementations
-                final Collection<PsiClass> classes = ClassInheritorsSearch.search(classImplClass, true).findAll();
-                items.addAll(filterGeneratedClasses(classes, element));
+                final Collection<PsiClass> found = ClassInheritorsSearch.search(classImplClass, true).findAll();
+                items.addAll(filterGeneratedClasses(found, element));
             }
         }
 
@@ -82,18 +82,18 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         }
 
         final SliceDataTypeElement typeElement = (SliceDataTypeElement) type;
-        PsiClass implClass = SliceHelper.searchImplementation(typeElement);
+        List<PsiClass> classes = SliceHelper.searchGeneratedJavaClasses(typeElement);
 
-        if (implClass != null) {
+        for (PsiClass implClass : classes) {
             if (!forNavigation || visited.add(element)) {
                 final PsiMethod[] m = implClass.findMethodsByName(element.getName(), false);
                 if (m.length != 0) {
                     PsiMethod baseMethod = m[0];
 
                     // Search for implementations
-                    Collection<PsiClass> classes = ClassInheritorsSearch.search(implClass, true).findAll();
+                    Collection<PsiClass> javaClasses = ClassInheritorsSearch.search(implClass, true).findAll();
 
-                    for (PsiClass clazz : filterGeneratedClasses(classes, typeElement)) {
+                    for (PsiClass clazz : filterGeneratedClasses(javaClasses, typeElement)) {
                         Collections.addAll(items, clazz.findMethodsBySignature(baseMethod, false));
                     }
                 }
@@ -145,9 +145,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
                     continue;
                 }
 
-                if (clazzName.equals("_" + name + "Operations") ||
-                    clazzName.equals(name) ||
-                    clazzName.equals("_" + name + "Disp")) {
+                if (clazzName.equals(name + "Disp")) {
                     items.remove(clazz);
                 }
             }

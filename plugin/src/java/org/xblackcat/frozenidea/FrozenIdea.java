@@ -1,9 +1,10 @@
 package org.xblackcat.frozenidea;
 
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import org.apache.commons.lang.StringUtils;
 import org.jdom.Element;
-import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.config.IceConfig;
 import org.xblackcat.frozenidea.jps.IceProjectExtensionSerializer;
 
@@ -18,30 +19,8 @@ import java.util.List;
         storages = @Storage(IceProjectExtensionSerializer.CONFIG_FILE_NAME)
 
 )
-public class FrozenIdea implements BaseComponent, PersistentStateComponent<Element>, ProjectComponent {
+public class FrozenIdea implements PersistentStateComponent<Element> {
     private IceConfig iceConfig;
-
-    public FrozenIdea() {
-    }
-
-    public void initComponent() {
-    }
-
-    public void disposeComponent() {
-    }
-
-    @NotNull
-    public String getComponentName() {
-        return "FrozenIdea";
-    }
-
-    @Override
-    public void projectOpened() {
-    }
-
-    @Override
-    public void projectClosed() {
-    }
 
     @Override
     public Element getState() {

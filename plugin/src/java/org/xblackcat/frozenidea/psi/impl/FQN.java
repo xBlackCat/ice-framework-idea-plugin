@@ -1,8 +1,11 @@
 package org.xblackcat.frozenidea.psi.impl;
 
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.SliceModule;
@@ -62,6 +65,15 @@ public class FQN {
         return new FQN(element.getContainingFile(), fqn.toArray(new String[0]));
     }
 
+    @Nullable
+    public static FQN buildFQN(@NotNull PsiClass javaPsiClass) {
+        final String qualifiedName = javaPsiClass.getQualifiedName();
+        if (qualifiedName == null) {
+            return null;
+        }
+        return new FQN(null, StringUtil.split(qualifiedName, ".").toArray(new String[0]));
+    }
+
     private final PsiFile psiFile;
     private final String[] elements;
 
@@ -76,6 +88,12 @@ public class FQN {
 
     public String getName() {
         return elements[elements.length - 1];
+    }
+
+    public FQN withNewName(String newName) {
+        final FQN fqn = new FQN(psiFile, elements.clone());
+        fqn.elements[fqn.elements.length - 1] = newName;
+        return fqn;
     }
 
     public boolean startWith(FQN path) {

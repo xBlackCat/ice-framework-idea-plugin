@@ -30,7 +30,7 @@ public class IceMessages {
     private static Reference<ResourceBundle> ourBundle;
 
     @NonNls
-    private static final String BUNDLE = "messages.IceErrorMessages";
+    private static final String BUNDLE = "messages.IceMessages";
 
     private IceMessages() {
     }

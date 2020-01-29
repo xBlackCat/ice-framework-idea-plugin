@@ -4,6 +4,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NotNullLazyKey;
 import com.intellij.psi.search.GlobalSearchScope;
+import org.xblackcat.frozenidea.psi.impl.FQN;
 
 /**
  * 10.09.13 10:06
@@ -19,7 +20,7 @@ public abstract class SlicePsiFacade {
         return INSTANCE_KEY.getValue(project);
     }
 
-    public abstract SliceDataTypeElement findClass(String className, GlobalSearchScope globalSearchScope);
+    public abstract SliceDataTypeElement findClass(FQN className, GlobalSearchScope globalSearchScope);
 
     protected abstract Project getProject();
 

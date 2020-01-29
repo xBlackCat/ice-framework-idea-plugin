@@ -101,7 +101,7 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
 
         @Override
         public void run() {
-            final FrozenIdea plugin = project.getComponent(FrozenIdea.class);
+            final FrozenIdea plugin = project.getService(FrozenIdea.class);
 
             if (plugin == null) {
                 // How it could be??

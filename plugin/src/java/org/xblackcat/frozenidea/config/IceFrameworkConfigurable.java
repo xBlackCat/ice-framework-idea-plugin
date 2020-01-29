@@ -59,7 +59,7 @@ public class IceFrameworkConfigurable extends BaseConfigurable implements Search
     @Override
     public JComponent createComponent() {
         if (configForm == null) {
-            final FrozenIdea plugin = project.getComponent(FrozenIdea.class);
+            final FrozenIdea plugin = project.getService(FrozenIdea.class);
             configForm = new IceFrameworkConfigForm(plugin);
         }
 

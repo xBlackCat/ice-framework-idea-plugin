@@ -10,9 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.psi.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 14.06.12 16:23
@@ -32,6 +30,9 @@ public class SliceHelper {
     }
 
     public static String getPackageName(PsiFile file, IceComponent target) {
+        if (file == null) {
+            return null;
+        }
         List<SliceGlobalMetadata> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(
                 file,
                 SliceGlobalMetadata.class
@@ -113,28 +114,38 @@ public class SliceHelper {
         return module;
     }
 
-    public static PsiClass searchImplementation(SliceDataTypeElement element) {
+    public static List<PsiClass> searchGeneratedJavaClasses(SliceDataTypeElement element) {
         if (element == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         final PsiElement id = element.getId();
         if (id == null) {
-            return null;
+            return Collections.emptyList();
         }
         String name = id.getText();
 
         if (name == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         SliceModule module = getContainerSliceModule(element);
         if (module == null) {
-            return null;
+            return Collections.emptyList();
         }
-        final String implFQN = buildFQN(name, module);
 
-        return checkJavaClass(element, implFQN);
+        List<PsiClass> result = new ArrayList<>();
+        final PsiClass javaClass = checkJavaClass(element, buildFQN(name, module));
+        if (javaClass != null) {
+            result.add(javaClass);
+        }
+
+        final PsiClass javaDispClass = checkJavaClass(element, buildFQN(name + "Disp", module));
+        if (javaDispClass != null) {
+            result.add(javaDispClass);
+        }
+
+        return result;
     }
 
     private static PsiClass checkJavaClass(SliceDataTypeElement element, String implFQN) {

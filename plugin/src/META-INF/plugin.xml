@@ -25,15 +25,9 @@
             <li><b>0.0.2.6</b> - Fix translator for non-java languages. Fix warnings. Implement Color settings page for the language</li>
             <li><b>0.0.3.0</b> - Support latest versions of IntelliJ code base. Support only ZeroC ICE v3.7.x. Improve find usages in java code from ICE code (methods/fields/classes)
             <li><b>0.0.3.1</b> - Fix method usages search
+            <li><b>0.0.3.2</b> - Java-to-slice gutter icons were added. Use vector icons.
             </ul>]]>
     </change-notes>
-
-    <project-components>
-        <component>
-            <loadForDefaultProject>true</loadForDefaultProject>
-            <implementation-class>org.xblackcat.frozenidea.FrozenIdea</implementation-class>
-        </component>
-    </project-components>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType implementationClass="org.xblackcat.frozenidea.IceFileType"
@@ -42,6 +36,7 @@
                   extensions="ice;slice"
                   fieldName="INSTANCE"/>
 
+        <projectService serviceImplementation="org.xblackcat.frozenidea.FrozenIdea"/>
         <projectConfigurable instance="org.xblackcat.frozenidea.config.IceFrameworkConfigurable"
                              id="frozenidea"
                              parentId="project.propCompiler"
@@ -87,6 +82,8 @@
                        serviceImplementation="org.xblackcat.frozenidea.integration.JavaModuleHelper$Impl"/>
         <codeInsight.lineMarkerProvider language="SLICE"
                                         implementationClass="org.xblackcat.frozenidea.link.Slice2JavaLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA"
+                                        implementationClass="org.xblackcat.frozenidea.link.Java2SliceLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="SLICE"
                                         implementationClass="org.xblackcat.frozenidea.link.SliceLineMarkerProvider"/>
     </extensions>

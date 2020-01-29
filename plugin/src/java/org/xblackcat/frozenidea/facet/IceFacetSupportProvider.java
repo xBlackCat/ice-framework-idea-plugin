@@ -34,7 +34,7 @@ public class IceFacetSupportProvider extends FacetBasedFrameworkSupportProvider<
     public boolean isSupportAlreadyAdded(@NotNull Module module) {
         com.intellij.openapi.project.Project project = module.getProject();
 
-        JavaPsiFacade facade = project.getComponent(JavaPsiFacade.class);
+        JavaPsiFacade facade = project.getService(JavaPsiFacade.class);
 
         PsiClass iceClass = facade.findClass("Ice.Object", module.getModuleWithDependenciesAndLibrariesScope(false));
 

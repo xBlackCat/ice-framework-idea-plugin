@@ -25,6 +25,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.psi.impl.FQN;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +66,7 @@ public class SliceModuleHelper {
     }
 
     @Nullable
-    public PsiElement findClass(String className) {
+    public PsiElement findClass(FQN className) {
         return null;
     }
 
@@ -75,12 +76,12 @@ public class SliceModuleHelper {
     }
 
     @Nullable
-    public SliceMethodDef findClassMethod(String className, String methodName, int paramCount) {
+    public SliceMethodDef findClassMethod(FQN className, String methodName, int paramCount) {
         return null;
     }
 
     @NotNull
-    public List<NavigatablePsiElement> getClassMethods(String className, boolean staticMethods) {
+    public List<NavigatablePsiElement> getClassMethods(FQN className, boolean staticMethods) {
         return Collections.emptyList();
     }
 
@@ -110,7 +111,7 @@ public class SliceModuleHelper {
         }
 
         @Override
-        public SliceDataTypeElement findClass(String className) {
+        public SliceDataTypeElement findClass(FQN className) {
             if (className == null) {
                 return null;
             }
@@ -123,7 +124,7 @@ public class SliceModuleHelper {
         }
 
         @Override
-        public SliceMethodDef findClassMethod(String className, String methodName, int paramCount) {
+        public SliceMethodDef findClassMethod(FQN className, String methodName, int paramCount) {
             SliceDataTypeElement aClass = findClass(className);
             if (aClass == null) {
                 return null;
@@ -175,7 +176,7 @@ public class SliceModuleHelper {
 
         @NotNull
         @Override
-        public List<NavigatablePsiElement> getClassMethods(String className, boolean staticMethods) {
+        public List<NavigatablePsiElement> getClassMethods(FQN className, boolean staticMethods) {
             SliceDataTypeElement aClass = findClass(className);
             if (aClass == null) return Collections.emptyList();
             final ArrayList<NavigatablePsiElement> result = new ArrayList<>();

@@ -171,14 +171,13 @@ public class SliceFoldingBuilder extends FoldingBuilderEx implements DumbAware {
                 list.add(new FoldingDescriptor(elementToFold, range));
                 return true;
             }
-            return false;
         } else {
             if (range.getLength() > 3) {
                 list.add(new FoldingDescriptor(elementToFold, range));
                 return true;
             }
-            return false;
         }
+        return false;
     }
 
 }
