@@ -196,4 +196,12 @@ public class SlicePsiImplUtil {
             }
         };
     }
+
+    public static int getParametersCount(SliceMethodDef parametersList) {
+        final SliceParametersList list = parametersList.getParametersList();
+        if (list == null) {
+            return 0;
+        }
+        return list.getParameterList().size();
+    }
 }

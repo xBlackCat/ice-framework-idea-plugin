@@ -8,9 +8,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.integration.SliceHelper;
-import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
-import org.xblackcat.frozenidea.psi.SliceFile;
-import org.xblackcat.frozenidea.psi.SliceNamedElement;
+import org.xblackcat.frozenidea.psi.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,6 +63,7 @@ public class SliceUtil {
         }
         return result;
     }
+
     public static List<SliceNamedElement> findNamedItems(Project project, String fqn) {
         List<SliceNamedElement> result = null;
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(
@@ -106,5 +105,25 @@ public class SliceUtil {
             }
         }
         return result;
+    }
+
+    public static List<SliceMethodDef> getMethodList(SliceDataTypeElement aClass) {
+        if (aClass instanceof SliceClassDef) {
+            final SliceClassBody body = ((SliceClassDef) aClass).getClassBody();
+            if (body != null) {
+                return body.getMethodDefList();
+            } else {
+                return null;
+            }
+        } else if (aClass instanceof SliceInterfaceDef) {
+            final SliceInterfaceBody body = ((SliceInterfaceDef) aClass).getInterfaceBody();
+            if (body != null) {
+                return body.getMethodDefList();
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

@@ -15,10 +15,12 @@ import com.intellij.util.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.integration.SliceModuleHelper;
+import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
 import org.xblackcat.frozenidea.psi.SliceMethodDef;
 import org.xblackcat.frozenidea.psi.impl.FQN;
 import org.xblackcat.frozenidea.util.IceMessages;
 import org.xblackcat.frozenidea.util.SliceIcons;
+import org.xblackcat.frozenidea.util.SliceUtil;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -50,44 +52,22 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
 
             PsiMethod method = (PsiMethod) parent;
 
+            final int parametersCount = method.getParameterList().getParametersCount() - 1;
+            if (parametersCount < 0) {
+                return null;
+            }
             List<PsiElement> targets = new ArrayList<>();
 
+            List<SliceDataTypeElement> sliceClasses = searchSliceClasses(method.getContainingClass(), sliceHelper);
 
-            for (
-                    MethodSignatureBackedByPsiMethod superSignature = SuperMethodsSearch.search(method, null, true, false).findFirst();
-                    superSignature != null;
-                    superSignature = SuperMethodsSearch.search(superSignature.getMethod(), null, true, false).findFirst()
-            ) {
-                final PsiClass containingClass = superSignature.getMethod().getContainingClass();
-                if (containingClass == null) {
-                    continue;
-                }
-                final FQN fqn = FQN.buildFQN(containingClass);
-                if (fqn == null) {
-                    continue;
-                }
-                final int parametersCount = method.getParameterList().getParametersCount();
-                if (parametersCount == 0) {
-                    continue;
-                }
-                final String name = fqn.getName();
-                if (name.endsWith("Disp")) {
-                    final SliceMethodDef sliceMethod = sliceHelper.findClassMethod(
-                            fqn.withNewName(name.substring(0, name.length() - 4)),
-                            method.getName(),
-                            parametersCount - 1
-                    );
-
-                    if (sliceMethod != null) {
+            for (SliceDataTypeElement e : sliceClasses) {
+                for (SliceMethodDef sliceMethod : SliceUtil.getMethodList(e)) {
+                    if (method.getName().equals(sliceMethod.getName()) && parametersCount == sliceMethod.getParametersCount()) {
                         targets.add(sliceMethod);
                     }
                 }
-                final SliceMethodDef sliceMethod = sliceHelper.findClassMethod(fqn, method.getName(), parametersCount - 1);
-
-                if (sliceMethod != null) {
-                    targets.add(sliceMethod);
-                }
             }
+
             if (targets.isEmpty()) {
                 return null;
             }
@@ -101,16 +81,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
                 return null;
             }
 
-            List<PsiElement> targets = new ArrayList<>();
-            Set<PsiElement> visited = new HashSet<>();
-
-            for (
-                    PsiClass targetClass = (PsiClass) parent;
-                    targetClass != null;
-                    targetClass = targetClass.getSuperClass()
-            ) {
-                searchReferences(sliceHelper, targets, visited, targetClass);
-            }
+            List<SliceDataTypeElement> targets = searchSliceClasses((PsiClass) parent, sliceHelper);
 
             if (targets.isEmpty()) {
                 return null;
@@ -125,13 +96,33 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
         return null;
     }
 
-    private void searchReferences(SliceModuleHelper sliceHelper, List<PsiElement> targets, Set<PsiElement> visited, PsiClass targetClass) {
+    @NotNull
+    private List<SliceDataTypeElement> searchSliceClasses(PsiClass parent, SliceModuleHelper sliceHelper) {
+        List<SliceDataTypeElement> targets = new ArrayList<>();
+        Set<PsiElement> visited = new HashSet<>();
+
+        for (
+                PsiClass targetClass = parent;
+                targetClass != null;
+                targetClass = targetClass.getSuperClass()
+        ) {
+            searchReferences(sliceHelper, targets, visited, targetClass);
+        }
+        return targets;
+    }
+
+    private void searchReferences(
+            SliceModuleHelper sliceHelper,
+            List<SliceDataTypeElement> targets,
+            Set<PsiElement> visited,
+            PsiClass targetClass
+    ) {
         if (!visited.add(targetClass)) {
             return;
         }
         final FQN fqn = FQN.buildFQN(targetClass);
         if (fqn != null) {
-            final PsiElement sliceClass = sliceHelper.findClass(fqn);
+            final SliceDataTypeElement sliceClass = sliceHelper.findClass(fqn);
 
             if (sliceClass != null) {
                 targets.add(sliceClass);
@@ -139,7 +130,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
 
             final String name = fqn.getName();
             if (name.endsWith("Disp")) {
-                final PsiElement sliceClassDisp = sliceHelper.findClass(fqn.withNewName(name.substring(0, name.length() - 4)));
+                final SliceDataTypeElement sliceClassDisp = sliceHelper.findClass(fqn.withNewName(name.substring(0, name.length() - 4)));
 
                 if (sliceClassDisp != null) {
                     targets.add(sliceClassDisp);
@@ -147,9 +138,9 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
 
             }
 
-            for (PsiClass i : targetClass.getInterfaces()) {
-                searchReferences(sliceHelper, targets, visited, i);
-            }
+        }
+        for (PsiClass i : targetClass.getInterfaces()) {
+            searchReferences(sliceHelper, targets, visited, i);
         }
     }
 

@@ -8,7 +8,10 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.xblackcat.frozenidea.IceFileType;
+import org.xblackcat.frozenidea.config.IceComponent;
+import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.*;
 
 import java.util.ArrayList;
@@ -39,8 +42,18 @@ public class SlicePsiFacadeImpl extends SlicePsiFacade {
         for (VirtualFile virtualFile : virtualFiles) {
             SliceFile sliceFile = (SliceFile) PsiManager.getInstance(myProject).findFile(virtualFile);
             if (sliceFile != null) {
+                final String javaPackageName = SliceHelper.getPackageName(sliceFile, IceComponent.Java);
+                int idx = 0;
+                if (javaPackageName != null) {
+                    final String[] path = StringUtils.split(javaPackageName, ".");
+                    if (!className.startWith(path)) {
+                        continue;
+                    }
+                    idx = path.length;
+                }
+
                 final String[] modules = className.getModules();
-                final PsiElement module = findModule(sliceFile, modules, 0);
+                final PsiElement module = findModule(sliceFile, modules, idx);
                 if (module != null) {
                     final SliceDataTypeElement[] types = PsiTreeUtil.getChildrenOfType(module, SliceDataTypeElement.class);
                     if (types != null) {

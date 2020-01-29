@@ -97,13 +97,17 @@ public class FQN {
     }
 
     public boolean startWith(FQN path) {
-        if (path.elements.length >= elements.length) {
+        return startWith(path.elements);
+    }
+
+    public boolean startWith(String[] path) {
+        if (path.length >= this.elements.length) {
             return false;
         }
 
-        int i = path.elements.length - 1;
+        int i = path.length - 1;
         while (i >= 0) {
-            if (!path.elements[i].equals(elements[i])) {
+            if (!path[i].equals(this.elements[i])) {
                 return false;
             }
             i--;

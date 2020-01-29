@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.psi.impl.FQN;
+import org.xblackcat.frozenidea.util.SliceUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,7 +67,7 @@ public class SliceModuleHelper {
     }
 
     @Nullable
-    public PsiElement findClass(FQN className) {
+    public SliceDataTypeElement findClass(FQN className) {
         return null;
     }
 
@@ -115,7 +116,7 @@ public class SliceModuleHelper {
             if (className == null) {
                 return null;
             }
-            return myFacade.findClass(className, GlobalSearchScope.moduleScope(module));
+            return myFacade.findClass(className, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module));
         }
 
         @Override
@@ -130,7 +131,7 @@ public class SliceModuleHelper {
                 return null;
             }
 
-            final List<SliceMethodDef> methods = getMethodList(methodName, aClass);
+            final List<SliceMethodDef> methods = SliceUtil.getMethodList(aClass);
             if (methods == null) {
                 return null;
             }
@@ -152,26 +153,6 @@ public class SliceModuleHelper {
                 }
             }
             return !methods.isEmpty() ? methods.get(0) : null;
-        }
-
-        private static List<SliceMethodDef> getMethodList(String methodName, SliceDataTypeElement aClass) {
-            if (aClass instanceof SliceClassDef) {
-                final SliceClassBody body = ((SliceClassDef) aClass).getClassBody();
-                if (body != null) {
-                    return body.getMethodDefList();
-                } else {
-                    return null;
-                }
-            } else if (aClass instanceof SliceInterfaceDef) {
-                final SliceInterfaceBody body = ((SliceInterfaceDef) aClass).getInterfaceBody();
-                if (body != null) {
-                    return body.getMethodDefList();
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
         }
 
         @NotNull

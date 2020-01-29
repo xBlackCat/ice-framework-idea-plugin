@@ -219,7 +219,7 @@ data_type ::= proxy_type | type_reference | primitive_data_types | simple_data_t
 modifier ::= 'idempotent' | 'local'
 method_return_type ::= data_type | 'void'
 
-method_def ::= metadata* modifier* method_return_type id '(' parameters_list ')' (throws_def)? ';' {pin=5}
+method_def ::= metadata* modifier* method_return_type id '(' parameters_list ')' (throws_def)? ';' {pin=5 methods = [getParametersCount]}
 throws_def ::= 'throws' throws_list {pin=1}
 throws_list ::= type_reference (',' type_reference) * {recoverWhile=throws_list_recovery}
 private throws_list_recovery ::= !(';' | '{')
