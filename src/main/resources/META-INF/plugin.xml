@@ -29,7 +29,8 @@
         <facetType implementation="org.xblackcat.frozenidea.facet.IceFacetType"/>
 
         <colorSettingsPage implementation="org.xblackcat.frozenidea.highlight.SliceColorSettingsPage"/>
-        <lang.syntaxHighlighterFactory implementationClass="org.xblackcat.frozenidea.highlight.SliceSyntaxHighlighterFactory" language="SLICE"/>
+        <lang.syntaxHighlighterFactory implementationClass="org.xblackcat.frozenidea.highlight.SliceSyntaxHighlighterFactory"
+                                       language="SLICE"/>
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceParserDefinition"/>
         <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceBraceMatcher"/>
         <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceFoldingBuilder"/>
@@ -47,7 +48,9 @@
                                  implementationClass="org.xblackcat.frozenidea.findUsages.slice.SliceFindUsagesProvider"/>
 
         <quoteHandler fileType="SLICE" className="org.xblackcat.frozenidea.SliceQuoteHandler"/>
-        <completion.contributor language="SLICE" implementationClass="org.xblackcat.frozenidea.completion.SliceBasicCompletionContributor" id="sliceBasic"/>
+        <completion.contributor language="SLICE"
+                                implementationClass="org.xblackcat.frozenidea.completion.SliceBasicCompletionContributor"
+                                id="sliceBasic"/>
         <completion.contributor language="SLICE"
                                 implementationClass="org.xblackcat.frozenidea.completion.SliceMetadataCompletionContributor"
                                 id="sliceMetadata"/>
@@ -58,5 +61,6 @@
 
         <codeInsight.lineMarkerProvider language="SLICE"
                                         implementationClass="org.xblackcat.frozenidea.link.SliceLineMarkerProvider"/>
+        <statistics.counterUsagesCollector groupId="slice.find.usages" version="1"/>
     </extensions>
 </idea-plugin>
