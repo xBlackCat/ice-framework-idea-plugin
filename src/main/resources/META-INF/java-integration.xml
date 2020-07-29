@@ -1,0 +1,16 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <findUsagesHandlerFactory implementation="org.xblackcat.frozenidea.findUsages.java.SliceJavaFindUsagesHandlerFactory"
+                                  id="slice"
+                                  order="last, before default"/>
+        <projectService serviceInterface="org.xblackcat.frozenidea.integration.java.JavaHelper"
+                        serviceImplementation="org.xblackcat.frozenidea.integration.java.JavaHelper$Impl"/>
+        <moduleService serviceInterface="org.xblackcat.frozenidea.integration.java.JavaModuleHelper"
+                       serviceImplementation="org.xblackcat.frozenidea.integration.java.JavaModuleHelper$Impl"/>
+        <codeInsight.lineMarkerProvider language="SLICE"
+                                        implementationClass="org.xblackcat.frozenidea.link.java.Slice2JavaLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JAVA"
+                                        implementationClass="org.xblackcat.frozenidea.link.java.Java2SliceLineMarkerProvider"/>
+
+    </extensions>
+</idea-plugin>

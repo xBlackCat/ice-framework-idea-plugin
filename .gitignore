@@ -1,3 +1,4 @@
 out
-plugin/gen/*
+slice-psi/src/gen/*
 .idea
+*.log

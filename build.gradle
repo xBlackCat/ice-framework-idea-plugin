@@ -1,0 +1,73 @@
+plugins {
+    id 'org.jetbrains.intellij' version '0.4.21'
+}
+
+group 'org.xblackcat'
+version pluginVersion
+
+
+allprojects {
+    apply plugin: 'java'
+
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+
+    repositories {
+        mavenCentral()
+        google()
+        jcenter()
+        maven { url "https://www.jetbrains.com/intellij-repository/releases" }
+        maven { url "https://www.jetbrains.com/intellij-repository/snapshots" }
+    }
+
+    apply plugin: 'org.jetbrains.intellij'
+
+    intellij {
+        version ideaVersion
+        type 'IU'
+        plugins = ['java'/*, 'com.jetbrains.php:201.7846.90', 'PythonCore:201.7846.85'*/]
+    }
+
+    apply plugin: 'idea'
+    idea {
+        module {
+            inheritOutputDirs = true
+        }
+    }
+}
+
+
+dependencies {
+    compile project('jps-plugin')
+    compile project('frozen-base')
+    compile project('frozen-java')
+}
+
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+
+patchPluginXml {
+    untilBuild null
+    changeNotes """
+<ul>
+            <li><b>0.0.0.1</b> - First revision: Only syntax highlighting</li>
+            <li><b>0.0.0.2</b> - Slice2Java translation was added.</li>
+            <li><b>0.0.0.3</b> - More error detections while file parsing. Allow to configure translation to several languages. Autodetection of Ice library in module classpath.</li>
+            <li><b>0.0.0.4</b> - Search source files for #include directive in content and source roots. Added line/block commenter.</li>
+            <li><b>0.0.0.5</b> - FIX: configuration check bug prevent compilation start
+            <li><b>0.0.1.0</b> - Create a link between a java code and slice definitions. Implement find usages action</li>
+            <li><b>0.0.1.1</b> - Find usages of generated objects.</li>
+            <li><b>0.0.2.0</b> - Use external compiler interface to support Slice compilation in Idea 12 and above.</li>
+            <li><b>0.0.2.1</b> - Show more information about errors during compilation.</li>
+            <li><b>0.0.2.2</b> - Rework slice file parser. Implement basic completion for data type places (in implement/extends/etc. list).</li>
+            <li><b>0.0.2.3</b> - Add line markers for implemented/overridden slice data types. Show line makers for slice data types which are used in java.</li>
+            <li><b>0.0.2.4</b> - Default include path was added to compiler command line</li>
+            <li><b>0.0.2.5</b> - Fix language parser (constants in enum and JavaDoc like comments)</li>
+            <li><b>0.0.2.6</b> - Fix translator for non-java languages. Fix warnings. Implement Color settings page for the language</li>
+            <li><b>0.0.3.0</b> - Support latest versions of IntelliJ code base. Support only ZeroC ICE v3.7.x. Improve find usages in java code from ICE code (methods/fields/classes)
+            <li><b>0.0.3.1</b> - Fix method usages search
+            <li><b>0.0.3.2</b> - Java-to-slice gutter icons were added. Use vector icons.
+            <li><b>0.0.4.0</b> - Support IDEA since 2020.1.2
+</ul>"""
+}

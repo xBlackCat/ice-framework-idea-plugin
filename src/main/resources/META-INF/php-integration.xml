@@ -1,0 +1,16 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+<!--        <findUsagesHandlerFactory implementation="SlicePhpFindUsagesHandlerFactory"-->
+<!--                                  id="slice"-->
+<!--                                  order="last, before default"/>-->
+<!--        <projectService serviceInterface="org.xblackcat.frozenidea.integration.php.PhpHelper"-->
+<!--                        serviceImplementation="org.xblackcat.frozenidea.integration.php.PhpHelper$Impl"/>-->
+<!--        <moduleService serviceInterface="org.xblackcat.frozenidea.integration.php.PhpModuleHelper"-->
+<!--                       serviceImplementation="org.xblackcat.frozenidea.integration.php.PhpModuleHelper$Impl"/>-->
+<!--        <codeInsight.lineMarkerProvider language="SLICE"-->
+<!--                                        implementationClass="org.xblackcat.frozenidea.link.php.Slice2PhpLineMarkerProvider"/>-->
+        <codeInsight.lineMarkerProvider language="PHP"
+                                        implementationClass="org.xblackcat.frozenidea.link.php.Php2SliceLineMarkerProvider"/>
+
+    </extensions>
+</idea-plugin>

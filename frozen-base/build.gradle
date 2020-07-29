@@ -1,0 +1,17 @@
+group 'org.xblackcat'
+version pluginVersion
+apply plugin: 'java'
+
+def generatedDir = 'src/main/gen'
+
+dependencies {
+    compile project(':jps-plugin')
+}
+
+sourceSets {
+    main   {
+        java {
+            srcDir generatedDir
+        }
+    }
+}
