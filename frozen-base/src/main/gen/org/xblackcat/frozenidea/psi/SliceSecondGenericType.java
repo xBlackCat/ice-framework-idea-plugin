@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceInterfaceBody extends SliceCompositeElement {
+public interface SliceSecondGenericType extends SliceCompositeElement {
 
-  @NotNull
-  List<SliceMethodDef> getMethodDefList();
+  @Nullable
+  SliceDataType getDataType();
 
 }

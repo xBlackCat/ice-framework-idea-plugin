@@ -8,34 +8,16 @@ import com.intellij.psi.PsiElement;
 public interface SliceModule extends SliceNamedElement {
 
   @NotNull
-  List<SliceClassDef> getClassDefList();
-
-  @NotNull
   List<SliceConstantDef> getConstantDefList();
 
   @NotNull
-  List<SliceDictionaryDef> getDictionaryDefList();
-
-  @NotNull
-  List<SliceEnumDef> getEnumDefList();
-
-  @NotNull
-  List<SliceExceptionDef> getExceptionDefList();
-
-  @NotNull
-  List<SliceInterfaceDef> getInterfaceDefList();
+  List<SliceDataTypeElement> getDataTypeElementList();
 
   @Nullable
   SliceMetadata getMetadata();
 
   @NotNull
   List<SliceModule> getModuleList();
-
-  @NotNull
-  List<SliceSequenceDef> getSequenceDefList();
-
-  @NotNull
-  List<SliceStructDef> getStructDefList();
 
   @Nullable
   PsiElement getId();

@@ -120,7 +120,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         List<PsiElement> items = new ArrayList<>();
 
         final PsiElement body = element.getParent();
-        if (!(body instanceof SliceClassBody) && !(body instanceof SliceInterfaceBody)) {
+        if (!(body instanceof SliceBodyBlock)) {
             return;
         }
         final PsiElement type = body.getParent();
@@ -164,10 +164,10 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
         final Set<SliceDataTypeElement> elements = new HashSet<>();
         elements.add(element);
-        if (element instanceof SliceClassDef) {
-            SliceHelper.findAllSubclasses(elements, module, (SliceClassDef) element);
-        } else if (element instanceof SliceInterfaceDef) {
-            SliceHelper.findAllImplementations(elements, module, (SliceInterfaceDef) element);
+        if (element.isClass()) {
+            SliceHelper.findAllSubclasses(elements, module, element);
+        } else if (element.isInterface()) {
+            SliceHelper.findAllImplementations(elements, module, element);
         } else {
             return Collections.emptySet();
         }

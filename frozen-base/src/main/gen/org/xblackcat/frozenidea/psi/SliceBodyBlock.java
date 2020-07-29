@@ -5,12 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceDictionaryTypeList extends SliceCompositeElement {
+public interface SliceBodyBlock extends SliceCompositeElement {
 
   @NotNull
-  SliceElementType getElementType();
+  List<SliceEnumConstant> getEnumConstantList();
 
   @NotNull
-  SliceKeyType getKeyType();
+  List<SliceFieldDef> getFieldDefList();
+
+  @NotNull
+  List<SliceMethodDef> getMethodDefList();
 
 }

@@ -7,7 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.psi.*;
 
-import java.util.List;
+import java.util.Objects;
 
 /**
  * 08.01.14 14:08
@@ -23,12 +23,12 @@ class SliceEnumConstRefImpl extends PsiReferenceBase<SliceEnumConstantReference>
     public PsiElement resolve() {
         final String referenceName = getRangeInElement().substring(myElement.getText());
 
-        final SliceEnumConstantList constantList = obtainEnumConstantList();
+        final SliceEnumConstant[] constantList = obtainEnumConstantList();
         if (constantList == null) {
             return null;
         }
 
-        for (SliceEnumConstant enumConst : constantList.getEnumConstantList()) {
+        for (SliceEnumConstant enumConst : constantList) {
             if (referenceName.equals(enumConst.getName())) {
                 return enumConst;
             }
@@ -37,9 +37,12 @@ class SliceEnumConstRefImpl extends PsiReferenceBase<SliceEnumConstantReference>
         return null;
     }
 
-    protected SliceEnumConstantList obtainEnumConstantList() {
-        @SuppressWarnings("unchecked")
-        final SliceCompositeElement constantDef = PsiTreeUtil.getParentOfType(myElement, SliceConstantDef.class, SliceFieldDef.class);
+    protected SliceEnumConstant[] obtainEnumConstantList() {
+        @SuppressWarnings("unchecked") final SliceCompositeElement constantDef = PsiTreeUtil.getParentOfType(
+                myElement,
+                SliceConstantDef.class,
+                SliceFieldDef.class
+        );
         if (constantDef == null) {
             return null;
         }
@@ -50,27 +53,21 @@ class SliceEnumConstRefImpl extends PsiReferenceBase<SliceEnumConstantReference>
         }
 
         final PsiElement enumType = SlicePsiImplUtil.resolveDataType(constType, TextRange.from(0, constType.getTextLength()));
-        if (!(enumType instanceof SliceEnumDef)) {
+        if (!(enumType instanceof SliceDataTypeElement) || !((SliceDataTypeElement) enumType).isEnum()) {
             return null;
         }
 
-        final SliceEnumConstantList constantList = ((SliceEnumDef) enumType).getEnumConstantList();
-        if (constantList == null) {
+        final SliceBodyBlock bodyBlock = ((SliceDataTypeElement) enumType).getBodyBlock();
+        if (bodyBlock == null) {
             return null;
         }
 
-        return constantList;
+        return bodyBlock.getEnumConstantList().toArray(new SliceEnumConstant[0]);
     }
 
     @NotNull
     @Override
     public Object[] getVariants() {
-        final SliceEnumConstantList constantList = obtainEnumConstantList();
-        if (constantList == null) {
-            return EMPTY_ARRAY;
-        }
-
-        final List<SliceEnumConstant> list = constantList.getEnumConstantList();
-        return list.toArray(new PsiElement[0]);
+        return obtainEnumConstantList();
     }
 }

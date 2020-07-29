@@ -27,38 +27,14 @@ public class SliceModuleImpl extends SliceNamedElementImpl implements SliceModul
 
   @Override
   @NotNull
-  public List<SliceClassDef> getClassDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceClassDef.class);
-  }
-
-  @Override
-  @NotNull
   public List<SliceConstantDef> getConstantDefList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceConstantDef.class);
   }
 
   @Override
   @NotNull
-  public List<SliceDictionaryDef> getDictionaryDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceDictionaryDef.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SliceEnumDef> getEnumDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceEnumDef.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SliceExceptionDef> getExceptionDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceExceptionDef.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SliceInterfaceDef> getInterfaceDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceInterfaceDef.class);
+  public List<SliceDataTypeElement> getDataTypeElementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceDataTypeElement.class);
   }
 
   @Override
@@ -71,18 +47,6 @@ public class SliceModuleImpl extends SliceNamedElementImpl implements SliceModul
   @NotNull
   public List<SliceModule> getModuleList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceModule.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SliceSequenceDef> getSequenceDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceSequenceDef.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SliceStructDef> getStructDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceStructDef.class);
   }
 
   @Override

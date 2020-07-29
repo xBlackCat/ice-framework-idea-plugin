@@ -27,8 +27,7 @@ public class SlicePatterns extends PlatformPatterns {
 
     public static ElementPattern<? extends PsiElement> parameterList() {
         return or(
-                psiElement().inside(SliceStructDef.class),//.andNot(psiElement().inside(SliceFieldDef.class)),
-                psiElement().inside(SliceExceptionDef.class),//.andNot(psiElement().inside(SliceFieldDef.class)),
+                psiElement().inside(SliceDataTypeElement.class),//.andNot(psiElement().inside(SliceFieldDef.class)),
                 psiElement().inside(SliceParametersList.class).afterLeaf(","),
                 psiElement().atStartOf(psiElement(SliceParametersList.class))
         );
@@ -36,10 +35,7 @@ public class SlicePatterns extends PlatformPatterns {
 
     public static ElementPattern<? extends PsiElement> classBody() {
         return or(
-                psiElement().inside(SliceClassBody.class),
-//                            .andNot(or(psiElement().inside(SliceFieldDef.class), psiElement().inside(SliceMethodDef.class))),
-                psiElement().inside(SliceInterfaceBody.class)
-//                            .andNot(or(psiElement().inside(SliceFieldDef.class), psiElement().inside(SliceMethodDef.class)))
+                psiElement().inside(SliceDataTypeElement.class)
         );
     }
 }

@@ -29,14 +29,13 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
         Set<PsiElement> visited = forNavigation ? new THashSet<>() : null;
 
         for (PsiElement element : elements) {
-            if (element instanceof SliceNamedElement) {
+            if (element instanceof SliceDataTypeElement) {
+                final SliceDataTypeElement typeDef = (SliceDataTypeElement) element;
                 // The element is interface
-                if (element instanceof SliceInterfaceDef) {
-                    collectImplementations(result, forNavigation, visited, (SliceInterfaceDef) element);
-                } else if (element instanceof SliceClassDef) {
-                    collectExtending(result, forNavigation, visited, (SliceClassDef) element);
-                } else if (element instanceof SliceExceptionDef) {
-                    collectExtending(result, forNavigation, visited, (SliceExceptionDef) element);
+                if (typeDef.isInterface()) {
+                    collectImplementations(result, forNavigation, visited, typeDef);
+                } else if (typeDef.isClass()) {
+                    collectExtending(result, forNavigation, visited, typeDef);
                 }
             }
         }
@@ -46,7 +45,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             Collection<? super RelatedItemLineMarkerInfo> result,
             boolean forNavigation,
             Set<PsiElement> visited,
-            SliceExceptionDef element
+            SliceDataTypeElement element
     ) {
         List<PsiElement> items = new ArrayList<>();
         SliceModule module = SliceHelper.getContainerSliceModule(element);
@@ -57,38 +56,9 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             return;
         }
 
-        for (SliceExceptionDef exceptionDef : module.getExceptionDefList()) {
+        for (SliceDataTypeElement exceptionDef : module.getDataTypeElementList()) {
             if (searchInExtends(element, exceptionDef.getExtendsDef())) {
                 items.add(exceptionDef);
-            }
-        }
-
-        if (!items.isEmpty()) {
-            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.OVERRIDDEN).
-                    setTargets(items).setTooltipText("Overriding");
-            final PsiElement id = element.getId();
-            result.add(builder.createLineMarkerInfo(id != null ? id : element));
-        }
-    }
-
-    private static void collectExtending(
-            Collection<? super RelatedItemLineMarkerInfo> result,
-            boolean forNavigation,
-            Set<PsiElement> visited,
-            SliceClassDef element
-    ) {
-        List<PsiElement> items = new ArrayList<>();
-        SliceModule module = SliceHelper.getContainerSliceModule(element);
-        if (module == null) {
-            return;
-        }
-        if (forNavigation && !visited.add(element)) {
-            return;
-        }
-
-        for (SliceClassDef classDef : module.getClassDefList()) {
-            if (searchInExtends(element, classDef.getExtendsDef())) {
-                items.add(classDef);
             }
         }
 
@@ -135,22 +105,22 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             return;
         }
 
-        for (SliceClassDef classDef : module.getClassDefList()) {
-            if (searchInImplements(element, classDef.getImplementsDef())) {
-                items.add(classDef);
+        for (SliceDataTypeElement typeDef : module.getDataTypeElementList()) {
+            if (searchInImplements(element, typeDef.getImplementsDef())) {
+                items.add(typeDef);
             }
-        }
-
-        for (SliceInterfaceDef interfaceDef : module.getInterfaceDefList()) {
-            if (searchInExtends(element, interfaceDef.getExtendsDef())) {
-                items.add(interfaceDef);
+            if (searchInExtends(element, typeDef.getExtendsDef())) {
+                items.add(typeDef);
             }
         }
 
         if (!items.isEmpty()) {
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.IMPLEMENTED).
                     setTargets(items).setTooltipText("Implemented");
-            result.add(builder.createLineMarkerInfo(element.getId()));
+            final PsiElement id = element.getId();
+            if (id != null) {
+                result.add(builder.createLineMarkerInfo(id));
+            }
         }
     }
 }

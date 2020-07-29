@@ -8,32 +8,24 @@ import org.xblackcat.frozenidea.psi.impl.*;
 
 public interface SliceTypes {
 
+  IElementType ICE_BODY_BLOCK = new SliceCompositeElementType("ICE_BODY_BLOCK");
   IElementType ICE_BOOL_LITERAL = new SliceCompositeElementType("ICE_BOOL_LITERAL");
-  IElementType ICE_CLASS_BODY = new SliceCompositeElementType("ICE_CLASS_BODY");
-  IElementType ICE_CLASS_DEF = new SliceCompositeElementType("ICE_CLASS_DEF");
   IElementType ICE_CONSTANT_DEF = new SliceCompositeElementType("ICE_CONSTANT_DEF");
   IElementType ICE_CONSTANT_VALUE = new SliceCompositeElementType("ICE_CONSTANT_VALUE");
   IElementType ICE_DATA_TYPE = new SliceCompositeElementType("ICE_DATA_TYPE");
-  IElementType ICE_DICTIONARY_DEF = new SliceCompositeElementType("ICE_DICTIONARY_DEF");
-  IElementType ICE_DICTIONARY_TYPE_LIST = new SliceCompositeElementType("ICE_DICTIONARY_TYPE_LIST");
-  IElementType ICE_ELEMENT_TYPE = new SliceCompositeElementType("ICE_ELEMENT_TYPE");
+  IElementType ICE_DATA_TYPE_ELEMENT = new SliceCompositeElementType("ICE_DATA_TYPE_ELEMENT");
   IElementType ICE_ENUM_CONSTANT = new SliceCompositeElementType("ICE_ENUM_CONSTANT");
   IElementType ICE_ENUM_CONSTANT_INITIALIZER = new SliceCompositeElementType("ICE_ENUM_CONSTANT_INITIALIZER");
-  IElementType ICE_ENUM_CONSTANT_LIST = new SliceCompositeElementType("ICE_ENUM_CONSTANT_LIST");
   IElementType ICE_ENUM_CONSTANT_REFERENCE = new SliceCompositeElementType("ICE_ENUM_CONSTANT_REFERENCE");
-  IElementType ICE_ENUM_DEF = new SliceCompositeElementType("ICE_ENUM_DEF");
-  IElementType ICE_EXCEPTION_DEF = new SliceCompositeElementType("ICE_EXCEPTION_DEF");
   IElementType ICE_EXTENDS_DEF = new SliceCompositeElementType("ICE_EXTENDS_DEF");
   IElementType ICE_EXTENDS_LIST = new SliceCompositeElementType("ICE_EXTENDS_LIST");
   IElementType ICE_FIELD_DEF = new SliceCompositeElementType("ICE_FIELD_DEF");
   IElementType ICE_FIELD_INITIALIZER = new SliceCompositeElementType("ICE_FIELD_INITIALIZER");
   IElementType ICE_FLOAT_LITERAL = new SliceCompositeElementType("ICE_FLOAT_LITERAL");
+  IElementType ICE_GENERIC_TYPE = new SliceCompositeElementType("ICE_GENERIC_TYPE");
   IElementType ICE_GLOBAL_METADATA = new SliceCompositeElementType("ICE_GLOBAL_METADATA");
   IElementType ICE_IMPLEMENTS_DEF = new SliceCompositeElementType("ICE_IMPLEMENTS_DEF");
   IElementType ICE_INTEGER_LITERAL = new SliceCompositeElementType("ICE_INTEGER_LITERAL");
-  IElementType ICE_INTERFACE_BODY = new SliceCompositeElementType("ICE_INTERFACE_BODY");
-  IElementType ICE_INTERFACE_DEF = new SliceCompositeElementType("ICE_INTERFACE_DEF");
-  IElementType ICE_KEY_TYPE = new SliceCompositeElementType("ICE_KEY_TYPE");
   IElementType ICE_METADATA = new SliceCompositeElementType("ICE_METADATA");
   IElementType ICE_METADATA_ELEMENT = new SliceCompositeElementType("ICE_METADATA_ELEMENT");
   IElementType ICE_METHOD_DEF = new SliceCompositeElementType("ICE_METHOD_DEF");
@@ -46,13 +38,12 @@ public interface SliceTypes {
   IElementType ICE_PARAMETERS_LIST = new SliceCompositeElementType("ICE_PARAMETERS_LIST");
   IElementType ICE_PARAMETER_MODIFIER = new SliceCompositeElementType("ICE_PARAMETER_MODIFIER");
   IElementType ICE_PROXY_TYPE = new SliceCompositeElementType("ICE_PROXY_TYPE");
-  IElementType ICE_SEQUENCE_DEF = new SliceCompositeElementType("ICE_SEQUENCE_DEF");
-  IElementType ICE_SEQUENCE_TYPE_LIST = new SliceCompositeElementType("ICE_SEQUENCE_TYPE_LIST");
+  IElementType ICE_SECOND_GENERIC_TYPE = new SliceCompositeElementType("ICE_SECOND_GENERIC_TYPE");
   IElementType ICE_STRING_LITERAL = new SliceCompositeElementType("ICE_STRING_LITERAL");
-  IElementType ICE_STRUCT_DEF = new SliceCompositeElementType("ICE_STRUCT_DEF");
   IElementType ICE_THROWS_DEF = new SliceCompositeElementType("ICE_THROWS_DEF");
   IElementType ICE_THROWS_LIST = new SliceCompositeElementType("ICE_THROWS_LIST");
   IElementType ICE_TYPE_REFERENCE = new SliceCompositeElementType("ICE_TYPE_REFERENCE");
+  IElementType ICE_TYPE_WORD = new SliceCompositeElementType("ICE_TYPE_WORD");
   IElementType ICE_VARIABLE_TYPE = new SliceCompositeElementType("ICE_VARIABLE_TYPE");
 
   IElementType ICE_ASTERISK = new SliceTokenType("*");
@@ -112,14 +103,11 @@ public interface SliceTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-      if (type == ICE_BOOL_LITERAL) {
+      if (type == ICE_BODY_BLOCK) {
+        return new SliceBodyBlockImpl(node);
+      }
+      else if (type == ICE_BOOL_LITERAL) {
         return new SliceBoolLiteralImpl(node);
-      }
-      else if (type == ICE_CLASS_BODY) {
-        return new SliceClassBodyImpl(node);
-      }
-      else if (type == ICE_CLASS_DEF) {
-        return new SliceClassDefImpl(node);
       }
       else if (type == ICE_CONSTANT_DEF) {
         return new SliceConstantDefImpl(node);
@@ -130,14 +118,8 @@ public interface SliceTypes {
       else if (type == ICE_DATA_TYPE) {
         return new SliceDataTypeImpl(node);
       }
-      else if (type == ICE_DICTIONARY_DEF) {
-        return new SliceDictionaryDefImpl(node);
-      }
-      else if (type == ICE_DICTIONARY_TYPE_LIST) {
-        return new SliceDictionaryTypeListImpl(node);
-      }
-      else if (type == ICE_ELEMENT_TYPE) {
-        return new SliceElementTypeImpl(node);
+      else if (type == ICE_DATA_TYPE_ELEMENT) {
+        return new SliceDataTypeElementImpl(node);
       }
       else if (type == ICE_ENUM_CONSTANT) {
         return new SliceEnumConstantImpl(node);
@@ -145,17 +127,8 @@ public interface SliceTypes {
       else if (type == ICE_ENUM_CONSTANT_INITIALIZER) {
         return new SliceEnumConstantInitializerImpl(node);
       }
-      else if (type == ICE_ENUM_CONSTANT_LIST) {
-        return new SliceEnumConstantListImpl(node);
-      }
       else if (type == ICE_ENUM_CONSTANT_REFERENCE) {
         return new SliceEnumConstantReferenceImpl(node);
-      }
-      else if (type == ICE_ENUM_DEF) {
-        return new SliceEnumDefImpl(node);
-      }
-      else if (type == ICE_EXCEPTION_DEF) {
-        return new SliceExceptionDefImpl(node);
       }
       else if (type == ICE_EXTENDS_DEF) {
         return new SliceExtendsDefImpl(node);
@@ -172,6 +145,9 @@ public interface SliceTypes {
       else if (type == ICE_FLOAT_LITERAL) {
         return new SliceFloatLiteralImpl(node);
       }
+      else if (type == ICE_GENERIC_TYPE) {
+        return new SliceGenericTypeImpl(node);
+      }
       else if (type == ICE_GLOBAL_METADATA) {
         return new SliceGlobalMetadataImpl(node);
       }
@@ -180,15 +156,6 @@ public interface SliceTypes {
       }
       else if (type == ICE_INTEGER_LITERAL) {
         return new SliceIntegerLiteralImpl(node);
-      }
-      else if (type == ICE_INTERFACE_BODY) {
-        return new SliceInterfaceBodyImpl(node);
-      }
-      else if (type == ICE_INTERFACE_DEF) {
-        return new SliceInterfaceDefImpl(node);
-      }
-      else if (type == ICE_KEY_TYPE) {
-        return new SliceKeyTypeImpl(node);
       }
       else if (type == ICE_METADATA) {
         return new SliceMetadataImpl(node);
@@ -226,17 +193,11 @@ public interface SliceTypes {
       else if (type == ICE_PROXY_TYPE) {
         return new SliceProxyTypeImpl(node);
       }
-      else if (type == ICE_SEQUENCE_DEF) {
-        return new SliceSequenceDefImpl(node);
-      }
-      else if (type == ICE_SEQUENCE_TYPE_LIST) {
-        return new SliceSequenceTypeListImpl(node);
+      else if (type == ICE_SECOND_GENERIC_TYPE) {
+        return new SliceSecondGenericTypeImpl(node);
       }
       else if (type == ICE_STRING_LITERAL) {
         return new SliceStringLiteralImpl(node);
-      }
-      else if (type == ICE_STRUCT_DEF) {
-        return new SliceStructDefImpl(node);
       }
       else if (type == ICE_THROWS_DEF) {
         return new SliceThrowsDefImpl(node);
@@ -246,6 +207,9 @@ public interface SliceTypes {
       }
       else if (type == ICE_TYPE_REFERENCE) {
         return new SliceTypeReferenceImpl(node);
+      }
+      else if (type == ICE_TYPE_WORD) {
+        return new SliceTypeWordImpl(node);
       }
       else if (type == ICE_VARIABLE_TYPE) {
         return new SliceVariableTypeImpl(node);

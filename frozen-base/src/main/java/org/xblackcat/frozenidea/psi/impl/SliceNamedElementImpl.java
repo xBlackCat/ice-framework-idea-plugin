@@ -117,20 +117,22 @@ public abstract class SliceNamedElementImpl extends SliceCompositeElementImpl im
             return SliceIcons.FIELD_ICON;
         } else if (this instanceof SliceEnumConstant) {
             return SliceIcons.FIELD_ICON;
-        } else if (this instanceof SliceClassDef) {
-            return SliceIcons.CLASS_ICON;
-        } else if (this instanceof SliceInterfaceDef) {
-            return SliceIcons.INTERFACE_ICON;
-        } else if (this instanceof SliceExceptionDef) {
-            return SliceIcons.EXCEPTION_ICON;
-        } else if (this instanceof SliceStructDef) {
-            return SliceIcons.CLASS_ICON;
-        } else if (this instanceof SliceEnumDef) {
-            return SliceIcons.ENUM_ICON;
-        } else if (this instanceof SliceDictionaryDef) {
-            return AllIcons.Nodes.Tag;
-        } else if (this instanceof SliceSequenceDef) {
-            return AllIcons.Nodes.Tag;
+        } else if (this instanceof SliceDataTypeElement) {
+            if (((SliceDataTypeElement) this).isClass()) {
+                return SliceIcons.CLASS_ICON;
+            } else if (((SliceDataTypeElement) this).isInterface()) {
+                return SliceIcons.INTERFACE_ICON;
+            } else if (((SliceDataTypeElement) this).isException()) {
+                return SliceIcons.EXCEPTION_ICON;
+            } else if (((SliceDataTypeElement) this).isStruct()) {
+                return SliceIcons.CLASS_ICON;
+            } else if (((SliceDataTypeElement) this).isEnum()) {
+                return SliceIcons.ENUM_ICON;
+            } else if (((SliceDataTypeElement) this).isDictionary()) {
+                return AllIcons.Nodes.Tag;
+            } else if (((SliceDataTypeElement) this).isSequence()) {
+                return AllIcons.Nodes.Tag;
+            }
         }
 
         return super.getElementIcon(flags);

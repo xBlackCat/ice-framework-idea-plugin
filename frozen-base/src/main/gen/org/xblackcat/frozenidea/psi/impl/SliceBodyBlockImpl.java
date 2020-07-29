@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import org.xblackcat.frozenidea.psi.*;
 
-public class SliceKeyTypeImpl extends SliceCompositeElementImpl implements SliceKeyType {
+public class SliceBodyBlockImpl extends SliceCompositeElementImpl implements SliceBodyBlock {
 
-  public SliceKeyTypeImpl(@NotNull ASTNode node) {
+  public SliceBodyBlockImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SliceVisitor visitor) {
-    visitor.visitKeyType(this);
+    visitor.visitBodyBlock(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -26,9 +26,21 @@ public class SliceKeyTypeImpl extends SliceCompositeElementImpl implements Slice
   }
 
   @Override
-  @Nullable
-  public SliceTypeReference getTypeReference() {
-    return findChildByClass(SliceTypeReference.class);
+  @NotNull
+  public List<SliceEnumConstant> getEnumConstantList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceEnumConstant.class);
+  }
+
+  @Override
+  @NotNull
+  public List<SliceFieldDef> getFieldDefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceFieldDef.class);
+  }
+
+  @Override
+  @NotNull
+  public List<SliceMethodDef> getMethodDefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceMethodDef.class);
   }
 
 }

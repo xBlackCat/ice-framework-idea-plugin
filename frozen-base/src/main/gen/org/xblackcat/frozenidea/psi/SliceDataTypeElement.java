@@ -5,13 +5,16 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceClassDef extends SliceDataTypeElement, SliceNamedElement {
+public interface SliceDataTypeElement extends SliceNamedElement {
 
   @Nullable
-  SliceClassBody getClassBody();
+  SliceBodyBlock getBodyBlock();
 
   @Nullable
   SliceExtendsDef getExtendsDef();
+
+  @Nullable
+  SliceGenericType getGenericType();
 
   @Nullable
   SliceImplementsDef getImplementsDef();
@@ -19,7 +22,26 @@ public interface SliceClassDef extends SliceDataTypeElement, SliceNamedElement {
   @NotNull
   List<SliceMetadata> getMetadataList();
 
+  @NotNull
+  SliceTypeWord getTypeWord();
+
   @Nullable
   PsiElement getId();
+
+  boolean isClass();
+
+  boolean isInterface();
+
+  boolean isException();
+
+  boolean isEnum();
+
+  boolean isStruct();
+
+  boolean isSequence();
+
+  boolean isDictionary();
+
+  SliceModule getModule();
 
 }

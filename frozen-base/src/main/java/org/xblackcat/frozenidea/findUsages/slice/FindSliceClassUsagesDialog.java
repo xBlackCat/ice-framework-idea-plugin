@@ -104,17 +104,18 @@ public class FindSliceClassUsagesDialog extends SliceFindUsagesDialog<SliceClass
                 true
         );
 
-        if (psiClass instanceof SliceClassDef ||
-                psiClass instanceof SliceInterfaceDef ||
-                psiClass instanceof SliceStructDef ||
-                psiClass instanceof SliceExceptionDef) {
-            myCbFieldsUsages = addCheckboxToPanel(
-                    JavaBundle.message("find.what.fields.usages.checkbox"),
-                    getFindUsagesOptions().isFieldsUsages,
-                    findWhatPanel,
-                    true
-            );
-            if (psiClass instanceof SliceInterfaceDef) {
+        if (psiClass instanceof SliceDataTypeElement) {
+            SliceDataTypeElement type = (SliceDataTypeElement) psiClass;
+            if (type.isClass() || type.isInterface() || type.isStruct() || type.isException()) {
+                myCbFieldsUsages = addCheckboxToPanel(
+                        JavaBundle.message("find.what.fields.usages.checkbox"),
+                        getFindUsagesOptions().isFieldsUsages,
+                        findWhatPanel,
+                        true
+                );
+            }
+
+            if (type.isInterface()) {
                 myCbImplementingClasses = addCheckboxToPanel(
                         JavaBundle.message("find.what.implementing.classes.checkbox"),
                         getFindUsagesOptions().isImplementingClasses,
@@ -127,7 +128,8 @@ public class FindSliceClassUsagesDialog extends SliceFindUsagesDialog<SliceClass
                         findWhatPanel,
                         true
                 );
-            } else if (psiClass instanceof SliceClassDef || psiClass instanceof SliceExceptionDef)
+            }
+            if (type.isClass() || type.isException())
                 myCbDerivedClasses = addCheckboxToPanel(
                         JavaBundle.message("find.what.derived.classes.checkbox"),
                         getFindUsagesOptions().isDerivedClasses,

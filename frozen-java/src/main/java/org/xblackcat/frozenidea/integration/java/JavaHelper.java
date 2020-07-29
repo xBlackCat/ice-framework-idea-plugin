@@ -181,12 +181,13 @@ public class JavaHelper {
                 if (!(element instanceof SliceDataTypeElement)) {
                     return null;
                 }
-                if (element instanceof SliceSequenceDef) {
-                    final SliceSequenceTypeList typeList = ((SliceSequenceDef) element).getSequenceTypeList();
-                    if (typeList == null) {
+                final SliceDataTypeElement typeElement = (SliceDataTypeElement) element;
+                if (typeElement.isSequence()) {
+                    final SliceGenericType genericType = typeElement.getGenericType();
+                    if (genericType == null || genericType.getDataType() == null) {
                         return null;
                     }
-                    return toJavaParameter(typeList.getElementType().getDataType()) + "[]";
+                    return toJavaParameter(genericType.getDataType()) + "[]";
                 }
                 return FQN.buildFQN((SliceNamedElement) element).getJavaFQN();
             }

@@ -42,19 +42,19 @@ public class SliceFindUsagesProvider implements FindUsagesProvider {
         if (element instanceof PsiFile) {
             return LangBundle.message("terms.file");
         }
-        if (element instanceof SliceExceptionDef) {
+        if (element instanceof SliceDataTypeElement && ((SliceDataTypeElement) element).isException()) {
             return LangBundle.message("java.terms.exception");
         }
         if (element instanceof SliceModule) {
             return LangBundle.message("java.terms.package");
         }
-        if (element instanceof SliceEnumDef) {
+        if (element instanceof SliceDataTypeElement && ((SliceDataTypeElement) element).isEnum()) {
             return LangBundle.message("java.terms.enum");
         }
-        if (element instanceof SliceInterfaceDef) {
+        if (element instanceof SliceDataTypeElement && ((SliceDataTypeElement) element).isInterface()) {
             return LangBundle.message("java.terms.interface");
         }
-        if (element instanceof SliceClassDef) {
+        if (element instanceof SliceDataTypeElement && ((SliceDataTypeElement) element).isClass()) {
             return LangBundle.message("java.terms.class");
 
         }

@@ -69,13 +69,12 @@ public class SlicePsiFacadeImpl extends SlicePsiFacade {
         }
 
         for (SliceDataTypeElement e : result) {
-            if (e instanceof SliceClassDef) {
-                if (((SliceClassDef) e).getClassBody() != null) {
-                    return e;
-                }
-            } else if (e instanceof SliceInterfaceDef) {
-                if (((SliceInterfaceDef) e).getInterfaceBody() != null) {
-                    return e;
+            if (e instanceof SliceDataTypeElement) {
+                SliceDataTypeElement type = (SliceDataTypeElement) e;
+                if (type.getBodyBlock() != null) {
+                    if (type.isClass() || type.isInterface()) {
+                        return e;
+                    }
                 }
             }
         }

@@ -119,21 +119,25 @@ public class SliceHelper {
     public static void findAllSubclasses(
             Set<SliceDataTypeElement> elements,
             SliceModule module,
-            SliceClassDef element
+            SliceDataTypeElement element
     ) {
-        final HashSet<SliceClassDef> set = new HashSet<>();
+        final HashSet<SliceDataTypeElement> set = new HashSet<>();
         set.add(element);
         findAllSubclasses(elements, module, set);
     }
 
-    private static void findAllSubclasses(Set<SliceDataTypeElement> elements, SliceModule module, Set<SliceClassDef> parents) {
-        for (SliceClassDef clazz : module.getClassDefList()) {
-            if (parents.contains(clazz)) {
+    private static void findAllSubclasses(Set<SliceDataTypeElement> elements, SliceModule module, Set<SliceDataTypeElement> parents) {
+        for (SliceDataTypeElement clazz : module.getDataTypeElementList()) {
+            if (!clazz.isClass()) {
                 continue;
             }
 
-            if (clazz.getClassBody() == null) {
+            if (clazz.getBodyBlock() == null) {
                 // Ignore forward definitions
+                continue;
+            }
+
+            if (parents.contains(clazz)) {
                 continue;
             }
 
@@ -149,7 +153,7 @@ public class SliceHelper {
             for (SliceTypeReference tr : extendsList.getTypeReferenceList()) {
                 final PsiElement psiElement = tr.getReference().resolve();
 
-                if (psiElement instanceof SliceClassDef) {
+                if (psiElement instanceof SliceDataTypeElement) {
                     if (parents.contains(psiElement)) {
                         elements.add(clazz);
                         parents.add(clazz);
@@ -160,65 +164,63 @@ public class SliceHelper {
         }
     }
 
-    public static void findAllImplementations(Set<SliceDataTypeElement> elements, SliceModule module, SliceInterfaceDef element) {
-        Set<SliceClassDef> supers = new HashSet<>();
+    public static void findAllImplementations(Set<SliceDataTypeElement> elements, SliceModule module, SliceDataTypeElement element) {
+        Set<SliceDataTypeElement> supers = new HashSet<>();
 
-        Set<SliceInterfaceDef> hierarchy = new HashSet<>();
+        Set<SliceDataTypeElement> hierarchy = new HashSet<>();
         hierarchy.add(element);
 
-        for (SliceInterfaceDef interfaceDef : module.getInterfaceDefList()) {
-            if (interfaceDef.equals(element)) {
-                continue;
-            }
-            if (interfaceDef.getInterfaceBody() == null) {
+        final List<SliceDataTypeElement> typeDefList = module.getDataTypeElementList();
+        for (SliceDataTypeElement type : typeDefList) {
+            if (type.getBodyBlock() == null) {
                 // Ignore forward definitions
                 continue;
             }
 
-            SliceExtendsDef extendsDef = interfaceDef.getExtendsDef();
-            if (extendsDef == null) {
-                continue;
-            }
-            SliceExtendsList extendsList = extendsDef.getExtendsList();
-            if (extendsList == null) {
-                continue;
-            }
+            if (type.isInterface()) {
+                if (type.equals(element)) {
+                    continue;
+                }
 
-            for (SliceTypeReference tr : extendsList.getTypeReferenceList()) {
-                final PsiElement psiElement = tr.getReference().resolve();
+                SliceExtendsDef extendsDef = type.getExtendsDef();
+                if (extendsDef == null) {
+                    continue;
+                }
+                SliceExtendsList extendsList = extendsDef.getExtendsList();
+                if (extendsList == null) {
+                    continue;
+                }
 
-                if (psiElement instanceof SliceInterfaceDef) {
-                    if (hierarchy.contains(psiElement)) {
-                        elements.add(interfaceDef);
-                        hierarchy.add(interfaceDef);
+                for (SliceTypeReference tr : extendsList.getTypeReferenceList()) {
+                    final PsiElement psiElement = tr.getReference().resolve();
+
+                    if (psiElement instanceof SliceDataTypeElement) {
+                        if (hierarchy.contains(psiElement)) {
+                            elements.add(type);
+                            hierarchy.add(type);
+                        }
                     }
                 }
             }
-        }
 
-        final List<SliceClassDef> classDefList = module.getClassDefList();
-        for (SliceClassDef clazz : classDefList) {
-            if (clazz.getClassBody() == null) {
-                // Ignore forward definitions
-                continue;
-            }
+            if (type.isClass()) {
+                SliceImplementsDef implementsDef = type.getImplementsDef();
+                if (implementsDef == null) {
+                    continue;
+                }
+                SliceExtendsList implementsList = implementsDef.getExtendsList();
+                if (implementsList == null) {
+                    continue;
+                }
 
-            SliceImplementsDef implementsDef = clazz.getImplementsDef();
-            if (implementsDef == null) {
-                continue;
-            }
-            SliceExtendsList implementsList = implementsDef.getExtendsList();
-            if (implementsList == null) {
-                continue;
-            }
+                for (SliceTypeReference tr : implementsList.getTypeReferenceList()) {
+                    final PsiElement psiElement = tr.getReference().resolve();
 
-            for (SliceTypeReference tr : implementsList.getTypeReferenceList()) {
-                final PsiElement psiElement = tr.getReference().resolve();
-
-                if (psiElement instanceof SliceInterfaceDef) {
-                    if (hierarchy.contains(psiElement)) {
-                        elements.add(clazz);
-                        supers.add(clazz);
+                    if (psiElement instanceof SliceDataTypeElement) {
+                        if (hierarchy.contains(psiElement)) {
+                            elements.add(type);
+                            supers.add(type);
+                        }
                     }
                 }
             }

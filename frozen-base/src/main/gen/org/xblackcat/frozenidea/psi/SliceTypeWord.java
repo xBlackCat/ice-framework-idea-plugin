@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceSequenceTypeList extends SliceCompositeElement {
-
-  @NotNull
-  SliceElementType getElementType();
+public interface SliceTypeWord extends SliceCompositeElement {
 
 }

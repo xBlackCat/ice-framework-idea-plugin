@@ -140,17 +140,14 @@ public class SlicePsiImplUtil {
         // Search in current file and module
         for (PsiElement c : m.getChildren()) {
             if (c instanceof SliceDataTypeElement) {
-                if (matcher.test((SliceDataTypeElement) c)) {
-                    if (c instanceof SliceClassDef) {
-                        if (((SliceClassDef) c).getClassBody() != null) {
-                            result.add((SliceClassDef) c);
-                        }
-                    } else if (c instanceof SliceInterfaceDef) {
-                        if (((SliceInterfaceDef) c).getInterfaceBody() != null) {
-                            result.add((SliceInterfaceDef) c);
+                final SliceDataTypeElement typeElement = (SliceDataTypeElement) c;
+                if (matcher.test(typeElement)) {
+                    if (typeElement.isClass() || typeElement.isInterface() || typeElement.isException()) {
+                        if ((typeElement).getBodyBlock() != null) {
+                            result.add(typeElement);
                         }
                     } else {
-                        result.add((SliceDataTypeElement) c);
+                        result.add(typeElement);
                     }
                 }
             }
@@ -204,5 +201,44 @@ public class SlicePsiImplUtil {
             return 0;
         }
         return list.getParameterList().size();
+    }
+
+    public static boolean isClass(SliceDataTypeElement element) {
+        SliceTypeWord word = element.getTypeWord();
+        return "class".equals(word.getText());
+    }
+
+    public static boolean isInterface(SliceDataTypeElement element) {
+        SliceTypeWord word = element.getTypeWord();
+        return "interface".equals(word.getText());
+    }
+
+    public static boolean isException(SliceDataTypeElement element) {
+        SliceTypeWord word = element.getTypeWord();
+        return "exception".equals(word.getText());
+    }
+
+    public static boolean isEnum(SliceDataTypeElement element) {
+        SliceTypeWord word = element.getTypeWord();
+        return "enum".equals(word.getText());
+    }
+
+    public static boolean isStruct(SliceDataTypeElement element) {
+        SliceTypeWord word = element.getTypeWord();
+        return "struct".equals(word.getText());
+    }
+
+    public static boolean isSequence(SliceDataTypeElement element) {
+        SliceTypeWord word = element.getTypeWord();
+        return "sequence".equals(word.getText());
+    }
+
+    public static boolean isDictionary(SliceDataTypeElement element) {
+        SliceTypeWord word = element.getTypeWord();
+        return "dictionary".equals(word.getText());
+    }
+
+    public static SliceModule getModule(SliceDataTypeElement element) {
+        return PsiTreeUtil.getParentOfType(element, SliceModule.class);
     }
 }

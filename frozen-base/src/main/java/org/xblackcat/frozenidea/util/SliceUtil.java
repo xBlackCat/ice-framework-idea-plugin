@@ -10,10 +10,8 @@ import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 24.03.2016 15:12
@@ -108,22 +106,11 @@ public class SliceUtil {
     }
 
     public static List<SliceMethodDef> getMethodList(SliceDataTypeElement aClass) {
-        if (aClass instanceof SliceClassDef) {
-            final SliceClassBody body = ((SliceClassDef) aClass).getClassBody();
-            if (body != null) {
-                return body.getMethodDefList();
-            } else {
-                return null;
-            }
-        } else if (aClass instanceof SliceInterfaceDef) {
-            final SliceInterfaceBody body = ((SliceInterfaceDef) aClass).getInterfaceBody();
-            if (body != null) {
-                return body.getMethodDefList();
-            } else {
-                return null;
-            }
-        } else {
+        final SliceBodyBlock bodyBlock = aClass.getBodyBlock();
+        if (bodyBlock == null) {
             return null;
         }
+
+        return bodyBlock.getMethodDefList();
     }
 }

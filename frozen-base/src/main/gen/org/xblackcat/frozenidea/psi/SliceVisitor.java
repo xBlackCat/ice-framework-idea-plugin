@@ -6,17 +6,12 @@ import com.intellij.psi.PsiElementVisitor;
 
 public class SliceVisitor extends PsiElementVisitor {
 
+  public void visitBodyBlock(@NotNull SliceBodyBlock o) {
+    visitCompositeElement(o);
+  }
+
   public void visitBoolLiteral(@NotNull SliceBoolLiteral o) {
     visitCompositeElement(o);
-  }
-
-  public void visitClassBody(@NotNull SliceClassBody o) {
-    visitCompositeElement(o);
-  }
-
-  public void visitClassDef(@NotNull SliceClassDef o) {
-    visitDataTypeElement(o);
-    // visitNamedElement(o);
   }
 
   public void visitConstantDef(@NotNull SliceConstantDef o) {
@@ -31,17 +26,8 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitDictionaryDef(@NotNull SliceDictionaryDef o) {
-    visitDataTypeElement(o);
-    // visitNamedElement(o);
-  }
-
-  public void visitDictionaryTypeList(@NotNull SliceDictionaryTypeList o) {
-    visitCompositeElement(o);
-  }
-
-  public void visitElementType(@NotNull SliceElementType o) {
-    visitCompositeElement(o);
+  public void visitDataTypeElement(@NotNull SliceDataTypeElement o) {
+    visitNamedElement(o);
   }
 
   public void visitEnumConstant(@NotNull SliceEnumConstant o) {
@@ -53,22 +39,8 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitEnumConstantList(@NotNull SliceEnumConstantList o) {
-    visitCompositeElement(o);
-  }
-
   public void visitEnumConstantReference(@NotNull SliceEnumConstantReference o) {
     visitCompositeElement(o);
-  }
-
-  public void visitEnumDef(@NotNull SliceEnumDef o) {
-    visitDataTypeElement(o);
-    // visitNamedElement(o);
-  }
-
-  public void visitExceptionDef(@NotNull SliceExceptionDef o) {
-    visitDataTypeElement(o);
-    // visitNamedElement(o);
   }
 
   public void visitExtendsDef(@NotNull SliceExtendsDef o) {
@@ -92,6 +64,10 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
+  public void visitGenericType(@NotNull SliceGenericType o) {
+    visitCompositeElement(o);
+  }
+
   public void visitGlobalMetadata(@NotNull SliceGlobalMetadata o) {
     visitCompositeElement(o);
   }
@@ -101,19 +77,6 @@ public class SliceVisitor extends PsiElementVisitor {
   }
 
   public void visitIntegerLiteral(@NotNull SliceIntegerLiteral o) {
-    visitCompositeElement(o);
-  }
-
-  public void visitInterfaceBody(@NotNull SliceInterfaceBody o) {
-    visitCompositeElement(o);
-  }
-
-  public void visitInterfaceDef(@NotNull SliceInterfaceDef o) {
-    visitDataTypeElement(o);
-    // visitNamedElement(o);
-  }
-
-  public void visitKeyType(@NotNull SliceKeyType o) {
     visitCompositeElement(o);
   }
 
@@ -166,22 +129,12 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitSequenceDef(@NotNull SliceSequenceDef o) {
-    visitDataTypeElement(o);
-    // visitNamedElement(o);
-  }
-
-  public void visitSequenceTypeList(@NotNull SliceSequenceTypeList o) {
+  public void visitSecondGenericType(@NotNull SliceSecondGenericType o) {
     visitCompositeElement(o);
   }
 
   public void visitStringLiteral(@NotNull SliceStringLiteral o) {
     visitCompositeElement(o);
-  }
-
-  public void visitStructDef(@NotNull SliceStructDef o) {
-    visitDataTypeElement(o);
-    // visitNamedElement(o);
   }
 
   public void visitThrowsDef(@NotNull SliceThrowsDef o) {
@@ -196,11 +149,11 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitVariableType(@NotNull SliceVariableType o) {
+  public void visitTypeWord(@NotNull SliceTypeWord o) {
     visitCompositeElement(o);
   }
 
-  public void visitDataTypeElement(@NotNull SliceDataTypeElement o) {
+  public void visitVariableType(@NotNull SliceVariableType o) {
     visitCompositeElement(o);
   }
 

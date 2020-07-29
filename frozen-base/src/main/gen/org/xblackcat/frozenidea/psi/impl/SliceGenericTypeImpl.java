@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import org.xblackcat.frozenidea.psi.*;
 
-public class SliceStructDefImpl extends SliceDataTypeElementImpl implements SliceStructDef {
+public class SliceGenericTypeImpl extends SliceCompositeElementImpl implements SliceGenericType {
 
-  public SliceStructDefImpl(ASTNode node) {
+  public SliceGenericTypeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SliceVisitor visitor) {
-    visitor.visitStructDef(this);
+    visitor.visitGenericType(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -26,21 +26,15 @@ public class SliceStructDefImpl extends SliceDataTypeElementImpl implements Slic
   }
 
   @Override
-  @NotNull
-  public List<SliceFieldDef> getFieldDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceFieldDef.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SliceMetadata> getMetadataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceMetadata.class);
+  @Nullable
+  public SliceDataType getDataType() {
+    return findChildByClass(SliceDataType.class);
   }
 
   @Override
   @Nullable
-  public PsiElement getId() {
-    return findChildByType(ICE_ID);
+  public SliceSecondGenericType getSecondGenericType() {
+    return findChildByClass(SliceSecondGenericType.class);
   }
 
 }
