@@ -187,7 +187,7 @@ private body_element_list_recovery ::= !('}')
 private type_recovery ::= !('>')
 
 enum_constant_initializer ::= '=' number_literal {pin=1 methods = [getConstant]}
-enum_constant ::= id enum_constant_initializer? {pin = 1}
+enum_constant ::= id enum_constant_initializer? ','? {pin = 1}
 
 // --- Other ---
 module_path ::= path_element*
@@ -224,7 +224,7 @@ variable_type ::= data_type
 
 field_initializer ::= '=' constant_value {pin=1}
 
-field_def ::= metadata* variable_type id (field_initializer )? ';' {pin=2}
+field_def ::= metadata* variable_type id (field_initializer )? ';' {pin=3}
 
 constant_def ::= metadata* 'const' variable_type id field_initializer ';' {pin=2}
 

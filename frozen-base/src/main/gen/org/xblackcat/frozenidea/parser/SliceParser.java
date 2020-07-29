@@ -285,7 +285,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // id enum_constant_initializer?
+  // id enum_constant_initializer? ','?
   public static boolean enum_constant(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enum_constant")) return false;
     if (!nextTokenIs(b, ICE_ID)) return false;
@@ -293,7 +293,8 @@ public class SliceParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, ICE_ENUM_CONSTANT, null);
     r = consumeToken(b, ICE_ID);
     p = r; // pin = 1
-    r = r && enum_constant_1(b, l + 1);
+    r = r && report_error_(b, enum_constant_1(b, l + 1));
+    r = p && enum_constant_2(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -302,6 +303,13 @@ public class SliceParser implements PsiParser, LightPsiParser {
   private static boolean enum_constant_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enum_constant_1")) return false;
     enum_constant_initializer(b, l + 1);
+    return true;
+  }
+
+  // ','?
+  private static boolean enum_constant_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "enum_constant_2")) return false;
+    consumeToken(b, ICE_COMA);
     return true;
   }
 
@@ -408,9 +416,9 @@ public class SliceParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, ICE_FIELD_DEF, "<field def>");
     r = field_def_0(b, l + 1);
     r = r && variable_type(b, l + 1);
-    p = r; // pin = 2
-    r = r && report_error_(b, consumeToken(b, ICE_ID));
-    r = p && report_error_(b, field_def_3(b, l + 1)) && r;
+    r = r && consumeToken(b, ICE_ID);
+    p = r; // pin = 3
+    r = r && report_error_(b, field_def_3(b, l + 1));
     r = p && consumeToken(b, ICE_SEMICOLON) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;

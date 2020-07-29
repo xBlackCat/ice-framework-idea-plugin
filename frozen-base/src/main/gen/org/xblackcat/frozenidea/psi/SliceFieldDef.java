@@ -16,7 +16,7 @@ public interface SliceFieldDef extends SliceInnerElement, SliceNamedElement {
   @NotNull
   SliceVariableType getVariableType();
 
-  @Nullable
+  @NotNull
   PsiElement getId();
 
 }
