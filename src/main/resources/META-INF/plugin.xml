@@ -35,6 +35,9 @@
         <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceBraceMatcher"/>
         <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceFoldingBuilder"/>
 
+        <lang.psiStructureViewFactory language="SLICE"
+                                      implementationClass="org.xblackcat.frozenidea.structure.SliceStructureViewFactory"/>
+
         <moduleService serviceInterface="org.xblackcat.frozenidea.integration.SliceModuleHelper"
                        serviceImplementation="org.xblackcat.frozenidea.integration.SliceModuleHelper$Impl"/>
         <projectService serviceInterface="org.xblackcat.frozenidea.psi.SlicePsiFacade"
