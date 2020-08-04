@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import org.xblackcat.frozenidea.psi.*;
 
-public class SliceExtendsListImpl extends SliceCompositeElementImpl implements SliceExtendsList {
+public class SliceImplementsBlockImpl extends SliceCompositeElementImpl implements SliceImplementsBlock {
 
-  public SliceExtendsListImpl(@NotNull ASTNode node) {
+  public SliceImplementsBlockImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SliceVisitor visitor) {
-    visitor.visitExtendsList(this);
+    visitor.visitImplementsBlock(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

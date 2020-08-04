@@ -20,7 +20,7 @@ public interface SliceMethodDef extends SliceInnerElement, SliceNamedElement {
   SliceParametersList getParametersList();
 
   @Nullable
-  SliceThrowsDef getThrowsDef();
+  SliceThrowsBlock getThrowsBlock();
 
   @NotNull
   PsiElement getId();

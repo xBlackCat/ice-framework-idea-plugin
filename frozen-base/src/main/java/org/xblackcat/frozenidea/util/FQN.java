@@ -120,7 +120,7 @@ public class FQN {
 
     @Override
     public String toString() {
-        return "FQN: " + getFQN();
+        return getFQN();
     }
 
     public String getFQN() {

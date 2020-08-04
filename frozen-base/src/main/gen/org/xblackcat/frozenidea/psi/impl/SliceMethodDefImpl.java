@@ -51,8 +51,8 @@ public class SliceMethodDefImpl extends SliceInnerElementImpl implements SliceMe
 
   @Override
   @Nullable
-  public SliceThrowsDef getThrowsDef() {
-    return findChildByClass(SliceThrowsDef.class);
+  public SliceThrowsBlock getThrowsBlock() {
+    return findChildByClass(SliceThrowsBlock.class);
   }
 
   @Override

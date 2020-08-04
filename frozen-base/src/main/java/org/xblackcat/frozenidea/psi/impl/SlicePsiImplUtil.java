@@ -61,19 +61,6 @@ public class SlicePsiImplUtil {
         return StringUtil.unescapeStringCharacters(o.getText());
     }
 
-    public static Integer getConstant(SliceEnumConstantInitializer o) {
-        final String text = o.getText();
-        if (text == null || text.isEmpty()) {
-            return null;
-        }
-        try {
-            // TODO: check modifiers for other than decimal base
-            return Integer.parseInt(StringUtil.unescapeStringCharacters(text));
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
     @NotNull
     public static String getValue(SliceIntegerLiteral o) {
         // TODO: fix
@@ -200,12 +187,20 @@ public class SlicePsiImplUtil {
         if (list == null) {
             return 0;
         }
-        return list.getParameterList().size();
+        return list.getParameterDefList().size();
+    }
+
+    public static SliceDataTypeElement getContainingClass(SliceMethodDef method) {
+        return PsiTreeUtil.getParentOfType(method, SliceDataTypeElement.class);
     }
 
     public static boolean isClass(SliceDataTypeElement element) {
         SliceTypeWord word = element.getTypeWord();
         return "class".equals(word.getText());
+    }
+
+    public static FQN getQualifiedName(SliceDataTypeElement element) {
+        return FQN.buildFQN(element);
     }
 
     public static boolean isInterface(SliceDataTypeElement element) {

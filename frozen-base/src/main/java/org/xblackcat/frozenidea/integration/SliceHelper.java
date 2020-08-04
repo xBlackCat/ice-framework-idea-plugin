@@ -141,16 +141,11 @@ public class SliceHelper {
                 continue;
             }
 
-            SliceExtendsDef extendsDef = clazz.getExtendsDef();
+            SliceExtendsBlock extendsDef = clazz.getExtendsBlock();
             if (extendsDef == null) {
                 continue;
             }
-            SliceExtendsList extendsList = extendsDef.getExtendsList();
-            if (extendsList == null) {
-                continue;
-            }
-
-            for (SliceTypeReference tr : extendsList.getTypeReferenceList()) {
+            for (SliceTypeReference tr : extendsDef.getTypeReferenceList()) {
                 final PsiElement psiElement = tr.getReference().resolve();
 
                 if (psiElement instanceof SliceDataTypeElement) {
@@ -182,50 +177,37 @@ public class SliceHelper {
                     continue;
                 }
 
-                SliceExtendsDef extendsDef = type.getExtendsDef();
-                if (extendsDef == null) {
-                    continue;
-                }
-                SliceExtendsList extendsList = extendsDef.getExtendsList();
-                if (extendsList == null) {
-                    continue;
-                }
-
-                for (SliceTypeReference tr : extendsList.getTypeReferenceList()) {
-                    final PsiElement psiElement = tr.getReference().resolve();
-
-                    if (psiElement instanceof SliceDataTypeElement) {
-                        if (hierarchy.contains(psiElement)) {
-                            elements.add(type);
-                            hierarchy.add(type);
-                        }
-                    }
-                }
+                SliceExtendsBlock extendsDef = type.getExtendsBlock();
+                searchInReferenceList(elements, hierarchy, hierarchy, type, extendsDef);
             }
 
             if (type.isClass()) {
-                SliceImplementsDef implementsDef = type.getImplementsDef();
-                if (implementsDef == null) {
-                    continue;
-                }
-                SliceExtendsList implementsList = implementsDef.getExtendsList();
-                if (implementsList == null) {
-                    continue;
-                }
-
-                for (SliceTypeReference tr : implementsList.getTypeReferenceList()) {
-                    final PsiElement psiElement = tr.getReference().resolve();
-
-                    if (psiElement instanceof SliceDataTypeElement) {
-                        if (hierarchy.contains(psiElement)) {
-                            elements.add(type);
-                            supers.add(type);
-                        }
-                    }
-                }
+                SliceImplementsBlock implementsDef = type.getImplementsBlock();
+                searchInReferenceList(elements, supers, hierarchy, type, implementsDef);
             }
         }
 
         findAllSubclasses(elements, module, supers);
+    }
+
+    private static void searchInReferenceList(
+            Set<SliceDataTypeElement> elements,
+            Set<SliceDataTypeElement> supers,
+            Set<SliceDataTypeElement> hierarchy,
+            SliceDataTypeElement type,
+            SliceReferenceListElement element
+    ) {
+        if (element != null) {
+            for (SliceTypeReference tr : element.getTypeReferenceList()) {
+                final PsiElement psiElement = tr.getReference().resolve();
+
+                if (psiElement instanceof SliceDataTypeElement) {
+                    if (hierarchy.contains(psiElement)) {
+                        elements.add(type);
+                        supers.add(type);
+                    }
+                }
+            }
+        }
     }
 }

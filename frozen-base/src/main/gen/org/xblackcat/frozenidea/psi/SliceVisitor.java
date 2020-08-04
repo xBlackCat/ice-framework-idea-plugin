@@ -15,7 +15,8 @@ public class SliceVisitor extends PsiElementVisitor {
   }
 
   public void visitConstantDef(@NotNull SliceConstantDef o) {
-    visitNamedElement(o);
+    visitVariableElement(o);
+    // visitNamedElement(o);
   }
 
   public void visitConstantValue(@NotNull SliceConstantValue o) {
@@ -32,27 +33,21 @@ public class SliceVisitor extends PsiElementVisitor {
 
   public void visitEnumConstant(@NotNull SliceEnumConstant o) {
     visitInnerElement(o);
+    // visitVariableElement(o);
     // visitNamedElement(o);
-  }
-
-  public void visitEnumConstantInitializer(@NotNull SliceEnumConstantInitializer o) {
-    visitCompositeElement(o);
   }
 
   public void visitEnumConstantReference(@NotNull SliceEnumConstantReference o) {
     visitCompositeElement(o);
   }
 
-  public void visitExtendsDef(@NotNull SliceExtendsDef o) {
-    visitNamedElement(o);
-  }
-
-  public void visitExtendsList(@NotNull SliceExtendsList o) {
-    visitCompositeElement(o);
+  public void visitExtendsBlock(@NotNull SliceExtendsBlock o) {
+    visitReferenceListElement(o);
   }
 
   public void visitFieldDef(@NotNull SliceFieldDef o) {
     visitInnerElement(o);
+    // visitVariableElement(o);
     // visitNamedElement(o);
   }
 
@@ -72,8 +67,8 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitImplementsDef(@NotNull SliceImplementsDef o) {
-    visitNamedElement(o);
+  public void visitImplementsBlock(@NotNull SliceImplementsBlock o) {
+    visitReferenceListElement(o);
   }
 
   public void visitIntegerLiteral(@NotNull SliceIntegerLiteral o) {
@@ -113,8 +108,9 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitParameter(@NotNull SliceParameter o) {
-    visitCompositeElement(o);
+  public void visitParameterDef(@NotNull SliceParameterDef o) {
+    visitVariableElement(o);
+    // visitNamedElement(o);
   }
 
   public void visitParameterModifier(@NotNull SliceParameterModifier o) {
@@ -137,12 +133,8 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitThrowsDef(@NotNull SliceThrowsDef o) {
-    visitNamedElement(o);
-  }
-
-  public void visitThrowsList(@NotNull SliceThrowsList o) {
-    visitCompositeElement(o);
+  public void visitThrowsBlock(@NotNull SliceThrowsBlock o) {
+    visitReferenceListElement(o);
   }
 
   public void visitTypeReference(@NotNull SliceTypeReference o) {
@@ -153,15 +145,19 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitVariableType(@NotNull SliceVariableType o) {
-    visitCompositeElement(o);
-  }
-
   public void visitInnerElement(@NotNull SliceInnerElement o) {
     visitCompositeElement(o);
   }
 
   public void visitNamedElement(@NotNull SliceNamedElement o) {
+    visitCompositeElement(o);
+  }
+
+  public void visitReferenceListElement(@NotNull SliceReferenceListElement o) {
+    visitCompositeElement(o);
+  }
+
+  public void visitVariableElement(@NotNull SliceVariableElement o) {
     visitCompositeElement(o);
   }
 

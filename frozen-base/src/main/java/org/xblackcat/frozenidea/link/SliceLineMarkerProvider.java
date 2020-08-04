@@ -57,7 +57,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
         }
 
         for (SliceDataTypeElement exceptionDef : module.getDataTypeElementList()) {
-            if (searchInExtends(element, exceptionDef.getExtendsDef())) {
+            if (searchInReferenceList(element, exceptionDef.getExtendsBlock())) {
                 items.add(exceptionDef);
             }
         }
@@ -70,15 +70,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
         }
     }
 
-    private static boolean searchInExtends(SliceDataTypeElement element, SliceExtendsDef def) {
-        return def != null && searchInExtendsList(element, def.getExtendsList());
-    }
-
-    private static boolean searchInImplements(SliceDataTypeElement element, SliceImplementsDef def) {
-        return def != null && searchInExtendsList(element, def.getExtendsList());
-    }
-
-    private static boolean searchInExtendsList(SliceDataTypeElement element, SliceExtendsList list) {
+    private static boolean searchInReferenceList(SliceDataTypeElement element, SliceReferenceListElement list) {
         if (list != null) {
             for (SliceTypeReference type : list.getTypeReferenceList()) {
                 final PsiElement reference = type.getReference().resolve();
@@ -106,10 +98,10 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
         }
 
         for (SliceDataTypeElement typeDef : module.getDataTypeElementList()) {
-            if (searchInImplements(element, typeDef.getImplementsDef())) {
+            if (searchInReferenceList(element, typeDef.getImplementsBlock())) {
                 items.add(typeDef);
             }
-            if (searchInExtends(element, typeDef.getExtendsDef())) {
+            if (searchInReferenceList(element, typeDef.getExtendsBlock())) {
                 items.add(typeDef);
             }
         }

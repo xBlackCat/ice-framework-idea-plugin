@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.util.FQN;
 
 public class SliceDataTypeElementImpl extends SliceNamedElementImpl implements SliceDataTypeElement {
 
@@ -33,8 +34,8 @@ public class SliceDataTypeElementImpl extends SliceNamedElementImpl implements S
 
   @Override
   @Nullable
-  public SliceExtendsDef getExtendsDef() {
-    return findChildByClass(SliceExtendsDef.class);
+  public SliceExtendsBlock getExtendsBlock() {
+    return findChildByClass(SliceExtendsBlock.class);
   }
 
   @Override
@@ -45,8 +46,8 @@ public class SliceDataTypeElementImpl extends SliceNamedElementImpl implements S
 
   @Override
   @Nullable
-  public SliceImplementsDef getImplementsDef() {
-    return findChildByClass(SliceImplementsDef.class);
+  public SliceImplementsBlock getImplementsBlock() {
+    return findChildByClass(SliceImplementsBlock.class);
   }
 
   @Override
@@ -105,6 +106,11 @@ public class SliceDataTypeElementImpl extends SliceNamedElementImpl implements S
   @Override
   public SliceModule getModule() {
     return SlicePsiImplUtil.getModule(this);
+  }
+
+  @Override
+  public FQN getQualifiedName() {
+    return SlicePsiImplUtil.getQualifiedName(this);
   }
 
 }

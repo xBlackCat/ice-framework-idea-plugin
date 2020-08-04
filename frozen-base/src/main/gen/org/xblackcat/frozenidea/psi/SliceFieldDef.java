@@ -5,16 +5,16 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceFieldDef extends SliceInnerElement, SliceNamedElement {
+public interface SliceFieldDef extends SliceInnerElement, SliceVariableElement, SliceNamedElement {
+
+  @NotNull
+  SliceDataType getDataType();
 
   @Nullable
   SliceFieldInitializer getFieldInitializer();
 
   @NotNull
   List<SliceMetadata> getMetadataList();
-
-  @NotNull
-  SliceVariableType getVariableType();
 
   @NotNull
   PsiElement getId();

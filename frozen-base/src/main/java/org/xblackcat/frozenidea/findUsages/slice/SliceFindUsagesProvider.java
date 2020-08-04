@@ -61,7 +61,7 @@ public class SliceFindUsagesProvider implements FindUsagesProvider {
         if (element instanceof SliceFieldDef) {
             return LangBundle.message("java.terms.field");
         }
-        if (element instanceof SliceParameter) {
+        if (element instanceof SliceParameterDef) {
             return LangBundle.message("java.terms.parameter");
         }
         if (element instanceof SliceMethodDef) {

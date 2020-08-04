@@ -71,7 +71,7 @@ public class SliceJavaFindUsagesHandler extends FindUsagesHandler {
             SliceFieldDef fieldDef = (SliceFieldDef) element;
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(fieldDef);
 
-            PsiElement javaField = javaHelper.findClassField(FQN.buildFQN(fieldDef.getDeclarationType()).getJavaFQN(), fieldDef.getName());
+            PsiElement javaField = javaHelper.findClassField(FQN.buildFQN(fieldDef.getContainingClass()).getJavaFQN(), fieldDef.getName());
             if (javaField != null) {
                 return new PsiElement[]{
                         javaField
@@ -81,7 +81,7 @@ public class SliceJavaFindUsagesHandler extends FindUsagesHandler {
             SliceEnumConstant fieldDef = (SliceEnumConstant) element;
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(fieldDef);
 
-            PsiElement javaField = javaHelper.findClassField(FQN.buildFQN(fieldDef.getDeclarationType()).getJavaFQN(), fieldDef.getName());
+            PsiElement javaField = javaHelper.findClassField(FQN.buildFQN(fieldDef.getContainingClass()).getJavaFQN(), fieldDef.getName());
             if (javaField != null) {
                 return new PsiElement[]{
                         javaField

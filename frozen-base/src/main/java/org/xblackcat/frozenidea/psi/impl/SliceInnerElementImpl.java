@@ -25,19 +25,13 @@ import org.xblackcat.frozenidea.util.FQN;
 import javax.swing.*;
 import java.util.stream.Collectors;
 
-/**
- * Created by IntelliJ IDEA.
- * User: gregory
- * Date: 14.07.11
- * Time: 20:04
- */
 public abstract class SliceInnerElementImpl extends SliceNamedElementImpl implements SliceInnerElement {
     protected SliceInnerElementImpl(ASTNode node) {
         super(node);
     }
 
     @Override
-    public SliceDataTypeElement getDeclarationType() {
+    public SliceDataTypeElement getContainingClass() {
         return PsiTreeUtil.getParentOfType(this, SliceDataTypeElement.class);
     }
 
@@ -51,10 +45,10 @@ public abstract class SliceInnerElementImpl extends SliceNamedElementImpl implem
             public String getPresentableText() {
                 final SliceParametersList list = ((SliceMethodDef) SliceInnerElementImpl.this).getParametersList();
                 final String params;
-                if (list == null || list.getParameterList().isEmpty()) {
+                if (list == null || list.getParameterDefList().isEmpty()) {
                     params = "";
                 } else {
-                    params = list.getParameterList().stream().map(p -> p.getDataType().getText()).collect(Collectors.joining(", "));
+                    params = list.getParameterDefList().stream().map(p -> p.getDataType().getText()).collect(Collectors.joining(", "));
                 }
                 return getName() + "(" + params + ")";
             }

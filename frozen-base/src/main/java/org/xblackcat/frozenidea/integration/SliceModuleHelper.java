@@ -142,7 +142,7 @@ public class SliceModuleHelper {
                     final int paramAmount;
                     final SliceParametersList list = method.getParametersList();
                     if (list != null) {
-                        paramAmount = list.getParameterList().size();
+                        paramAmount = list.getParameterDefList().size();
                     } else {
                         paramAmount = 0;
                     }

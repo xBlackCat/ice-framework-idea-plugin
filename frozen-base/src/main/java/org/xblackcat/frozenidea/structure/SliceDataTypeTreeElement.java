@@ -4,9 +4,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
-import org.xblackcat.frozenidea.psi.SliceModule;
-import org.xblackcat.frozenidea.psi.SliceNamedElement;
+import org.xblackcat.frozenidea.psi.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,9 +21,21 @@ public class SliceDataTypeTreeElement extends PsiTreeElementBase<SliceDataTypeEl
 
     @Override
     public @NotNull Collection<StructureViewTreeElement> getChildrenBase() {
-        // TODO: implement show members (fields, methods, etc.)
+        final SliceDataTypeElement element = getElement();
+        if (element == null) {
+            return Collections.emptyList();
+        }
+        final SliceBodyBlock block = element.getBodyBlock();
+        if (block == null) {
+            return Collections.emptyList();
+        }
 
-        return Collections.emptyList();
+        final List<StructureViewTreeElement> elements = new ArrayList<>();
+        for (SliceMethodDef method : block.getMethodDefList()) {
+            elements.add(new SliceMethodTreeElement(method));
+        }
+
+        return elements;
     }
 
     @Override

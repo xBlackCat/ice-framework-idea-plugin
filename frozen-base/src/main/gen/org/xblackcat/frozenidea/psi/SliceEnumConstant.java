@@ -5,10 +5,10 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceEnumConstant extends SliceInnerElement, SliceNamedElement {
+public interface SliceEnumConstant extends SliceInnerElement, SliceVariableElement, SliceNamedElement {
 
   @Nullable
-  SliceEnumConstantInitializer getEnumConstantInitializer();
+  SliceFieldInitializer getFieldInitializer();
 
   @NotNull
   PsiElement getId();

@@ -27,8 +27,8 @@ public class SliceParametersListImpl extends SliceCompositeElementImpl implement
 
   @Override
   @NotNull
-  public List<SliceParameter> getParameterList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceParameter.class);
+  public List<SliceParameterDef> getParameterDefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceParameterDef.class);
   }
 
 }

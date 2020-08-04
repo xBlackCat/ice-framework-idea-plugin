@@ -67,43 +67,35 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
         final PsiElement parent = myElement.getParent();
         final Project project = myElement.getProject();
 
-        if (parent instanceof SliceExtendsList) {
-            PsiElement block = parent.getParent();
-
-            final PsiElement declaration;
-            if (block instanceof SliceImplementsDef) {
-                declaration = block.getParent();
-                if (declaration instanceof SliceDataTypeElement && ((SliceDataTypeElement) declaration).isClass()) {
+        if (parent instanceof SliceReferenceListElement) {
+            final SliceDataTypeElement declaration = ((SliceReferenceListElement) parent).getContainingClass();
+            if (parent instanceof SliceImplementsBlock) {
+                if (declaration != null && declaration.isClass()) {
                     SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceInterfacePredicate));
                 } else {
                     return EMPTY_ARRAY;
                 }
-            } else if (block instanceof SliceExtendsDef) {
-                declaration = block.getParent();
-                if (declaration instanceof SliceDataTypeElement) {
-                    final SliceDataTypeElement typeDef = (SliceDataTypeElement) declaration;
-                    if (typeDef.isClass()) {
-                        SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceClassPredicate));
-                    } else if (typeDef.isInterface()) {
-                        SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceInterfacePredicate));
-                    } else if (typeDef.isException()) {
-                        SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceExceptionPredicate));
-                    } else {
-                        return EMPTY_ARRAY;
-                    }
+            } else if (parent instanceof SliceExtendsBlock) {
+                if (declaration == null) {
+                    return EMPTY_ARRAY;
+                }
+                if (declaration.isClass()) {
+                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceClassPredicate));
+                } else if (declaration.isInterface()) {
+                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceInterfacePredicate));
+                } else if (declaration.isException()) {
+                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceExceptionPredicate));
                 } else {
                     return EMPTY_ARRAY;
                 }
+            } else if (parent instanceof SliceThrowsBlock) {
+                SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceExceptionPredicate));
             } else {
                 return EMPTY_ARRAY;
             }
 
-            FQN referenceName = FQN.buildFQN((SliceNamedElement) declaration);
+            FQN referenceName = FQN.buildFQN(declaration);
             references.remove(referenceName);
-        } else if (parent instanceof SliceImplementsDef) {
-            SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceInterfacePredicate));
-        } else if (parent instanceof SliceThrowsList) {
-            SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceExceptionPredicate));
         } else {
             SlicePsiImplUtil.addAll(
                     references,

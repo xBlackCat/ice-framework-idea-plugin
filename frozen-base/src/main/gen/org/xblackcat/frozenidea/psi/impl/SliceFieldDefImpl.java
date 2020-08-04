@@ -26,6 +26,12 @@ public class SliceFieldDefImpl extends SliceInnerElementImpl implements SliceFie
   }
 
   @Override
+  @NotNull
+  public SliceDataType getDataType() {
+    return findNotNullChildByClass(SliceDataType.class);
+  }
+
+  @Override
   @Nullable
   public SliceFieldInitializer getFieldInitializer() {
     return findChildByClass(SliceFieldInitializer.class);
@@ -35,12 +41,6 @@ public class SliceFieldDefImpl extends SliceInnerElementImpl implements SliceFie
   @NotNull
   public List<SliceMetadata> getMetadataList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceMetadata.class);
-  }
-
-  @Override
-  @NotNull
-  public SliceVariableType getVariableType() {
-    return findNotNullChildByClass(SliceVariableType.class);
   }
 
   @Override

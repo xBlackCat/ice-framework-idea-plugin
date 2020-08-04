@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceImplementsDef extends SliceNamedElement {
+public interface SliceThrowsBlock extends SliceReferenceListElement {
 
-  @Nullable
-  SliceExtendsList getExtendsList();
+  @NotNull
+  List<SliceTypeReference> getTypeReferenceList();
 
 }

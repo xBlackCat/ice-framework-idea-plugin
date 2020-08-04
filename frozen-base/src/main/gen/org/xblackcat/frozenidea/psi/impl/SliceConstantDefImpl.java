@@ -27,6 +27,12 @@ public class SliceConstantDefImpl extends SliceNamedElementImpl implements Slice
 
   @Override
   @Nullable
+  public SliceDataType getDataType() {
+    return findChildByClass(SliceDataType.class);
+  }
+
+  @Override
+  @Nullable
   public SliceFieldInitializer getFieldInitializer() {
     return findChildByClass(SliceFieldInitializer.class);
   }
@@ -35,12 +41,6 @@ public class SliceConstantDefImpl extends SliceNamedElementImpl implements Slice
   @NotNull
   public List<SliceMetadata> getMetadataList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceMetadata.class);
-  }
-
-  @Override
-  @Nullable
-  public SliceVariableType getVariableType() {
-    return findChildByClass(SliceVariableType.class);
   }
 
   @Override

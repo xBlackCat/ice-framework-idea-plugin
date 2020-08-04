@@ -151,7 +151,7 @@ public class JavaModuleHelper {
                 return null;
             }
 
-            final String className = FQN.buildFQN(methodDef.getDeclarationType()).getJavaFQN();
+            final String className = FQN.buildFQN(methodDef.getContainingClass()).getJavaFQN();
             final List<PsiElement> result = new ArrayList<>();
             PsiClass aClass = findClass(className);
             if (aClass != null) {
@@ -176,7 +176,7 @@ public class JavaModuleHelper {
         ) {
             PsiMethod[] methods = aClass.findMethodsByName(methodDef.getName() + suffix, true);
             final SliceParametersList parametersList = methodDef.getParametersList();
-            final int paramsCount = parametersList == null ? 0 : parametersList.getParameterList().size();
+            final int paramsCount = parametersList == null ? 0 : parametersList.getParameterDefList().size();
 
 
             for (PsiMethod method : methods) {
@@ -204,7 +204,7 @@ public class JavaModuleHelper {
         ) {
             PsiMethod[] methods = aClassPrx.findMethodsByName(methodDef.getName() + suffix, true);
             final SliceParametersList parametersList = methodDef.getParametersList();
-            final int paramsCount = parametersList == null ? 0 : parametersList.getParameterList().size();
+            final int paramsCount = parametersList == null ? 0 : parametersList.getParameterDefList().size();
 
 
             for (PsiMethod method : methods) {
@@ -232,7 +232,7 @@ public class JavaModuleHelper {
                 PsiParameter[] javaParameters
         ) {
             for (int i = 0; i < paramsCount; i++) {
-                final SliceDataType dataType = parametersList.getParameterList().get(i).getDataType();
+                final SliceDataType dataType = parametersList.getParameterDefList().get(i).getDataType();
                 final String type = JavaHelper.getJavaHelper(iceClass.getProject()).toJavaParameter(dataType);
 
                 if (!javaParameters[i].getType().getCanonicalText().equals(type)) {

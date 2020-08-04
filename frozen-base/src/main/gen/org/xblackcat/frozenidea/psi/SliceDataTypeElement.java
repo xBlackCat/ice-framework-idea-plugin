@@ -4,6 +4,7 @@ package org.xblackcat.frozenidea.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import org.xblackcat.frozenidea.util.FQN;
 
 public interface SliceDataTypeElement extends SliceNamedElement {
 
@@ -11,13 +12,13 @@ public interface SliceDataTypeElement extends SliceNamedElement {
   SliceBodyBlock getBodyBlock();
 
   @Nullable
-  SliceExtendsDef getExtendsDef();
+  SliceExtendsBlock getExtendsBlock();
 
   @Nullable
   SliceGenericType getGenericType();
 
   @Nullable
-  SliceImplementsDef getImplementsDef();
+  SliceImplementsBlock getImplementsBlock();
 
   @NotNull
   List<SliceMetadata> getMetadataList();
@@ -43,5 +44,7 @@ public interface SliceDataTypeElement extends SliceNamedElement {
   boolean isDictionary();
 
   SliceModule getModule();
+
+  FQN getQualifiedName();
 
 }

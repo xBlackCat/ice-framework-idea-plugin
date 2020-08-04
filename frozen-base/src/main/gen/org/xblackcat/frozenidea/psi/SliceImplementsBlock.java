@@ -5,11 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceEnumConstantInitializer extends SliceCompositeElement {
+public interface SliceImplementsBlock extends SliceReferenceListElement {
 
-  @Nullable
-  SliceNumberLiteral getNumberLiteral();
-
-  Integer getConstant();
+  @NotNull
+  List<SliceTypeReference> getTypeReferenceList();
 
 }

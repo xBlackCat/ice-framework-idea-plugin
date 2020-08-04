@@ -27,8 +27,8 @@ public class SliceEnumConstantImpl extends SliceInnerElementImpl implements Slic
 
   @Override
   @Nullable
-  public SliceEnumConstantInitializer getEnumConstantInitializer() {
-    return findChildByClass(SliceEnumConstantInitializer.class);
+  public SliceFieldInitializer getFieldInitializer() {
+    return findChildByClass(SliceFieldInitializer.class);
   }
 
   @Override

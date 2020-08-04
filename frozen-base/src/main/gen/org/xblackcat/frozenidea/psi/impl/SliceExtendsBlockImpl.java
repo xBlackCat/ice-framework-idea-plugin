@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import org.xblackcat.frozenidea.psi.*;
 
-public class SliceVariableTypeImpl extends SliceCompositeElementImpl implements SliceVariableType {
+public class SliceExtendsBlockImpl extends SliceCompositeElementImpl implements SliceExtendsBlock {
 
-  public SliceVariableTypeImpl(@NotNull ASTNode node) {
+  public SliceExtendsBlockImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SliceVisitor visitor) {
-    visitor.visitVariableType(this);
+    visitor.visitExtendsBlock(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -27,8 +27,8 @@ public class SliceVariableTypeImpl extends SliceCompositeElementImpl implements 
 
   @Override
   @NotNull
-  public SliceDataType getDataType() {
-    return findNotNullChildByClass(SliceDataType.class);
+  public List<SliceTypeReference> getTypeReferenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceTypeReference.class);
   }
 
 }

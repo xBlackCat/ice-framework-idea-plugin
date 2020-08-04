@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface SliceParametersList extends SliceCompositeElement {
 
   @NotNull
-  List<SliceParameter> getParameterList();
+  List<SliceParameterDef> getParameterDefList();
 
 }

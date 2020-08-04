@@ -138,7 +138,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* 'const' variable_type id field_initializer ';'
+  // metadata* 'const' data_type id field_initializer ';'
   public static boolean constant_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "constant_def")) return false;
     if (!nextTokenIs(b, "<constant def>", ICE_KW_CONST, ICE_LEFT_BRACKET)) return false;
@@ -147,7 +147,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     r = constant_def_0(b, l + 1);
     r = r && consumeToken(b, ICE_KW_CONST);
     p = r; // pin = 2
-    r = r && report_error_(b, variable_type(b, l + 1));
+    r = r && report_error_(b, data_type(b, l + 1));
     r = p && report_error_(b, consumeToken(b, ICE_ID)) && r;
     r = p && report_error_(b, field_initializer(b, l + 1)) && r;
     r = p && consumeToken(b, ICE_SEMICOLON) && r;
@@ -195,7 +195,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* type_word generic_type? id extends_def? implements_def? body_block? ';'
+  // metadata* type_word generic_type? id extends_block? implements_block? body_block? ';'
   public static boolean data_type_element(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type_element")) return false;
     boolean r, p;
@@ -231,17 +231,17 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // extends_def?
+  // extends_block?
   private static boolean data_type_element_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type_element_4")) return false;
-    extends_def(b, l + 1);
+    extends_block(b, l + 1);
     return true;
   }
 
-  // implements_def?
+  // implements_block?
   private static boolean data_type_element_5(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type_element_5")) return false;
-    implements_def(b, l + 1);
+    implements_block(b, l + 1);
     return true;
   }
 
@@ -285,7 +285,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // id enum_constant_initializer? ','?
+  // id field_initializer? ','?
   public static boolean enum_constant(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enum_constant")) return false;
     if (!nextTokenIs(b, ICE_ID)) return false;
@@ -299,10 +299,10 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // enum_constant_initializer?
+  // field_initializer?
   private static boolean enum_constant_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enum_constant_1")) return false;
-    enum_constant_initializer(b, l + 1);
+    field_initializer(b, l + 1);
     return true;
   }
 
@@ -311,20 +311,6 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "enum_constant_2")) return false;
     consumeToken(b, ICE_COMA);
     return true;
-  }
-
-  /* ********************************************************** */
-  // '=' number_literal
-  public static boolean enum_constant_initializer(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_constant_initializer")) return false;
-    if (!nextTokenIs(b, ICE_EQ)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ICE_ENUM_CONSTANT_INITIALIZER, null);
-    r = consumeToken(b, ICE_EQ);
-    p = r; // pin = 1
-    r = r && number_literal(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
   }
 
   /* ********************************************************** */
@@ -340,51 +326,17 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'extends' extends_list
-  public static boolean extends_def(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "extends_def")) return false;
+  // 'extends' type_reference_list
+  public static boolean extends_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "extends_block")) return false;
     if (!nextTokenIs(b, ICE_KW_EXTENDS)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ICE_EXTENDS_DEF, null);
+    Marker m = enter_section_(b, l, _NONE_, ICE_EXTENDS_BLOCK, null);
     r = consumeToken(b, ICE_KW_EXTENDS);
     p = r; // pin = 1
-    r = r && extends_list(b, l + 1);
+    r = r && type_reference_list(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  /* ********************************************************** */
-  // type_reference (',' type_reference) *
-  public static boolean extends_list(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "extends_list")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, ICE_EXTENDS_LIST, "<extends list>");
-    r = type_reference(b, l + 1);
-    r = r && extends_list_1(b, l + 1);
-    exit_section_(b, l, m, r, false, extends_list_recovery_parser_);
-    return r;
-  }
-
-  // (',' type_reference) *
-  private static boolean extends_list_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "extends_list_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!extends_list_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "extends_list_1", c)) break;
-    }
-    return true;
-  }
-
-  // ',' type_reference
-  private static boolean extends_list_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "extends_list_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, ICE_COMA);
-    r = r && type_reference(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -409,13 +361,13 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* variable_type id (field_initializer )? ';'
+  // metadata* data_type id (field_initializer )? ';'
   public static boolean field_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "field_def")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_FIELD_DEF, "<field def>");
     r = field_def_0(b, l + 1);
-    r = r && variable_type(b, l + 1);
+    r = r && data_type(b, l + 1);
     r = r && consumeToken(b, ICE_ID);
     p = r; // pin = 3
     r = r && report_error_(b, field_def_3(b, l + 1));
@@ -635,15 +587,15 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'implements' extends_list
-  public static boolean implements_def(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "implements_def")) return false;
+  // 'implements' type_reference_list
+  public static boolean implements_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "implements_block")) return false;
     if (!nextTokenIs(b, ICE_KW_IMPLEMENTS)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ICE_IMPLEMENTS_DEF, null);
+    Marker m = enter_section_(b, l, _NONE_, ICE_IMPLEMENTS_BLOCK, null);
     r = consumeToken(b, ICE_KW_IMPLEMENTS);
     p = r; // pin = 1
-    r = r && extends_list(b, l + 1);
+    r = r && type_reference_list(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -751,7 +703,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* modifier* method_return_type id '(' parameters_list ')' (throws_def)? ';'
+  // metadata* modifier* method_return_type id '(' parameters_list ')' (throws_block)? ';'
   public static boolean method_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "method_def")) return false;
     boolean r, p;
@@ -791,19 +743,19 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (throws_def)?
+  // (throws_block)?
   private static boolean method_def_7(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "method_def_7")) return false;
     method_def_7_0(b, l + 1);
     return true;
   }
 
-  // (throws_def)
+  // (throws_block)
   private static boolean method_def_7_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "method_def_7_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = throws_def(b, l + 1);
+    r = throws_block(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -947,12 +899,12 @@ public class SliceParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // metadata* parameter_modifier* data_type id
-  public static boolean parameter(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parameter")) return false;
+  public static boolean parameter_def(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parameter_def")) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ICE_PARAMETER, "<parameter>");
-    r = parameter_0(b, l + 1);
-    r = r && parameter_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, ICE_PARAMETER_DEF, "<parameter def>");
+    r = parameter_def_0(b, l + 1);
+    r = r && parameter_def_1(b, l + 1);
     r = r && data_type(b, l + 1);
     p = r; // pin = 3
     r = r && consumeToken(b, ICE_ID);
@@ -961,23 +913,23 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   // metadata*
-  private static boolean parameter_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parameter_0")) return false;
+  private static boolean parameter_def_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parameter_def_0")) return false;
     while (true) {
       int c = current_position_(b);
       if (!metadata(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "parameter_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "parameter_def_0", c)) break;
     }
     return true;
   }
 
   // parameter_modifier*
-  private static boolean parameter_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parameter_1")) return false;
+  private static boolean parameter_def_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parameter_def_1")) return false;
     while (true) {
       int c = current_position_(b);
       if (!parameter_modifier(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "parameter_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "parameter_def_1", c)) break;
     }
     return true;
   }
@@ -1006,7 +958,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (parameter (',' parameter) *)?
+  // (parameter_def (',' parameter_def) *)?
   public static boolean parameters_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parameters_list")) return false;
     Marker m = enter_section_(b, l, _NONE_, ICE_PARAMETERS_LIST, "<parameters list>");
@@ -1015,18 +967,18 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // parameter (',' parameter) *
+  // parameter_def (',' parameter_def) *
   private static boolean parameters_list_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parameters_list_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = parameter(b, l + 1);
+    r = parameter_def(b, l + 1);
     r = r && parameters_list_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // (',' parameter) *
+  // (',' parameter_def) *
   private static boolean parameters_list_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parameters_list_0_1")) return false;
     while (true) {
@@ -1037,13 +989,13 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ',' parameter
+  // ',' parameter_def
   private static boolean parameters_list_0_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parameters_list_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, ICE_COMA);
-    r = r && parameter(b, l + 1);
+    r = r && parameter_def(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1163,71 +1115,17 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'throws' throws_list
-  public static boolean throws_def(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "throws_def")) return false;
+  // 'throws' type_reference_list
+  public static boolean throws_block(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "throws_block")) return false;
     if (!nextTokenIs(b, ICE_KW_THROWS)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ICE_THROWS_DEF, null);
+    Marker m = enter_section_(b, l, _NONE_, ICE_THROWS_BLOCK, null);
     r = consumeToken(b, ICE_KW_THROWS);
     p = r; // pin = 1
-    r = r && throws_list(b, l + 1);
+    r = r && type_reference_list(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  /* ********************************************************** */
-  // type_reference (',' type_reference) *
-  public static boolean throws_list(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "throws_list")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, ICE_THROWS_LIST, "<throws list>");
-    r = type_reference(b, l + 1);
-    r = r && throws_list_1(b, l + 1);
-    exit_section_(b, l, m, r, false, throws_list_recovery_parser_);
-    return r;
-  }
-
-  // (',' type_reference) *
-  private static boolean throws_list_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "throws_list_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!throws_list_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "throws_list_1", c)) break;
-    }
-    return true;
-  }
-
-  // ',' type_reference
-  private static boolean throws_list_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "throws_list_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, ICE_COMA);
-    r = r && type_reference(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // !(';' | '{')
-  static boolean throws_list_recovery(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "throws_list_recovery")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_);
-    r = !throws_list_recovery_0(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // ';' | '{'
-  private static boolean throws_list_recovery_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "throws_list_recovery_0")) return false;
-    boolean r;
-    r = consumeToken(b, ICE_SEMICOLON);
-    if (!r) r = consumeToken(b, ICE_LEFT_BRACE);
-    return r;
   }
 
   /* ********************************************************** */
@@ -1255,6 +1153,40 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // type_reference (',' type_reference) *
+  static boolean type_reference_list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_reference_list")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = type_reference(b, l + 1);
+    r = r && type_reference_list_1(b, l + 1);
+    exit_section_(b, l, m, r, false, extends_list_recovery_parser_);
+    return r;
+  }
+
+  // (',' type_reference) *
+  private static boolean type_reference_list_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_reference_list_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!type_reference_list_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "type_reference_list_1", c)) break;
+    }
+    return true;
+  }
+
+  // ',' type_reference
+  private static boolean type_reference_list_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_reference_list_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, ICE_COMA);
+    r = r && type_reference(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // 'class'|'interface'|'exception'|'struct'|'enum'|'sequence'|'dictionary'
   public static boolean type_word(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_word")) return false;
@@ -1267,17 +1199,6 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, ICE_KW_ENUM);
     if (!r) r = consumeToken(b, ICE_KW_SEQUENCE);
     if (!r) r = consumeToken(b, ICE_KW_DICTIONARY);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // data_type
-  public static boolean variable_type(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "variable_type")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, ICE_VARIABLE_TYPE, "<variable type>");
-    r = data_type(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -1325,11 +1246,6 @@ public class SliceParser implements PsiParser, LightPsiParser {
   static final Parser parameter_list_recovery_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return parameter_list_recovery(b, l + 1);
-    }
-  };
-  static final Parser throws_list_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return throws_list_recovery(b, l + 1);
     }
   };
   static final Parser type_recovery_parser_ = new Parser() {
