@@ -35,6 +35,14 @@ public class SliceDataTypeTreeElement extends PsiTreeElementBase<SliceDataTypeEl
             elements.add(new SliceMethodTreeElement(method));
         }
 
+        for (SliceFieldDef field : block.getFieldDefList()) {
+            elements.add(new SliceVariableTreeElement(field));
+        }
+
+        for (SliceEnumConstant field : block.getEnumConstantList()) {
+            elements.add(new SliceVariableTreeElement(field));
+        }
+
         return elements;
     }
 

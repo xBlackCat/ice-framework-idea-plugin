@@ -3,7 +3,6 @@ package org.xblackcat.frozenidea.util;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiFormatUtilBase;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.BitUtil;
 import com.intellij.util.ObjectUtils;
 import org.intellij.lang.annotations.MagicConstant;
@@ -98,7 +97,7 @@ public class PsiFormatUtil extends PsiFormatUtilBase {
         }
     }
 
-    private static String formatVariableType(@NotNull SliceVariableElement variable, int options) {
+    private static String formatVariableType(@NotNull SliceVariableElement variable, @FormatVariableOptions int options) {
         final SliceDataType type = variable.getDataType();
         if (type != null) {
             return formatType(type, options);
@@ -113,28 +112,25 @@ public class PsiFormatUtil extends PsiFormatUtilBase {
 
     public static String formatMethod(
             @NotNull SliceMethodDef method,
-            @NotNull PsiSubstitutor substitutor,
             @FormatMethodOptions int options,
             @FormatVariableOptions int parameterOptions
     ) {
-        return formatMethod(method, substitutor, options, parameterOptions, MAX_PARAMS_TO_SHOW);
+        return formatMethod(method, options, parameterOptions, MAX_PARAMS_TO_SHOW);
     }
 
     public static String formatMethod(
             @NotNull SliceMethodDef method,
-            @NotNull PsiSubstitutor substitutor,
             @FormatMethodOptions int options,
             @FormatVariableOptions int parameterOptions,
             int maxParametersToShow
     ) {
         StringBuilder buffer = new StringBuilder();
-        formatMethod(method, substitutor, options, parameterOptions, maxParametersToShow, buffer);
+        formatMethod(method, options, parameterOptions, maxParametersToShow, buffer);
         return buffer.toString();
     }
 
     private static void formatMethod(
             @NotNull SliceMethodDef method,
-            @NotNull PsiSubstitutor substitutor,
             @FormatMethodOptions int options,
             @FormatVariableOptions int parameterOptions,
             int maxParametersToShow,
@@ -270,35 +266,5 @@ public class PsiFormatUtil extends PsiFormatUtilBase {
 
     public static String formatReference(SliceTypeReference ref, int options) {
         return BitUtil.isSet(options, SHOW_FQ_CLASS_NAMES) ? ref.getReference().getCanonicalText() : ref.getText();
-    }
-
-    public static String getPackageDisplayName(@NotNull PsiClass psiClass) {
-        if (psiClass instanceof PsiTypeParameter) {
-            PsiTypeParameterListOwner owner = ((PsiTypeParameter) psiClass).getOwner();
-            String ownerName = null;
-            if (owner instanceof PsiClass) {
-                ownerName = ((PsiClass) owner).getQualifiedName();
-                if (ownerName == null) {
-                    ownerName = owner.getName();
-                }
-            } else if (owner instanceof SliceMethodDef) {
-                ownerName = owner.getName();
-            }
-            return ownerName == null ? "type parameter" : "type parameter of " + ownerName;
-        }
-
-        if (PsiUtil.isLocalClass(psiClass)) {
-            return "local class";
-        }
-
-        String packageName = psiClass.getQualifiedName();
-        packageName = packageName == null || packageName.lastIndexOf('.') <= 0 ? "" : packageName.substring(
-                0,
-                packageName.lastIndexOf('.')
-        );
-        if (packageName.isEmpty()) {
-            packageName = "default package";
-        }
-        return packageName;
     }
 }

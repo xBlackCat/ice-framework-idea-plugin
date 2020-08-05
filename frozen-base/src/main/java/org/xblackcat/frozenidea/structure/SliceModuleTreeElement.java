@@ -2,16 +2,13 @@ package org.xblackcat.frozenidea.structure;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
-import org.xblackcat.frozenidea.psi.SliceFile;
-import org.xblackcat.frozenidea.psi.SliceModule;
-import org.xblackcat.frozenidea.psi.SliceNamedElement;
+import org.xblackcat.frozenidea.psi.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,11 +23,20 @@ public class SliceModuleTreeElement extends PsiTreeElementBase<SliceModule> {
     public @NotNull Collection<StructureViewTreeElement> getChildrenBase() {
         List<StructureViewTreeElement> children = new ArrayList<>();
 
-        for (SliceModule module : getElement().getModuleList()) {
+        final SliceModule element = getElement();
+        if (element == null) {
+            return Collections.emptyList();
+        }
+        
+        for (SliceModule module : element.getModuleList()) {
             children.add(new SliceModuleTreeElement(module));
         }
 
-        for (SliceDataTypeElement dataType : getElement().getDataTypeElementList()) {
+        for (SliceConstantDef constant : element.getConstantDefList()) {
+            children.add(new SliceVariableTreeElement(constant));
+        }
+
+        for (SliceDataTypeElement dataType : element.getDataTypeElementList()) {
             children.add(new SliceDataTypeTreeElement(dataType));
         }
 
