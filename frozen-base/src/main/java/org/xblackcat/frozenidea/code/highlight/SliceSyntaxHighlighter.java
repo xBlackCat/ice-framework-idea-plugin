@@ -1,4 +1,4 @@
-package org.xblackcat.frozenidea.highlight;
+package org.xblackcat.frozenidea.code.highlight;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.HighlighterColors;

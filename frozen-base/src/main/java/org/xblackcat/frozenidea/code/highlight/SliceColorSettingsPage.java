@@ -1,4 +1,4 @@
-package org.xblackcat.frozenidea.highlight;
+package org.xblackcat.frozenidea.code.highlight;
 
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
