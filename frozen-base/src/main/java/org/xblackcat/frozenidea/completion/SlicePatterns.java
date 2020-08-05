@@ -3,6 +3,8 @@ package org.xblackcat.frozenidea.completion;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.xblackcat.frozenidea.psi.*;
 
 /**
@@ -12,7 +14,11 @@ import org.xblackcat.frozenidea.psi.*;
  */
 public class SlicePatterns extends PlatformPatterns {
     public static ElementPattern<? extends PsiElement> moduleBody() {
-        return psiElement().inside(psiFile(SliceFile.class)).and(not(psiElement().inside(psiElement(SliceDataTypeElement.class))));
+        return psiElement().inside(psiElement(SliceModule.class)).and(not(psiElement().inside(psiElement(SliceDataTypeElement.class))));
+    }
+
+    public static ElementPattern<? extends PsiElement> emptySliceFile() {
+        return psiElement().inside(psiFile(SliceFile.class)).and(not(psiElement().inside(psiElement(SliceModule.class))));
     }
 
     public static ElementPattern<? extends PsiElement> metadataDirective() {
@@ -34,8 +40,10 @@ public class SlicePatterns extends PlatformPatterns {
     }
 
     public static ElementPattern<? extends PsiElement> classBody() {
-        return or(
-                psiElement().inside(SliceDataTypeElement.class)
-        );
+        return psiElement().inside(SliceBodyBlock.class);
+    }
+
+    public static ElementPattern<? extends PsiElement> classBodyNotReference() {
+        return psiElement().inside(SliceBodyBlock.class).and(psiElement(LeafPsiElement.class));
     }
 }

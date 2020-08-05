@@ -4,26 +4,20 @@ import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.util.FQN;
+import org.xblackcat.frozenidea.util.SlicePsiUtil;
 
 import javax.swing.*;
 import java.util.*;
-import java.util.function.Predicate;
 
 
 /**
@@ -32,6 +26,7 @@ import java.util.function.Predicate;
  * @author xBlackCat
  */
 public class SlicePsiImplUtil {
+
     @NotNull
     public static PsiReference[] getReferences(SliceTypeReference o) {
         return new PsiReference[]{
@@ -92,63 +87,9 @@ public class SlicePsiImplUtil {
 
         FQN referenceName = FQN.buildFQN(rangeInElement.substring(element.getText()), module);
 
-        return searchElements(element.getProject(), c -> referenceName.equals(FQN.buildFQN(c)));
+        return SlicePsiUtil.searchElements(element.getProject(), c -> referenceName.equals(FQN.buildFQN(c)));
     }
 
-
-    @NotNull
-    public static List<SliceNamedElement> searchElements(Project project, Predicate<SliceNamedElement> matcher) {
-        List<SliceNamedElement> result = new ArrayList<>();
-
-        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(
-                IceFileType.INSTANCE,
-                GlobalSearchScope.allScope(project)
-        );
-
-        for (VirtualFile virtualFile : virtualFiles) {
-            SliceFile simpleFile = (SliceFile) PsiManager.getInstance(project).findFile(virtualFile);
-            if (simpleFile != null) {
-                SliceModule[] modules = PsiTreeUtil.getChildrenOfType(simpleFile, SliceModule.class);
-                if (modules != null) {
-                    for (SliceModule m : modules) {
-                        searchThroughModule(m, result, matcher);
-                    }
-                }
-            }
-        }
-        return result.isEmpty() ? Collections.emptyList() : result;
-    }
-
-    private static void searchThroughModule(
-            SliceModule m,
-            List<SliceNamedElement> result,
-            Predicate<SliceNamedElement> matcher
-    ) {
-        // Search in current file and module
-        for (PsiElement c : m.getChildren()) {
-            if (c instanceof SliceDataTypeElement) {
-                final SliceDataTypeElement typeElement = (SliceDataTypeElement) c;
-                if (matcher.test(typeElement)) {
-                    if (typeElement.isClass() || typeElement.isInterface() || typeElement.isException()) {
-                        if ((typeElement).getBodyBlock() != null) {
-                            result.add(typeElement);
-                        }
-                    } else {
-                        result.add(typeElement);
-                    }
-                }
-            }
-        }
-        for (SliceModule mm : m.getModuleList()) {
-            searchThroughModule(mm, result, matcher);
-        }
-    }
-
-    public static <T extends SliceNamedElement> void addAll(Map<FQN, T> map, Collection<? extends T> collection) {
-        for (T el : collection) {
-            map.put(FQN.buildFQN(el), el);
-        }
-    }
 
     public static ItemPresentation getPresentation(final SliceNamedElement element) {
         return new ColoredItemPresentation() {

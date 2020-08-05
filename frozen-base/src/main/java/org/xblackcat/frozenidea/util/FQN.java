@@ -99,10 +99,13 @@ public class FQN {
     }
 
     public boolean startWith(FQN path) {
-        return startWith(path.elements);
+        return path != null && startWith(path.elements);
     }
 
     public boolean startWith(String[] path) {
+        if (path == null) {
+            return false;
+        }
         if (path.length >= this.elements.length) {
             return false;
         }

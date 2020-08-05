@@ -1,22 +1,18 @@
 package org.xblackcat.frozenidea.psi.impl;
 
-import com.intellij.codeInsight.lookup.AutoCompletionPolicy;
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.util.FQN;
+import org.xblackcat.frozenidea.util.SlicePsiUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * 15.06.12 15:37
@@ -24,13 +20,6 @@ import java.util.function.Predicate;
  * @author xBlackCat
  */
 public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiReferenceBase<T> implements PsiPolyVariantReference {
-
-    private final Predicate<SliceNamedElement> sliceClassPredicate = c -> c instanceof SliceDataTypeElement &&
-            ((SliceDataTypeElement) c).isClass();
-    private final Predicate<SliceNamedElement> sliceInterfacePredicate = c -> c instanceof SliceDataTypeElement &&
-            ((SliceDataTypeElement) c).isInterface();
-    private final Predicate<SliceNamedElement> sliceExceptionPredicate = c -> c instanceof SliceDataTypeElement &&
-            ((SliceDataTypeElement) c).isException();
 
     public SliceReferenceImpl(T element, TextRange range) {
         super(element, range);
@@ -71,7 +60,7 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
             final SliceDataTypeElement declaration = ((SliceReferenceListElement) parent).getContainingClass();
             if (parent instanceof SliceImplementsBlock) {
                 if (declaration != null && declaration.isClass()) {
-                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceInterfacePredicate));
+                    SlicePsiUtil.findAll(project, references, SlicePsiUtil.SLICE_INTERFACE_PREDICATE);
                 } else {
                     return EMPTY_ARRAY;
                 }
@@ -80,16 +69,16 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
                     return EMPTY_ARRAY;
                 }
                 if (declaration.isClass()) {
-                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceClassPredicate));
+                    SlicePsiUtil.findAll(project, references, SlicePsiUtil.SLICE_CLASS_PREDICATE);
                 } else if (declaration.isInterface()) {
-                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceInterfacePredicate));
+                    SlicePsiUtil.findAll(project, references, SlicePsiUtil.SLICE_INTERFACE_PREDICATE);
                 } else if (declaration.isException()) {
-                    SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceExceptionPredicate));
+                    SlicePsiUtil.findAll(project, references, SlicePsiUtil.SLICE_EXCEPTION_PREDICATE);
                 } else {
                     return EMPTY_ARRAY;
                 }
             } else if (parent instanceof SliceThrowsBlock) {
-                SlicePsiImplUtil.addAll(references, SlicePsiImplUtil.searchElements(project, sliceExceptionPredicate));
+                SlicePsiUtil.findAll(project, references, SlicePsiUtil.SLICE_EXCEPTION_PREDICATE);
             } else {
                 return EMPTY_ARRAY;
             }
@@ -97,27 +86,9 @@ public class SliceReferenceImpl<T extends SliceCompositeElement> extends PsiRefe
             FQN referenceName = FQN.buildFQN(declaration);
             references.remove(referenceName);
         } else {
-            SlicePsiImplUtil.addAll(
-                    references,
-                    SlicePsiImplUtil.searchElements(project, c -> c instanceof SliceDataTypeElement)
-            );
+            SlicePsiUtil.findAll(project, references, SlicePsiUtil.SLICE_DATA_DECLARATION_PREDICATE);
         }
 
-        return references.entrySet()
-                .stream()
-                .map(
-                        e -> {
-                            final FQN fqn = e.getKey();
-                            return LookupElementBuilder
-                                    .createWithSmartPointer(
-                                            fqn.startWith(modulePath) ? fqn.getName() : fqn.getFQN(), e.getValue()
-                                    )
-                                    .withPresentableText(fqn.getName())
-                                    .withIcon(e.getValue().getIcon(Iconable.ICON_FLAG_VISIBILITY))
-                                    .withTailText(" (" + fqn.getPathString() + ")", true)
-                                    .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE);
-                        }
-                )
-                .toArray(LookupElement[]::new);
+        return SlicePsiUtil.buildLookupElementsForReferences(modulePath, references);
     }
 }
