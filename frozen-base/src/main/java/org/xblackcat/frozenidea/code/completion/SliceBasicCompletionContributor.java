@@ -61,7 +61,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                                     LookupElementBuilder.create(kw)
                                             .withBoldness(true)
                                             .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
-                                    TailType.SPACE
+                                    GROUP_TAIL_TYPE
                             )
                     );
                 }
@@ -160,7 +160,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                                 LookupElementBuilder.create(moduleKeyword)
                                         .withBoldness(true)
                                         .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
-                                GROUP_TAIL_TYPE
+                                TailType.SPACE
                         )
                 );
                 result.addElement(
@@ -168,7 +168,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                                 LookupElementBuilder.create(constKeyword)
                                         .withBoldness(true)
                                         .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
-                                GROUP_TAIL_TYPE
+                                TailType.SPACE
                         )
                 );
             }
