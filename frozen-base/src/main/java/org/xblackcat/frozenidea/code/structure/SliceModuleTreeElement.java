@@ -1,4 +1,4 @@
-package org.xblackcat.frozenidea.structure;
+package org.xblackcat.frozenidea.code.structure;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;

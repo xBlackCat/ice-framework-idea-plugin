@@ -1,4 +1,4 @@
-package org.xblackcat.frozenidea.completion;
+package org.xblackcat.frozenidea.code.completion;
 
 /**
  * 09.02.12 12:47

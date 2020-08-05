@@ -1,11 +1,11 @@
-package org.xblackcat.frozenidea.structure;
+package org.xblackcat.frozenidea.code.structure;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.psi.SliceMethodDef;
+import org.xblackcat.frozenidea.psi.SliceVariableElement;
 import org.xblackcat.frozenidea.util.PsiFormatUtil;
 
 import java.util.Collection;
@@ -16,8 +16,8 @@ import static com.intellij.psi.util.PsiFormatUtilBase.*;
 /**
  *
  */
-public class SliceMethodTreeElement extends PsiTreeElementBase<SliceMethodDef> {
-    public SliceMethodTreeElement(SliceMethodDef psiElement) {
+public class SliceVariableTreeElement extends PsiTreeElementBase<SliceVariableElement> {
+    public SliceVariableTreeElement(SliceVariableElement psiElement) {
         super(psiElement);
     }
 
@@ -28,15 +28,11 @@ public class SliceMethodTreeElement extends PsiTreeElementBase<SliceMethodDef> {
 
     @Override
     public @Nullable String getPresentableText() {
-        @Nullable SliceMethodDef psiMethod = getElement();
-        if (psiMethod == null) {
+        @Nullable SliceVariableElement psiField = getElement();
+        if (psiField == null) {
             return "";
         }
-        String method = PsiFormatUtil.formatMethod(
-                psiMethod,
-                SHOW_NAME | TYPE_AFTER | SHOW_PARAMETERS | SHOW_TYPE,
-                SHOW_TYPE
-        );
+        String method = PsiFormatUtil.formatVariable(psiField, SHOW_NAME | TYPE_AFTER | SHOW_TYPE);
         return StringUtil.replace(method, ":", ": ");
     }
 }

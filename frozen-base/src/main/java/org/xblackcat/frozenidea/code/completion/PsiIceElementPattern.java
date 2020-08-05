@@ -1,4 +1,4 @@
-package org.xblackcat.frozenidea.completion;
+package org.xblackcat.frozenidea.code.completion;
 
 import com.intellij.patterns.InitialPatternCondition;
 import com.intellij.patterns.PsiElementPattern;

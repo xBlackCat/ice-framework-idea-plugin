@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.xblackcat.frozenidea.completion;
+package org.xblackcat.frozenidea.code.completion;
 
 import com.intellij.application.options.CodeStyle;
 import com.intellij.codeInsight.TailType;

@@ -1,4 +1,4 @@
-package org.xblackcat.frozenidea.structure;
+package org.xblackcat.frozenidea.code.structure;
 
 import com.intellij.ide.util.treeView.smartTree.ActionPresentation;
 import com.intellij.ide.util.treeView.smartTree.ActionPresentationData;
@@ -7,7 +7,6 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenidea.psi.SliceVariableElement;
 import org.xblackcat.frozenidea.util.IceMessages;
 
 public class FieldsFilter implements Filter {

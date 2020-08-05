@@ -1,4 +1,4 @@
-package org.xblackcat.frozenidea.completion;
+package org.xblackcat.frozenidea.code.completion;
 
 import com.intellij.codeInsight.TailType;
 import com.intellij.codeInsight.completion.*;

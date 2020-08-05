@@ -1,9 +1,8 @@
-package org.xblackcat.frozenidea.completion;
+package org.xblackcat.frozenidea.code.completion;
 
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.xblackcat.frozenidea.psi.*;
 

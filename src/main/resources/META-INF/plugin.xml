@@ -36,7 +36,7 @@
         <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceFoldingBuilder"/>
 
         <lang.psiStructureViewFactory language="SLICE"
-                                      implementationClass="org.xblackcat.frozenidea.structure.SliceStructureViewFactory"/>
+                                      implementationClass="org.xblackcat.frozenidea.code.structure.SliceStructureViewFactory"/>
 
         <moduleService serviceInterface="org.xblackcat.frozenidea.integration.SliceModuleHelper"
                        serviceImplementation="org.xblackcat.frozenidea.integration.SliceModuleHelper$Impl"/>
@@ -52,10 +52,10 @@
 
         <quoteHandler fileType="SLICE" className="org.xblackcat.frozenidea.SliceQuoteHandler"/>
         <completion.contributor language="SLICE"
-                                implementationClass="org.xblackcat.frozenidea.completion.SliceBasicCompletionContributor"
+                                implementationClass="org.xblackcat.frozenidea.code.completion.SliceBasicCompletionContributor"
                                 id="sliceBasic"/>
         <completion.contributor language="SLICE"
-                                implementationClass="org.xblackcat.frozenidea.completion.SliceMetadataCompletionContributor"
+                                implementationClass="org.xblackcat.frozenidea.code.completion.SliceMetadataCompletionContributor"
                                 id="sliceMetadata"/>
 
         <gotoSymbolContributor implementation="org.xblackcat.frozenidea.code.SliceGotoSymbolContributor"/>
