@@ -38,6 +38,8 @@
         <lang.psiStructureViewFactory language="SLICE"
                                       implementationClass="org.xblackcat.frozenidea.code.structure.SliceStructureViewFactory"/>
 
+        <lang.formatter language="SLICE" implementationClass="org.xblackcat.frozenidea.code.formatter.SliceFormattingModelBuilder"/>
+
         <moduleService serviceInterface="org.xblackcat.frozenidea.integration.SliceModuleHelper"
                        serviceImplementation="org.xblackcat.frozenidea.integration.SliceModuleHelper$Impl"/>
         <projectService serviceInterface="org.xblackcat.frozenidea.psi.SlicePsiFacade"

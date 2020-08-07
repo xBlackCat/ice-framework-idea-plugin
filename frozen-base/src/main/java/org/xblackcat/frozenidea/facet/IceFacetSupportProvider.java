@@ -11,7 +11,7 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenidea.util.IceMessages;
+import org.xblackcat.frozenidea.util.SliceBundle;
 
 /**
  * 08.01.12 12:58
@@ -42,8 +42,8 @@ public class IceFacetSupportProvider extends FacetBasedFrameworkSupportProvider<
             // No class found!
             final Notification notification = new Notification(
                     "Ice Facet",
-                    IceMessages.message("ICE.library.not.added"),
-                    IceMessages.message("ICE.library.not.added.message"),
+                    SliceBundle.message("ICE.library.not.added"),
+                    SliceBundle.message("ICE.library.not.added.message"),
                     NotificationType.ERROR,
                     (notification1, event) -> {
                     }

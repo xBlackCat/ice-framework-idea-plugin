@@ -7,7 +7,7 @@ import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.util.IceMessages;
+import org.xblackcat.frozenidea.util.SliceBundle;
 import org.xblackcat.frozenidea.util.SliceIcons;
 
 import javax.swing.*;
@@ -20,16 +20,16 @@ import java.util.Map;
  */
 public class SliceColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
-            new AttributesDescriptor(IceMessages.message("highlight.key.keyword"), SliceHighlighterColors.ICE_KEYWORD),
-            new AttributesDescriptor(IceMessages.message("highlight.key.string_literal"), SliceHighlighterColors.ICE_STRING_LITERAL),
-            new AttributesDescriptor(IceMessages.message("highlight.key.numeric_literal"), SliceHighlighterColors.ICE_NUMERIC_LITERAL),
-            new AttributesDescriptor(IceMessages.message("highlight.key.doc_comment"), SliceHighlighterColors.ICE_DOC_STYLE_COMMENT),
-            new AttributesDescriptor(IceMessages.message("highlight.key.block_comment"), SliceHighlighterColors.ICE_C_STYLE_COMMENT),
-            new AttributesDescriptor(IceMessages.message("highlight.key.line_comment"), SliceHighlighterColors.ICE_END_OF_LINE_COMMENT),
-            new AttributesDescriptor(IceMessages.message("highlight.key.directive"), SliceHighlighterColors.ICE_DIRECTIVE),
-            new AttributesDescriptor(IceMessages.message("highlight.key.parentheses"), SliceHighlighterColors.ICE_PARENTHESES),
-            new AttributesDescriptor(IceMessages.message("highlight.key.braces"), SliceHighlighterColors.ICE_BRACES),
-            new AttributesDescriptor(IceMessages.message("highlight.key.brackets"), SliceHighlighterColors.ICE_BRACKETS),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.keyword"), SliceHighlighterColors.ICE_KEYWORD),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.string_literal"), SliceHighlighterColors.ICE_STRING_LITERAL),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.numeric_literal"), SliceHighlighterColors.ICE_NUMERIC_LITERAL),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.doc_comment"), SliceHighlighterColors.ICE_DOC_STYLE_COMMENT),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.block_comment"), SliceHighlighterColors.ICE_C_STYLE_COMMENT),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.line_comment"), SliceHighlighterColors.ICE_END_OF_LINE_COMMENT),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.directive"), SliceHighlighterColors.ICE_DIRECTIVE),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.parentheses"), SliceHighlighterColors.ICE_PARENTHESES),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.braces"), SliceHighlighterColors.ICE_BRACES),
+            new AttributesDescriptor(SliceBundle.message("highlight.key.brackets"), SliceHighlighterColors.ICE_BRACKETS),
     };
 
     @Nullable

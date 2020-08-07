@@ -1,6 +1,5 @@
 package org.xblackcat.frozenidea.parser;
 
-import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
@@ -42,7 +41,7 @@ DIRECTIVE=#.+
 
   "="                        { return ICE_EQ; }
   ";"                        { return ICE_SEMICOLON; }
-  ","                        { return ICE_COMA; }
+  ","                        { return ICE_COMMA; }
   "*"                        { return ICE_ASTERISK; }
   "<"                        { return ICE_LT; }
   ">"                        { return ICE_GT; }

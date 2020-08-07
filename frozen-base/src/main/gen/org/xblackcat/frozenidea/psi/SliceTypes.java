@@ -48,7 +48,7 @@ public interface SliceTypes {
   IElementType ICE_ASTERISK = new SliceTokenType("*");
   IElementType ICE_BAD_STRING = new SliceTokenType("bad_string");
   IElementType ICE_CLOSE_GL_MD = new SliceTokenType("]]");
-  IElementType ICE_COMA = new SliceTokenType(",");
+  IElementType ICE_COMMA = new SliceTokenType(",");
   IElementType ICE_C_STYLE_COMMENT = new SliceTokenType("c_style_comment");
   IElementType ICE_DIRECTIVE = new SliceTokenType("directive");
   IElementType ICE_DOC_STYLE_COMMENT = new SliceTokenType("doc_style_comment");

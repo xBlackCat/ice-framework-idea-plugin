@@ -25,7 +25,7 @@ import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.config.IceConfig;
 import org.xblackcat.frozenidea.config.IceFrameworkConfigurable;
 import org.xblackcat.frozenidea.util.IceChecker;
-import org.xblackcat.frozenidea.util.IceMessages;
+import org.xblackcat.frozenidea.util.SliceBundle;
 
 import javax.swing.event.HyperlinkEvent;
 import java.io.File;
@@ -122,8 +122,8 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                         // No class found!
                         final Notification notification = new Notification(
                                 "Ice Facet",
-                                IceMessages.message("ICE.library.not.added"),
-                                IceMessages.message("ICE.library.not.added.message"),
+                                SliceBundle.message("ICE.library.not.added"),
+                                SliceBundle.message("ICE.library.not.added.message"),
                                 NotificationType.ERROR,
                                 (notification1, event) -> {
                                     Computable<Boolean> runnable = new LibraryInstaller(frameworkHome);
@@ -142,8 +142,8 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
 
             final Notification notification = new Notification(
                     "Ice Facet",
-                    IceMessages.message("ICE.not.configured"),
-                    IceMessages.message("ICE.not.configured.message"),
+                    SliceBundle.message("ICE.not.configured"),
+                    SliceBundle.message("ICE.not.configured.message"),
                     NotificationType.ERROR,
                     (notification1, event) -> {
                         if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {

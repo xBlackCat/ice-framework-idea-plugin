@@ -7,7 +7,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenidea.util.IceMessages;
+import org.xblackcat.frozenidea.util.SliceBundle;
 
 public class FieldsFilter implements Filter {
     @NonNls
@@ -21,7 +21,7 @@ public class FieldsFilter implements Filter {
     @Override
     @NotNull
     public ActionPresentation getPresentation() {
-        return new ActionPresentationData(IceMessages.message("action.structureview.show.fields"), null, PlatformIcons.FIELD_ICON);
+        return new ActionPresentationData(SliceBundle.message("action.structureview.show.fields"), null, PlatformIcons.FIELD_ICON);
     }
 
     @Override

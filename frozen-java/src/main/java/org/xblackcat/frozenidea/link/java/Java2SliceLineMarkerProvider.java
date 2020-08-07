@@ -13,7 +13,7 @@ import org.xblackcat.frozenidea.integration.SliceModuleHelper;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
 import org.xblackcat.frozenidea.psi.SliceMethodDef;
 import org.xblackcat.frozenidea.util.FQN;
-import org.xblackcat.frozenidea.util.IceMessages;
+import org.xblackcat.frozenidea.util.SliceBundle;
 import org.xblackcat.frozenidea.util.SliceIcons;
 import org.xblackcat.frozenidea.util.SliceUtil;
 
@@ -67,7 +67,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
             }
 
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.IMPLEMENTED_SLICE_METHOD).
-                    setTargets(targets).setTooltipText(IceMessages.message("goto.ice.declaration.method"));
+                    setTargets(targets).setTooltipText(SliceBundle.message("goto.ice.declaration.method"));
 
             return builder.createLineMarkerInfo(element);
         } else if (element instanceof PsiIdentifier && parent instanceof PsiClass) {
@@ -82,7 +82,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
             }
 
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.IMPLEMENTED_SLICE_CLASS).
-                    setTargets(targets).setTooltipText(IceMessages.message("goto.ice.declaration.interface"));
+                    setTargets(targets).setTooltipText(SliceBundle.message("goto.ice.declaration.interface"));
 
             return builder.createLineMarkerInfo(element);
         }

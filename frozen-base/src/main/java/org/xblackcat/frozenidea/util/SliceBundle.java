@@ -16,16 +16,17 @@
 package org.xblackcat.frozenidea.util;
 
 import com.intellij.AbstractBundle;
+import com.intellij.DynamicBundle;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.PropertyKey;
 
-public class IceMessages extends AbstractBundle {
-    private static final IceMessages INSTANCE = new IceMessages();
+public class SliceBundle extends DynamicBundle {
+    private static final SliceBundle INSTANCE = new SliceBundle();
 
     @NonNls
-    private static final String BUNDLE = "messages.IceMessages";
+    public static final String BUNDLE = "messages.IceMessages";
 
-    private IceMessages() {
+    private SliceBundle() {
         super(BUNDLE);
     }
 

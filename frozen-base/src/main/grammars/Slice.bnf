@@ -35,7 +35,7 @@
 
         EQ="="
         SEMICOLON=";"
-        COMA=","
+        COMMA=","
         ASTERISK="*"
         LT="<"
         GT=">"

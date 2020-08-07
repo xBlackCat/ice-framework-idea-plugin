@@ -7,7 +7,6 @@ import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import static org.xblackcat.frozenidea.parser.SliceParserUtil.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
 import com.intellij.lang.LightPsiParser;
 
@@ -67,7 +66,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, ICE_SEMICOLON);
-    if (!r) r = consumeToken(b, ICE_COMA);
+    if (!r) r = consumeToken(b, ICE_COMMA);
     if (!r) r = method_def(b, l + 1);
     if (!r) r = field_def(b, l + 1);
     if (!r) r = enum_constant(b, l + 1);
@@ -287,7 +286,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   // ','?
   private static boolean enum_constant_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enum_constant_2")) return false;
-    consumeToken(b, ICE_COMA);
+    consumeToken(b, ICE_COMMA);
     return true;
   }
 
@@ -473,7 +472,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "global_metadata_body_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, ICE_COMA);
+    r = consumeToken(b, ICE_COMMA);
     r = r && metadata_element(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -610,7 +609,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "metadata_body_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, ICE_COMA);
+    r = consumeToken(b, ICE_COMMA);
     r = r && metadata_element(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -950,7 +949,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "parameters_list_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, ICE_COMA);
+    r = consumeToken(b, ICE_COMMA);
     r = r && parameter_def(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1014,10 +1013,10 @@ public class SliceParser implements PsiParser, LightPsiParser {
   // ',' data_type
   public static boolean second_generic_type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "second_generic_type")) return false;
-    if (!nextTokenIs(b, ICE_COMA)) return false;
+    if (!nextTokenIs(b, ICE_COMMA)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_SECOND_GENERIC_TYPE, null);
-    r = consumeToken(b, ICE_COMA);
+    r = consumeToken(b, ICE_COMMA);
     p = r; // pin = 1
     r = r && data_type(b, l + 1);
     exit_section_(b, l, m, r, p, null);
@@ -1136,7 +1135,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "type_reference_list_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, ICE_COMA);
+    r = consumeToken(b, ICE_COMMA);
     r = r && type_reference(b, l + 1);
     exit_section_(b, m, null, r);
     return r;

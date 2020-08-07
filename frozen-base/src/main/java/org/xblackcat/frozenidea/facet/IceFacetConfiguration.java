@@ -34,7 +34,7 @@ import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.config.SliceCompilerSettings;
 import org.xblackcat.frozenidea.config.Target;
 import org.xblackcat.frozenidea.util.IceChecker;
-import org.xblackcat.frozenidea.util.IceMessages;
+import org.xblackcat.frozenidea.util.SliceBundle;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -214,7 +214,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                                     @Override
                                     public void run(AnActionButton button) {
                                         final ListPopup popup = PopupFactoryImpl.getInstance().createActionGroupPopup(
-                                                IceMessages.message("frozenidea.facet.options.targets.popup.title"),
+                                                SliceBundle.message("frozenidea.facet.options.targets.popup.title"),
                                                 myGeneratorListGroup,
                                                 button.getDataContext(),
                                                 JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,

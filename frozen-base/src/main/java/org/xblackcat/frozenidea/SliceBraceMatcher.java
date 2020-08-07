@@ -39,7 +39,7 @@ public class SliceBraceMatcher implements PairedBraceMatcher {
                 contextType == SliceTypes.ICE_C_STYLE_COMMENT ||
                 contextType == SliceTypes.ICE_END_OF_LINE_COMMENT ||
                 contextType == SliceTypes.ICE_SEMICOLON ||
-                contextType == SliceTypes.ICE_COMA ||
+                contextType == SliceTypes.ICE_COMMA ||
                 contextType == SliceTypes.ICE_RIGHT_PARENTH ||
                 contextType == SliceTypes.ICE_RIGHT_BRACKET ||
                 contextType == SliceTypes.ICE_RIGHT_BRACE ||
