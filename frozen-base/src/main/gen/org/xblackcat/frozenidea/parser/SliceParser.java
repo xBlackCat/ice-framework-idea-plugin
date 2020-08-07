@@ -138,13 +138,13 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* 'const' data_type id field_initializer ';'
+  // metadata 'const' data_type id field_initializer ';'
   public static boolean constant_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "constant_def")) return false;
     if (!nextTokenIs(b, "<constant def>", ICE_KW_CONST, ICE_LEFT_BRACKET)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_CONSTANT_DEF, "<constant def>");
-    r = constant_def_0(b, l + 1);
+    r = metadata(b, l + 1);
     r = r && consumeToken(b, ICE_KW_CONST);
     p = r; // pin = 2
     r = r && report_error_(b, data_type(b, l + 1));
@@ -153,17 +153,6 @@ public class SliceParser implements PsiParser, LightPsiParser {
     r = p && consumeToken(b, ICE_SEMICOLON) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // metadata*
-  private static boolean constant_def_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "constant_def_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!metadata(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "constant_def_0", c)) break;
-    }
-    return true;
   }
 
   /* ********************************************************** */
@@ -195,12 +184,12 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* type_word generic_type? id extends_block? implements_block? body_block? ';'
+  // metadata type_word generic_type? id extends_block? implements_block? body_block? ';'
   public static boolean data_type_element(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type_element")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_DATA_TYPE_ELEMENT, "<data type element>");
-    r = data_type_element_0(b, l + 1);
+    r = metadata(b, l + 1);
     r = r && type_word(b, l + 1);
     p = r; // pin = 2
     r = r && report_error_(b, data_type_element_2(b, l + 1));
@@ -211,17 +200,6 @@ public class SliceParser implements PsiParser, LightPsiParser {
     r = p && consumeToken(b, ICE_SEMICOLON) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // metadata*
-  private static boolean data_type_element_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "data_type_element_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!metadata(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "data_type_element_0", c)) break;
-    }
-    return true;
   }
 
   // generic_type?
@@ -361,12 +339,12 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* data_type id (field_initializer )? ';'
+  // metadata data_type id (field_initializer )? ';'
   public static boolean field_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "field_def")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_FIELD_DEF, "<field def>");
-    r = field_def_0(b, l + 1);
+    r = metadata(b, l + 1);
     r = r && data_type(b, l + 1);
     r = r && consumeToken(b, ICE_ID);
     p = r; // pin = 3
@@ -374,17 +352,6 @@ public class SliceParser implements PsiParser, LightPsiParser {
     r = p && consumeToken(b, ICE_SEMICOLON) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // metadata*
-  private static boolean field_def_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "field_def_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!metadata(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "field_def_0", c)) break;
-    }
-    return true;
   }
 
   // (field_initializer )?
@@ -465,24 +432,16 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '[[' global_metadata_body? ']]'
+  // global_metadata_statement*
   public static boolean global_metadata(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "global_metadata")) return false;
-    if (!nextTokenIs(b, ICE_OPEN_GL_MD)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ICE_GLOBAL_METADATA, null);
-    r = consumeToken(b, ICE_OPEN_GL_MD);
-    p = r; // pin = 1
-    r = r && report_error_(b, global_metadata_1(b, l + 1));
-    r = p && consumeToken(b, ICE_CLOSE_GL_MD) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  // global_metadata_body?
-  private static boolean global_metadata_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_metadata_1")) return false;
-    global_metadata_body(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, ICE_GLOBAL_METADATA, "<global metadata>");
+    while (true) {
+      int c = current_position_(b);
+      if (!global_metadata_statement(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "global_metadata", c)) break;
+    }
+    exit_section_(b, l, m, true, false, global_metadata_recovery_parser_);
     return true;
   }
 
@@ -521,7 +480,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !(']]' | global_metadata | module)
+  // !(']]' | module)
   static boolean global_metadata_element_recovery(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "global_metadata_element_recovery")) return false;
     boolean r;
@@ -531,42 +490,17 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // ']]' | global_metadata | module
+  // ']]' | module
   private static boolean global_metadata_element_recovery_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "global_metadata_element_recovery_0")) return false;
     boolean r;
     r = consumeToken(b, ICE_CLOSE_GL_MD);
-    if (!r) r = global_metadata(b, l + 1);
     if (!r) r = module(b, l + 1);
     return r;
   }
 
   /* ********************************************************** */
-  // (global_metadata)*
-  static boolean global_metadata_list(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_metadata_list")) return false;
-    Marker m = enter_section_(b, l, _NONE_);
-    while (true) {
-      int c = current_position_(b);
-      if (!global_metadata_list_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "global_metadata_list", c)) break;
-    }
-    exit_section_(b, l, m, true, false, global_metadata_recovery_parser_);
-    return true;
-  }
-
-  // (global_metadata)
-  private static boolean global_metadata_list_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_metadata_list_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = global_metadata(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // !(module | global_metadata | metadata)
+  // !(module | global_metadata_statement | metadata_statement)
   static boolean global_metadata_recovery(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "global_metadata_recovery")) return false;
     boolean r;
@@ -576,14 +510,36 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // module | global_metadata | metadata
+  // module | global_metadata_statement | metadata_statement
   private static boolean global_metadata_recovery_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "global_metadata_recovery_0")) return false;
     boolean r;
     r = module(b, l + 1);
-    if (!r) r = global_metadata(b, l + 1);
-    if (!r) r = metadata(b, l + 1);
+    if (!r) r = global_metadata_statement(b, l + 1);
+    if (!r) r = metadata_statement(b, l + 1);
     return r;
+  }
+
+  /* ********************************************************** */
+  // '[[' global_metadata_body? ']]'
+  public static boolean global_metadata_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_metadata_statement")) return false;
+    if (!nextTokenIs(b, ICE_OPEN_GL_MD)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, ICE_GLOBAL_METADATA_STATEMENT, null);
+    r = consumeToken(b, ICE_OPEN_GL_MD);
+    p = r; // pin = 1
+    r = r && report_error_(b, global_metadata_statement_1(b, l + 1));
+    r = p && consumeToken(b, ICE_CLOSE_GL_MD) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // global_metadata_body?
+  private static boolean global_metadata_statement_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_metadata_statement_1")) return false;
+    global_metadata_body(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
@@ -613,24 +569,16 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '[' metadata_body? ']'
+  // metadata_statement*
   public static boolean metadata(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "metadata")) return false;
-    if (!nextTokenIs(b, ICE_LEFT_BRACKET)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ICE_METADATA, null);
-    r = consumeToken(b, ICE_LEFT_BRACKET);
-    p = r; // pin = 1
-    r = r && report_error_(b, metadata_1(b, l + 1));
-    r = p && consumeToken(b, ICE_RIGHT_BRACKET) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  // metadata_body?
-  private static boolean metadata_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "metadata_1")) return false;
-    metadata_body(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, ICE_METADATA, "<metadata>");
+    while (true) {
+      int c = current_position_(b);
+      if (!metadata_statement(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "metadata", c)) break;
+    }
+    exit_section_(b, l, m, true, false, null);
     return true;
   }
 
@@ -703,12 +651,34 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* modifier* method_return_type id '(' parameters_list ')' (throws_block)? ';'
+  // '[' metadata_body? ']'
+  public static boolean metadata_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "metadata_statement")) return false;
+    if (!nextTokenIs(b, ICE_LEFT_BRACKET)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, ICE_METADATA_STATEMENT, null);
+    r = consumeToken(b, ICE_LEFT_BRACKET);
+    p = r; // pin = 1
+    r = r && report_error_(b, metadata_statement_1(b, l + 1));
+    r = p && consumeToken(b, ICE_RIGHT_BRACKET) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // metadata_body?
+  private static boolean metadata_statement_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "metadata_statement_1")) return false;
+    metadata_body(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // metadata modifier* method_return_type id '(' parameters_list ')' (throws_block)? ';'
   public static boolean method_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "method_def")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_METHOD_DEF, "<method def>");
-    r = method_def_0(b, l + 1);
+    r = metadata(b, l + 1);
     r = r && method_def_1(b, l + 1);
     r = r && method_return_type(b, l + 1);
     r = r && consumeTokens(b, 2, ICE_ID, ICE_LEFT_PARENTH);
@@ -719,17 +689,6 @@ public class SliceParser implements PsiParser, LightPsiParser {
     r = p && consumeToken(b, ICE_SEMICOLON) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // metadata*
-  private static boolean method_def_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "method_def_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!metadata(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "method_def_0", c)) break;
-    }
-    return true;
   }
 
   // modifier*
@@ -786,51 +745,34 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata? 'module' id '{' module_body '}' ';'
+  // metadata 'module' id module_body ';'
   public static boolean module(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "module")) return false;
     if (!nextTokenIs(b, "<module>", ICE_KW_MODULE, ICE_LEFT_BRACKET)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_MODULE, "<module>");
-    r = module_0(b, l + 1);
-    r = r && consumeTokens(b, 1, ICE_KW_MODULE, ICE_ID, ICE_LEFT_BRACE);
+    r = metadata(b, l + 1);
+    r = r && consumeTokens(b, 1, ICE_KW_MODULE, ICE_ID);
     p = r; // pin = 2
     r = r && report_error_(b, module_body(b, l + 1));
-    r = p && report_error_(b, consumeTokens(b, -1, ICE_RIGHT_BRACE, ICE_SEMICOLON)) && r;
+    r = p && consumeToken(b, ICE_SEMICOLON) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
-  // metadata?
-  private static boolean module_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "module_0")) return false;
-    metadata(b, l + 1);
-    return true;
-  }
-
   /* ********************************************************** */
-  // (';' | module_element) *
-  static boolean module_body(PsiBuilder b, int l) {
+  // '{' module_element_list '}'
+  public static boolean module_body(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "module_body")) return false;
-    Marker m = enter_section_(b, l, _NONE_);
-    while (true) {
-      int c = current_position_(b);
-      if (!module_body_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "module_body", c)) break;
-    }
-    exit_section_(b, l, m, true, false, body_element_list_recovery_parser_);
-    return true;
-  }
-
-  // ';' | module_element
-  private static boolean module_body_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "module_body_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, ICE_SEMICOLON);
-    if (!r) r = module_element(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    if (!nextTokenIs(b, ICE_LEFT_BRACE)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, ICE_MODULE_BODY, null);
+    r = consumeToken(b, ICE_LEFT_BRACE);
+    p = r; // pin = 1
+    r = r && report_error_(b, module_element_list(b, l + 1));
+    r = p && consumeToken(b, ICE_RIGHT_BRACE) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -843,6 +785,31 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!r) r = data_type_element(b, l + 1);
     if (!r) r = module(b, l + 1);
     exit_section_(b, l, m, r, false, element_recovery_parser_);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // (';' | module_element) *
+  static boolean module_element_list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "module_element_list")) return false;
+    Marker m = enter_section_(b, l, _NONE_);
+    while (true) {
+      int c = current_position_(b);
+      if (!module_element_list_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "module_element_list", c)) break;
+    }
+    exit_section_(b, l, m, true, false, body_element_list_recovery_parser_);
+    return true;
+  }
+
+  // ';' | module_element
+  private static boolean module_element_list_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "module_element_list_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, ICE_SEMICOLON);
+    if (!r) r = module_element(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -898,29 +865,18 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata* parameter_modifier* data_type id
+  // metadata parameter_modifier* data_type id
   public static boolean parameter_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parameter_def")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_PARAMETER_DEF, "<parameter def>");
-    r = parameter_def_0(b, l + 1);
+    r = metadata(b, l + 1);
     r = r && parameter_def_1(b, l + 1);
     r = r && data_type(b, l + 1);
     p = r; // pin = 3
     r = r && consumeToken(b, ICE_ID);
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // metadata*
-  private static boolean parameter_def_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parameter_def_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!metadata(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "parameter_def_0", c)) break;
-    }
-    return true;
   }
 
   // parameter_modifier*
@@ -1080,13 +1036,13 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !<<eof>> global_metadata_list module_list
+  // !<<eof>> global_metadata module_list
   static boolean slice_block(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "slice_block")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = slice_block_0(b, l + 1);
-    r = r && global_metadata_list(b, l + 1);
+    r = r && global_metadata(b, l + 1);
     r = r && module_list(b, l + 1);
     exit_section_(b, m, null, r);
     return r;

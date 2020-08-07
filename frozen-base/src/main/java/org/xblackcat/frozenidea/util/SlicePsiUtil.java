@@ -12,11 +12,9 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.IceFileType;
-import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
-import org.xblackcat.frozenidea.psi.SliceFile;
-import org.xblackcat.frozenidea.psi.SliceModule;
-import org.xblackcat.frozenidea.psi.SliceNamedElement;
+import org.xblackcat.frozenidea.psi.*;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -72,8 +70,11 @@ public class SlicePsiUtil {
                 }
             }
         }
-        for (SliceModule mm : m.getModuleList()) {
-            searchThroughModule(mm, result, matcher);
+        final SliceModuleBody moduleBody = m.getModuleBody();
+        if (moduleBody != null) {
+            for (SliceModule mm : moduleBody.getModuleList()) {
+                searchThroughModule(mm, result, matcher);
+            }
         }
     }
 
@@ -99,5 +100,21 @@ public class SlicePsiUtil {
                 .withIcon(element.getIcon(Iconable.ICON_FLAG_VISIBILITY))
                 .withTailText(" (" + fqn.getPathString() + ")", true)
                 .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE);
+    }
+
+    public static boolean isEmpty(SliceModule module) {
+        final SliceModuleBody body = module.getModuleBody();
+        if (body == null) {
+            return true;
+        }
+        return body.getConstantDefList().isEmpty() && body.getDataTypeElementList().isEmpty() && body.getModuleList().isEmpty();
+    }
+
+    public static boolean isEmpty(SliceDataTypeElement type) {
+        final @Nullable SliceBodyBlock body = type.getBodyBlock();
+        if (body == null) {
+            return true;
+        }
+        return body.getEnumConstantList().isEmpty() && body.getFieldDefList().isEmpty() && body.getMethodDefList().isEmpty();
     }
 }

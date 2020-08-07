@@ -39,8 +39,8 @@ public class SliceFieldDefImpl extends SliceInnerElementImpl implements SliceFie
 
   @Override
   @NotNull
-  public List<SliceMetadata> getMetadataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceMetadata.class);
+  public SliceMetadata getMetadata() {
+    return findNotNullChildByClass(SliceMetadata.class);
   }
 
   @Override

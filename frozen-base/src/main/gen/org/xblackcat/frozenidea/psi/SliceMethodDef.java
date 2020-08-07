@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface SliceMethodDef extends SliceInnerElement, SliceNamedElement {
 
   @NotNull
-  List<SliceMetadata> getMetadataList();
+  SliceMetadata getMetadata();
 
   @NotNull
   SliceMethodReturnType getMethodReturnType();

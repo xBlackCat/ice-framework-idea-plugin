@@ -27,8 +27,8 @@ public class SliceMethodDefImpl extends SliceInnerElementImpl implements SliceMe
 
   @Override
   @NotNull
-  public List<SliceMetadata> getMetadataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceMetadata.class);
+  public SliceMetadata getMetadata() {
+    return findNotNullChildByClass(SliceMetadata.class);
   }
 
   @Override

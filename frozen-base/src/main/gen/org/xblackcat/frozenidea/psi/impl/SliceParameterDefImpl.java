@@ -33,8 +33,8 @@ public class SliceParameterDefImpl extends SliceNamedElementImpl implements Slic
 
   @Override
   @NotNull
-  public List<SliceMetadata> getMetadataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceMetadata.class);
+  public SliceMetadata getMetadata() {
+    return findNotNullChildByClass(SliceMetadata.class);
   }
 
   @Override

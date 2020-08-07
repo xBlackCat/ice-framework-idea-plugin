@@ -106,25 +106,27 @@
 }
 
 root ::= slice_block
-private slice_block ::= !<<eof>> global_metadata_list module_list
+private slice_block ::= !<<eof>> global_metadata module_list
 
 private module_list ::= (module)* {recoverWhile=element_recovery}
-module ::= metadata? 'module' id '{' module_body '}' ';' { pin=2 }
-private module_body ::= (';' | module_element) * {recoverWhile = body_element_list_recovery}
+module ::= metadata 'module' id module_body ';' { pin=2 }
+module_body ::= '{' module_element_list '}' { pin=1 }
+private module_element_list ::= (';' | module_element) * {recoverWhile = body_element_list_recovery}
 
 private module_element ::= (constant_def | data_type_element | module) {recoverWhile=element_recovery}
 private element_recovery ::= !('[' | 'const' | 'module' | 'class' | 'exception' | 'interface' | 'sequence' | 'struct' | 'dictionary' | 'enum' | '}' | <<eof>>)
 
-private global_metadata_list ::= (global_metadata)* {recoverWhile=global_metadata_recovery}
-private global_metadata_recovery ::= !(module | global_metadata | metadata)
+global_metadata ::= global_metadata_statement* {recoverWhile=global_metadata_recovery}
+private global_metadata_recovery ::= !(module | global_metadata_statement | metadata_statement)
 
-global_metadata ::= '[[' global_metadata_body? ']]' {pin=1}
+global_metadata_statement ::= '[[' global_metadata_body? ']]' {pin=1}
 private global_metadata_body ::= metadata_element (',' metadata_element)* {recoverWhile=global_metadata_element_recovery}
 
-metadata ::= '[' metadata_body? ']' {pin=1}
+metadata ::= metadata_statement*
+metadata_statement ::= '[' metadata_body? ']' {pin=1}
 private metadata_body ::= metadata_element (',' metadata_element)* {recoverWhile=metadata_element_recovery}
 metadata_element ::= string_literal | bad_string
-private global_metadata_element_recovery ::= !(']]' | global_metadata | module)
+private global_metadata_element_recovery ::= !(']]' | module)
 private metadata_element_recovery ::= !(']' | module | element_recovery)
 
 string_literal ::= string_value {
@@ -154,7 +156,7 @@ bool_literal ::= 'false' | 'true' {
     ]
 }
 
-data_type_element ::= metadata* type_word generic_type? id extends_block? implements_block? body_block? ';' {
+data_type_element ::= metadata type_word generic_type? id extends_block? implements_block? body_block? ';' {
   pin=2
   methods=[
     isClass
@@ -208,7 +210,7 @@ data_type ::= proxy_type | type_reference | primitive_data_types | simple_data_t
 modifier ::= 'idempotent' | 'local'
 method_return_type ::= data_type | 'void'
 
-method_def ::= metadata* modifier* method_return_type id '(' parameters_list ')' (throws_block)? ';' {
+method_def ::= metadata modifier* method_return_type id '(' parameters_list ')' (throws_block)? ';' {
   pin=5
   methods = [
     getParametersCount
@@ -219,7 +221,7 @@ throws_block ::= 'throws' type_reference_list {pin=1}
 parameter_modifier ::= 'out'
 
 parameters_list ::= (parameter_def (',' parameter_def) *)? {recoverWhile=parameter_list_recovery}
-parameter_def ::= metadata* parameter_modifier* data_type id {pin=3}
+parameter_def ::= metadata parameter_modifier* data_type id {pin=3}
 
 private parameter_list_recovery ::= !(')')
 
@@ -227,9 +229,9 @@ constant_value ::= (number_literal | bool_literal | string_literal | enum_consta
 
 field_initializer ::= '=' constant_value {pin=1}
 
-field_def ::= metadata* data_type id (field_initializer )? ';' {pin=3}
+field_def ::= metadata data_type id (field_initializer )? ';' {pin=3}
 
-constant_def ::= metadata* 'const' data_type id field_initializer ';' {pin=2}
+constant_def ::= metadata 'const' data_type id field_initializer ';' {pin=2}
 
 //
 // Data types

@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import org.xblackcat.frozenidea.psi.*;
 
-public class SliceGlobalMetadataImpl extends SliceCompositeElementImpl implements SliceGlobalMetadata {
+public class SliceGlobalMetadataStatementImpl extends SliceCompositeElementImpl implements SliceGlobalMetadataStatement {
 
-  public SliceGlobalMetadataImpl(@NotNull ASTNode node) {
+  public SliceGlobalMetadataStatementImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SliceVisitor visitor) {
-    visitor.visitGlobalMetadata(this);
+    visitor.visitGlobalMetadataStatement(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

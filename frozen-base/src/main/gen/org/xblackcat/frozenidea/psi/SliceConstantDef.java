@@ -14,7 +14,7 @@ public interface SliceConstantDef extends SliceVariableElement, SliceNamedElemen
   SliceFieldInitializer getFieldInitializer();
 
   @NotNull
-  List<SliceMetadata> getMetadataList();
+  SliceMetadata getMetadata();
 
   @Nullable
   PsiElement getId();

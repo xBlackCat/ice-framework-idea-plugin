@@ -56,7 +56,12 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             return;
         }
 
-        for (SliceDataTypeElement exceptionDef : module.getDataTypeElementList()) {
+        final SliceModuleBody body = module.getModuleBody();
+        if (body == null) {
+            return;
+        }
+
+        for (SliceDataTypeElement exceptionDef : body.getDataTypeElementList()) {
             if (searchInReferenceList(element, exceptionDef.getExtendsBlock())) {
                 items.add(exceptionDef);
             }
@@ -97,7 +102,12 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             return;
         }
 
-        for (SliceDataTypeElement typeDef : module.getDataTypeElementList()) {
+        final SliceModuleBody body = module.getModuleBody();
+        if (body == null) {
+            return;
+        }
+
+        for (SliceDataTypeElement typeDef : body.getDataTypeElementList()) {
             if (searchInReferenceList(element, typeDef.getImplementsBlock())) {
                 items.add(typeDef);
             }

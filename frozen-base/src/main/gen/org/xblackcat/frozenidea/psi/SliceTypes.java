@@ -22,14 +22,17 @@ public interface SliceTypes {
   IElementType ICE_FLOAT_LITERAL = new SliceCompositeElementType("ICE_FLOAT_LITERAL");
   IElementType ICE_GENERIC_TYPE = new SliceCompositeElementType("ICE_GENERIC_TYPE");
   IElementType ICE_GLOBAL_METADATA = new SliceCompositeElementType("ICE_GLOBAL_METADATA");
+  IElementType ICE_GLOBAL_METADATA_STATEMENT = new SliceCompositeElementType("ICE_GLOBAL_METADATA_STATEMENT");
   IElementType ICE_IMPLEMENTS_BLOCK = new SliceCompositeElementType("ICE_IMPLEMENTS_BLOCK");
   IElementType ICE_INTEGER_LITERAL = new SliceCompositeElementType("ICE_INTEGER_LITERAL");
   IElementType ICE_METADATA = new SliceCompositeElementType("ICE_METADATA");
   IElementType ICE_METADATA_ELEMENT = new SliceCompositeElementType("ICE_METADATA_ELEMENT");
+  IElementType ICE_METADATA_STATEMENT = new SliceCompositeElementType("ICE_METADATA_STATEMENT");
   IElementType ICE_METHOD_DEF = new SliceCompositeElementType("ICE_METHOD_DEF");
   IElementType ICE_METHOD_RETURN_TYPE = new SliceCompositeElementType("ICE_METHOD_RETURN_TYPE");
   IElementType ICE_MODIFIER = new SliceCompositeElementType("ICE_MODIFIER");
   IElementType ICE_MODULE = new SliceCompositeElementType("ICE_MODULE");
+  IElementType ICE_MODULE_BODY = new SliceCompositeElementType("ICE_MODULE_BODY");
   IElementType ICE_MODULE_PATH = new SliceCompositeElementType("ICE_MODULE_PATH");
   IElementType ICE_NUMBER_LITERAL = new SliceCompositeElementType("ICE_NUMBER_LITERAL");
   IElementType ICE_PARAMETERS_LIST = new SliceCompositeElementType("ICE_PARAMETERS_LIST");
@@ -141,6 +144,9 @@ public interface SliceTypes {
       else if (type == ICE_GLOBAL_METADATA) {
         return new SliceGlobalMetadataImpl(node);
       }
+      else if (type == ICE_GLOBAL_METADATA_STATEMENT) {
+        return new SliceGlobalMetadataStatementImpl(node);
+      }
       else if (type == ICE_IMPLEMENTS_BLOCK) {
         return new SliceImplementsBlockImpl(node);
       }
@@ -153,6 +159,9 @@ public interface SliceTypes {
       else if (type == ICE_METADATA_ELEMENT) {
         return new SliceMetadataElementImpl(node);
       }
+      else if (type == ICE_METADATA_STATEMENT) {
+        return new SliceMetadataStatementImpl(node);
+      }
       else if (type == ICE_METHOD_DEF) {
         return new SliceMethodDefImpl(node);
       }
@@ -164,6 +173,9 @@ public interface SliceTypes {
       }
       else if (type == ICE_MODULE) {
         return new SliceModuleImpl(node);
+      }
+      else if (type == ICE_MODULE_BODY) {
+        return new SliceModuleBodyImpl(node);
       }
       else if (type == ICE_MODULE_PATH) {
         return new SliceModulePathImpl(node);

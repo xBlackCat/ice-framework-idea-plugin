@@ -31,11 +31,11 @@ public class SliceHelper {
         if (file == null) {
             return null;
         }
-        List<SliceGlobalMetadata> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(
+        List<SliceGlobalMetadataStatement> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(
                 file,
-                SliceGlobalMetadata.class
+                SliceGlobalMetadataStatement.class
         );
-        for (SliceGlobalMetadata md : globalMetadatas) {
+        for (SliceGlobalMetadataStatement md : globalMetadatas) {
             for (SliceMetadataElement el : md.getMetadataElementList()) {
                 final SliceStringLiteral literal = el.getStringLiteral();
                 if (literal == null) {
@@ -127,7 +127,11 @@ public class SliceHelper {
     }
 
     private static void findAllSubclasses(Set<SliceDataTypeElement> elements, SliceModule module, Set<SliceDataTypeElement> parents) {
-        for (SliceDataTypeElement clazz : module.getDataTypeElementList()) {
+        final SliceModuleBody body = module.getModuleBody();
+        if (body == null) {
+            return;
+        }
+        for (SliceDataTypeElement clazz : body.getDataTypeElementList()) {
             if (!clazz.isClass()) {
                 continue;
             }
@@ -165,7 +169,12 @@ public class SliceHelper {
         Set<SliceDataTypeElement> hierarchy = new HashSet<>();
         hierarchy.add(element);
 
-        final List<SliceDataTypeElement> typeDefList = module.getDataTypeElementList();
+        final SliceModuleBody body = module.getModuleBody();
+        if (body == null) {
+            return;
+        }
+
+        final List<SliceDataTypeElement> typeDefList = body.getDataTypeElementList();
         for (SliceDataTypeElement type : typeDefList) {
             if (type.getBodyBlock() == null) {
                 // Ignore forward definitions

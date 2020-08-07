@@ -21,7 +21,7 @@ public interface SliceDataTypeElement extends SliceNamedElement {
   SliceImplementsBlock getImplementsBlock();
 
   @NotNull
-  List<SliceMetadata> getMetadataList();
+  SliceMetadata getMetadata();
 
   @NotNull
   SliceTypeWord getTypeWord();

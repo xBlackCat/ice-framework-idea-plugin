@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceGlobalMetadata extends SliceCompositeElement {
+public interface SliceMetadataStatement extends SliceCompositeElement {
 
   @NotNull
   List<SliceMetadataElement> getMetadataElementList();

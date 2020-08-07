@@ -11,7 +11,7 @@ public interface SliceParameterDef extends SliceVariableElement, SliceNamedEleme
   SliceDataType getDataType();
 
   @NotNull
-  List<SliceMetadata> getMetadataList();
+  SliceMetadata getMetadata();
 
   @NotNull
   List<SliceParameterModifier> getParameterModifierList();

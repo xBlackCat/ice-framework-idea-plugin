@@ -67,5 +67,4 @@ public abstract class SliceInnerElementImpl extends SliceNamedElementImpl implem
             }
         };
     }
-
 }

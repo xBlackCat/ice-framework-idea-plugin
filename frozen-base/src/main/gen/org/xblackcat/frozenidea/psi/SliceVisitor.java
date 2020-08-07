@@ -67,6 +67,10 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
+  public void visitGlobalMetadataStatement(@NotNull SliceGlobalMetadataStatement o) {
+    visitCompositeElement(o);
+  }
+
   public void visitImplementsBlock(@NotNull SliceImplementsBlock o) {
     visitReferenceListElement(o);
   }
@@ -80,6 +84,10 @@ public class SliceVisitor extends PsiElementVisitor {
   }
 
   public void visitMetadataElement(@NotNull SliceMetadataElement o) {
+    visitCompositeElement(o);
+  }
+
+  public void visitMetadataStatement(@NotNull SliceMetadataStatement o) {
     visitCompositeElement(o);
   }
 
@@ -98,6 +106,10 @@ public class SliceVisitor extends PsiElementVisitor {
 
   public void visitModule(@NotNull SliceModule o) {
     visitNamedElement(o);
+  }
+
+  public void visitModuleBody(@NotNull SliceModuleBody o) {
+    visitCompositeElement(o);
   }
 
   public void visitModulePath(@NotNull SliceModulePath o) {

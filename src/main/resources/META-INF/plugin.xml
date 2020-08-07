@@ -33,7 +33,7 @@
                                        language="SLICE"/>
         <lang.parserDefinition language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceParserDefinition"/>
         <lang.braceMatcher language="SLICE" implementationClass="org.xblackcat.frozenidea.SliceBraceMatcher"/>
-        <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenidea.code.SliceFoldingBuilder"/>
+        <lang.foldingBuilder language="SLICE" implementationClass="org.xblackcat.frozenidea.code.folding.SliceFoldingBuilder"/>
 
         <lang.psiStructureViewFactory language="SLICE"
                                       implementationClass="org.xblackcat.frozenidea.code.structure.SliceStructureViewFactory"/>

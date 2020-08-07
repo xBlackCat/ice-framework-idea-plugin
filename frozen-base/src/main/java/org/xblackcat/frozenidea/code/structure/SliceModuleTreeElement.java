@@ -27,16 +27,21 @@ public class SliceModuleTreeElement extends PsiTreeElementBase<SliceModule> {
         if (element == null) {
             return Collections.emptyList();
         }
-        
-        for (SliceModule module : element.getModuleList()) {
+
+        final @Nullable SliceModuleBody body = element.getModuleBody();
+        if (body == null) {
+            return Collections.emptyList();
+        }
+
+        for (SliceModule module : body.getModuleList()) {
             children.add(new SliceModuleTreeElement(module));
         }
 
-        for (SliceConstantDef constant : element.getConstantDefList()) {
+        for (SliceConstantDef constant : body.getConstantDefList()) {
             children.add(new SliceVariableTreeElement(constant));
         }
 
-        for (SliceDataTypeElement dataType : element.getDataTypeElementList()) {
+        for (SliceDataTypeElement dataType : body.getDataTypeElementList()) {
             children.add(new SliceDataTypeTreeElement(dataType));
         }
 

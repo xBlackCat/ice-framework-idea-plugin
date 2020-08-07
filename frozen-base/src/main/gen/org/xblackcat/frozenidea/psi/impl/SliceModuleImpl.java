@@ -27,26 +27,14 @@ public class SliceModuleImpl extends SliceNamedElementImpl implements SliceModul
 
   @Override
   @NotNull
-  public List<SliceConstantDef> getConstantDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceConstantDef.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SliceDataTypeElement> getDataTypeElementList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceDataTypeElement.class);
+  public SliceMetadata getMetadata() {
+    return findNotNullChildByClass(SliceMetadata.class);
   }
 
   @Override
   @Nullable
-  public SliceMetadata getMetadata() {
-    return findChildByClass(SliceMetadata.class);
-  }
-
-  @Override
-  @NotNull
-  public List<SliceModule> getModuleList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceModule.class);
+  public SliceModuleBody getModuleBody() {
+    return findChildByClass(SliceModuleBody.class);
   }
 
   @Override
