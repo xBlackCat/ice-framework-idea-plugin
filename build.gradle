@@ -68,6 +68,6 @@ patchPluginXml {
             <li><b>0.0.3.0</b> - Support latest versions of IntelliJ code base. Support only ZeroC ICE v3.7.x. Improve find usages in java code from ICE code (methods/fields/classes)
             <li><b>0.0.3.1</b> - Fix method usages search
             <li><b>0.0.3.2</b> - Java-to-slice gutter icons were added. Use vector icons.
-            <li><b>0.0.4.0</b> - Support IDEA since 2020.1.2
+            <li><b>0.0.4.0</b> - Support IDEA 2020.1.2+. Added structure view and folding code. Gutter icons added to navigate to/from java code. 
 </ul>"""
 }
