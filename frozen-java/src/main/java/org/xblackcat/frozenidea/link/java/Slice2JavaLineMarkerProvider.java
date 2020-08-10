@@ -71,8 +71,8 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
     @Override
     public void collectNavigationMarkers(
-            List<PsiElement> elements,
-            @NotNull Collection<? super RelatedItemLineMarkerInfo> result,
+            @NotNull List<? extends PsiElement> elements,
+            @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result,
             boolean forNavigation
     ) {
         Set<PsiElement> visited = forNavigation ? new THashSet<>() : new AbyssSet<>();

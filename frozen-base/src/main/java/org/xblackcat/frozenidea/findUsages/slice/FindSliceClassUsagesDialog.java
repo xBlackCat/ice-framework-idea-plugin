@@ -67,20 +67,7 @@ public class FindSliceClassUsagesDialog extends SliceFindUsagesDialog<SliceClass
         }
         options.isCheckDeepInheritance = true;
         options.isIncludeInherited = false;
-
-        FUCounterUsageLogger.getInstance().logEvent(EVENT_LOG_GROUP, "find.class.started", createFeatureUsageData(options));
-    }
-
-    @Override
-    protected FeatureUsageData createFeatureUsageData(SliceClassFindUsagesOptions options) {
-        FeatureUsageData data = super.createFeatureUsageData(options);
-        data.addData("methodUsages", options.isMethodsUsages);
-        data.addData("fieldUsages", options.isFieldsUsages);
-        data.addData("derivedUsages", options.isDerivedClasses);
-        data.addData("implementingClasses", options.isImplementingClasses);
-        data.addData("derivedInterfaces", options.isDerivedInterfaces);
-        return data;
-    }
+     }
 
     @Override
     protected JPanel createFindWhatPanel() {

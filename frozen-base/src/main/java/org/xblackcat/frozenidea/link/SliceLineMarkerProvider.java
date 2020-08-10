@@ -5,6 +5,7 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.psi.PsiElement;
 import gnu.trove.THashSet;
+import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.util.SliceIcons;
@@ -22,8 +23,8 @@ import java.util.Set;
 public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
     public void collectNavigationMarkers(
-            List<PsiElement> elements,
-            Collection<? super RelatedItemLineMarkerInfo> result,
+            @NotNull List<? extends PsiElement> elements,
+            @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result,
             boolean forNavigation
     ) {
         Set<PsiElement> visited = forNavigation ? new THashSet<>() : null;
@@ -42,7 +43,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
     }
 
     private static void collectExtending(
-            Collection<? super RelatedItemLineMarkerInfo> result,
+            Collection<? super RelatedItemLineMarkerInfo<?>> result,
             boolean forNavigation,
             Set<PsiElement> visited,
             SliceDataTypeElement element
@@ -88,7 +89,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
     }
 
     private static void collectImplementations(
-            Collection<? super RelatedItemLineMarkerInfo> result,
+            Collection<? super RelatedItemLineMarkerInfo<?>> result,
             boolean forNavigation,
             Set<PsiElement> visited,
             SliceDataTypeElement element

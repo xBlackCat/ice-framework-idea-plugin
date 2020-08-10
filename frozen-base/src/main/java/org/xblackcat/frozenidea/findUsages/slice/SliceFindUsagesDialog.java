@@ -60,14 +60,6 @@ public abstract class SliceFindUsagesDialog<T extends SliceFindUsagesOptions> ex
         return (SliceNamedElement) myPsiElement;
     }
 
-    protected FeatureUsageData createFeatureUsageData(T options) {
-        FeatureUsageData data = new FeatureUsageData();
-        data.addData("usages", options.isUsages);
-        data.addData("textOccurrences", options.isSearchForTextOccurrences);
-        addScopeData(data, options.searchScope);
-        return data;
-    }
-
     @Override
     public void configureLabelComponent(@NotNull final SimpleColoredComponent coloredComponent) {
         coloredComponent.append(StringUtil.capitalize(UsageViewUtil.getType(myPsiElement)));
