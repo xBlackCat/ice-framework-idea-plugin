@@ -53,7 +53,8 @@ public abstract class SliceFindUsagesDialog<T extends SliceFindUsagesOptions> ex
     @Override
     public void calcFindUsagesOptions(FindUsagesOptions options) {
         super.calcFindUsagesOptions(options);
-        calcFindUsagesOptions((T) options);
+        @SuppressWarnings("unchecked") final T o = (T) options;
+        calcFindUsagesOptions(o);
     }
 
     protected SliceNamedElement getPsiElement() {

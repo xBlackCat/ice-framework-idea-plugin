@@ -2,7 +2,6 @@ package org.xblackcat.frozenidea.code.formatter;
 
 import com.intellij.formatting.*;
 import com.intellij.json.JsonLanguage;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
@@ -15,12 +14,14 @@ import static org.xblackcat.frozenidea.psi.SliceTypes.*;
  */
 public class SliceFormattingModelBuilder implements FormattingModelBuilder {
     @Override
-    public @NotNull FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
-        SpacingBuilder spacingBuilder = createSpacingBuilder(settings);
+    public @NotNull FormattingModel createModel(@NotNull FormattingContext formattingContext) {
+        final CodeStyleSettings codeStyleSettings = formattingContext.getCodeStyleSettings();
+
+        SpacingBuilder spacingBuilder = createSpacingBuilder(codeStyleSettings);
         return FormattingModelProvider.createFormattingModelForPsiFile(
-                element.getContainingFile(),
-                new SliceFileBlock(element.getNode(), spacingBuilder),
-                settings
+                formattingContext.getContainingFile(),
+                new SliceFileBlock(formattingContext.getNode(), spacingBuilder),
+                codeStyleSettings
         );
     }
 

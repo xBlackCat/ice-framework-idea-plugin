@@ -78,12 +78,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
     }
 
     private static Icon getIcon(IceComponent type) {
-        return new IconLoader.LazyIcon() {
-            @Override
-            protected Icon compute() {
-                return IconLoader.getIcon(type.getIconName());
-            }
-        };
+        return IconLoader.createLazy(() -> IconLoader.getIcon(type.getIconName(), IceFacetConfiguration.class));
     }
 
     private class IceFacetEditor extends FacetEditorTab {
@@ -172,12 +167,7 @@ public class IceFacetConfiguration implements FacetConfiguration, PersistentStat
                                 assert value != null;
 
                                 IceComponent type = (IceComponent) value;
-                                setIcon(new IconLoader.LazyIcon() {
-                                    @Override
-                                    protected Icon compute() {
-                                        return IconLoader.getIcon(type.getIconName());
-                                    }
-                                });
+                                setIcon(IconLoader.createLazy(() -> IconLoader.getIcon(type.getIconName(), IceFacetConfiguration.class)));
                                 append(type.name(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                             }
                         }

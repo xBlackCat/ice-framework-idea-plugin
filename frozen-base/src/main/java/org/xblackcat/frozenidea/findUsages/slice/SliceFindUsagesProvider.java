@@ -1,7 +1,6 @@
 package org.xblackcat.frozenidea.findUsages.slice;
 
 import com.intellij.ide.TypePresentationService;
-import com.intellij.lang.LangBundle;
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
@@ -14,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.parser.SliceLexer;
 import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.util.FQN;
+import org.xblackcat.frozenidea.util.SliceBundle;
 
 public class SliceFindUsagesProvider implements FindUsagesProvider {
     @Override
@@ -40,35 +40,34 @@ public class SliceFindUsagesProvider implements FindUsagesProvider {
     @Override
     public String getType(@NotNull PsiElement element) {
         if (element instanceof PsiFile) {
-            return LangBundle.message("terms.file");
+            return SliceBundle.message("slice.terms.file");
         }
         if (element instanceof SliceDataTypeElement && ((SliceDataTypeElement) element).isException()) {
-            return LangBundle.message("java.terms.exception");
+            return SliceBundle.message("slice.terms.exception");
         }
         if (element instanceof SliceModule) {
-            return LangBundle.message("java.terms.package");
+            return SliceBundle.message("slice.terms.module");
         }
         if (element instanceof SliceDataTypeElement && ((SliceDataTypeElement) element).isEnum()) {
-            return LangBundle.message("java.terms.enum");
+            return SliceBundle.message("slice.terms.enum");
         }
         if (element instanceof SliceDataTypeElement && ((SliceDataTypeElement) element).isInterface()) {
-            return LangBundle.message("java.terms.interface");
+            return SliceBundle.message("slice.terms.interface");
         }
         if (element instanceof SliceDataTypeElement && ((SliceDataTypeElement) element).isClass()) {
-            return LangBundle.message("java.terms.class");
-
+            return SliceBundle.message("slice.terms.class");
         }
         if (element instanceof SliceFieldDef) {
-            return LangBundle.message("java.terms.field");
+            return SliceBundle.message("slice.terms.field");
         }
         if (element instanceof SliceParameterDef) {
-            return LangBundle.message("java.terms.parameter");
+            return SliceBundle.message("slice.terms.parameter");
         }
         if (element instanceof SliceMethodDef) {
-            return LangBundle.message("java.terms.method");
+            return SliceBundle.message("slice.terms.method");
         }
         if (element instanceof SliceConstantDef) {
-            return LangBundle.message("java.terms.variable");
+            return SliceBundle.message("slice.terms.variable");
         }
 
         final String name = TypePresentationService.getService().getTypePresentableName(element.getClass());
