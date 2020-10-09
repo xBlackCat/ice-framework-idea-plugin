@@ -12,6 +12,9 @@ public interface SliceDataTypeElement extends SliceNamedElement {
   SliceBodyBlock getBodyBlock();
 
   @Nullable
+  SliceCompactTypeIdDeclaration getCompactTypeIdDeclaration();
+
+  @Nullable
   SliceExtendsBlock getExtendsBlock();
 
   @Nullable

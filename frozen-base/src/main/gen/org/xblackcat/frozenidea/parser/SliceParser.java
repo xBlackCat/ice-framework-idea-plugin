@@ -7,6 +7,7 @@ import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import static org.xblackcat.frozenidea.parser.SliceParserUtil.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
 import com.intellij.lang.LightPsiParser;
 
@@ -137,6 +138,55 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // integer_literal
+  static boolean compact_type_id(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "compact_type_id")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = integer_literal(b, l + 1);
+    exit_section_(b, l, m, r, false, compact_type_id_recovery_parser_);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // '(' compact_type_id ')'
+  public static boolean compact_type_id_declaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "compact_type_id_declaration")) return false;
+    if (!nextTokenIs(b, ICE_LEFT_PARENTH)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, ICE_COMPACT_TYPE_ID_DECLARATION, null);
+    r = consumeToken(b, ICE_LEFT_PARENTH);
+    p = r; // pin = 1
+    r = r && report_error_(b, compact_type_id(b, l + 1));
+    r = p && consumeToken(b, ICE_RIGHT_PARENTH) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
+  // !(')' | ';' | extends_block | implements_block | '{')
+  static boolean compact_type_id_recovery(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "compact_type_id_recovery")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !compact_type_id_recovery_0(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // ')' | ';' | extends_block | implements_block | '{'
+  private static boolean compact_type_id_recovery_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "compact_type_id_recovery_0")) return false;
+    boolean r;
+    r = consumeToken(b, ICE_RIGHT_PARENTH);
+    if (!r) r = consumeToken(b, ICE_SEMICOLON);
+    if (!r) r = extends_block(b, l + 1);
+    if (!r) r = implements_block(b, l + 1);
+    if (!r) r = consumeToken(b, ICE_LEFT_BRACE);
+    return r;
+  }
+
+  /* ********************************************************** */
   // metadata 'const' data_type id field_initializer ';'
   public static boolean constant_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "constant_def")) return false;
@@ -183,7 +233,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata type_word generic_type? id extends_block? implements_block? body_block? ';'
+  // metadata type_word generic_type? id compact_type_id_declaration? extends_block? implements_block? body_block? ';'
   public static boolean data_type_element(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type_element")) return false;
     boolean r, p;
@@ -196,6 +246,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     r = p && report_error_(b, data_type_element_4(b, l + 1)) && r;
     r = p && report_error_(b, data_type_element_5(b, l + 1)) && r;
     r = p && report_error_(b, data_type_element_6(b, l + 1)) && r;
+    r = p && report_error_(b, data_type_element_7(b, l + 1)) && r;
     r = p && consumeToken(b, ICE_SEMICOLON) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -208,23 +259,30 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // extends_block?
+  // compact_type_id_declaration?
   private static boolean data_type_element_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "data_type_element_4")) return false;
+    compact_type_id_declaration(b, l + 1);
+    return true;
+  }
+
+  // extends_block?
+  private static boolean data_type_element_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "data_type_element_5")) return false;
     extends_block(b, l + 1);
     return true;
   }
 
   // implements_block?
-  private static boolean data_type_element_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "data_type_element_5")) return false;
+  private static boolean data_type_element_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "data_type_element_6")) return false;
     implements_block(b, l + 1);
     return true;
   }
 
   // body_block?
-  private static boolean data_type_element_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "data_type_element_6")) return false;
+  private static boolean data_type_element_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "data_type_element_7")) return false;
     body_block(b, l + 1);
     return true;
   }
@@ -1171,6 +1229,11 @@ public class SliceParser implements PsiParser, LightPsiParser {
   static final Parser body_element_recovery_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return body_element_recovery(b, l + 1);
+    }
+  };
+  static final Parser compact_type_id_recovery_parser_ = new Parser() {
+    public boolean parse(PsiBuilder b, int l) {
+      return compact_type_id_recovery(b, l + 1);
     }
   };
   static final Parser element_recovery_parser_ = new Parser() {

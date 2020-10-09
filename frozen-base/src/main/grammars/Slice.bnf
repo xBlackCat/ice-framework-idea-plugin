@@ -156,7 +156,11 @@ bool_literal ::= 'false' | 'true' {
     ]
 }
 
-data_type_element ::= metadata type_word generic_type? id extends_block? implements_block? body_block? ';' {
+compact_type_id_declaration ::= '(' compact_type_id ')' { pin = 1 }
+private compact_type_id ::= integer_literal {recoverWhile = compact_type_id_recovery}
+private compact_type_id_recovery ::= !(')' | ';' | extends_block | implements_block | '{')
+
+data_type_element ::= metadata type_word generic_type? id compact_type_id_declaration? extends_block? implements_block? body_block? ';' {
   pin=2
   methods=[
     isClass

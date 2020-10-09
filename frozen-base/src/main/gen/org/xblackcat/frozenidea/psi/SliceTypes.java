@@ -10,6 +10,7 @@ public interface SliceTypes {
 
   IElementType ICE_BODY_BLOCK = new SliceCompositeElementType("ICE_BODY_BLOCK");
   IElementType ICE_BOOL_LITERAL = new SliceCompositeElementType("ICE_BOOL_LITERAL");
+  IElementType ICE_COMPACT_TYPE_ID_DECLARATION = new SliceCompositeElementType("ICE_COMPACT_TYPE_ID_DECLARATION");
   IElementType ICE_CONSTANT_DEF = new SliceCompositeElementType("ICE_CONSTANT_DEF");
   IElementType ICE_CONSTANT_VALUE = new SliceCompositeElementType("ICE_CONSTANT_VALUE");
   IElementType ICE_DATA_TYPE = new SliceCompositeElementType("ICE_DATA_TYPE");
@@ -107,6 +108,9 @@ public interface SliceTypes {
       }
       else if (type == ICE_BOOL_LITERAL) {
         return new SliceBoolLiteralImpl(node);
+      }
+      else if (type == ICE_COMPACT_TYPE_ID_DECLARATION) {
+        return new SliceCompactTypeIdDeclarationImpl(node);
       }
       else if (type == ICE_CONSTANT_DEF) {
         return new SliceConstantDefImpl(node);

@@ -34,6 +34,12 @@ public class SliceDataTypeElementImpl extends SliceNamedElementImpl implements S
 
   @Override
   @Nullable
+  public SliceCompactTypeIdDeclaration getCompactTypeIdDeclaration() {
+    return findChildByClass(SliceCompactTypeIdDeclaration.class);
+  }
+
+  @Override
+  @Nullable
   public SliceExtendsBlock getExtendsBlock() {
     return findChildByClass(SliceExtendsBlock.class);
   }

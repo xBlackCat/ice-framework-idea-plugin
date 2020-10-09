@@ -14,6 +14,10 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
+  public void visitCompactTypeIdDeclaration(@NotNull SliceCompactTypeIdDeclaration o) {
+    visitCompositeElement(o);
+  }
+
   public void visitConstantDef(@NotNull SliceConstantDef o) {
     visitVariableElement(o);
     // visitNamedElement(o);
