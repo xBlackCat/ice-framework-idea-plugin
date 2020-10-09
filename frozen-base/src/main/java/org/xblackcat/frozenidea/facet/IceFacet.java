@@ -126,11 +126,6 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                                 SliceBundle.message("ICE.library.not.added.message"),
                                 NotificationType.ERROR,
                                 (notification1, event) -> {
-                                    Computable<Boolean> runnable = new LibraryInstaller(frameworkHome);
-
-                                    if (ApplicationManager.getApplication().runWriteAction(runnable)) {
-                                        notification1.expire();
-                                    }
                                 }
                         );
                         Notifications.Bus.notify(notification, project);
