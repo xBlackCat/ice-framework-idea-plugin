@@ -20,6 +20,7 @@ public class SliceModuleImpl extends SliceNamedElementImpl implements SliceModul
     visitor.visitModule(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);
@@ -41,6 +42,16 @@ public class SliceModuleImpl extends SliceNamedElementImpl implements SliceModul
   @Nullable
   public PsiElement getId() {
     return findChildByType(ICE_ID);
+  }
+
+  @Override
+  public @NotNull List<SliceModule> getSubModules() {
+    return SlicePsiImplUtil.getSubModules(this);
+  }
+
+  @Override
+  public @NotNull List<SliceDataTypeElement> getTypeDeclarations() {
+    return SlicePsiImplUtil.getTypeDeclarations(this);
   }
 
 }

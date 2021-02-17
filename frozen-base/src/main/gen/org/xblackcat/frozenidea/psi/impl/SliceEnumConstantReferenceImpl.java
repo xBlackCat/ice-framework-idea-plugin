@@ -21,6 +21,7 @@ public class SliceEnumConstantReferenceImpl extends SliceCompositeElementImpl im
     visitor.visitEnumConstantReference(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);
@@ -33,14 +34,12 @@ public class SliceEnumConstantReferenceImpl extends SliceCompositeElementImpl im
   }
 
   @Override
-  @NotNull
-  public PsiReference[] getReferences() {
+  public @NotNull PsiReference[] getReferences() {
     return SlicePsiImplUtil.getReferences(this);
   }
 
   @Override
-  @NotNull
-  public PsiReference getReference() {
+  public @NotNull PsiReference getReference() {
     return SlicePsiImplUtil.getReference(this);
   }
 

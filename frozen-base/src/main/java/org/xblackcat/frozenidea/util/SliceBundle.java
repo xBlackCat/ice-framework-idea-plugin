@@ -15,7 +15,6 @@
  */
 package org.xblackcat.frozenidea.util;
 
-import com.intellij.AbstractBundle;
 import com.intellij.DynamicBundle;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.PropertyKey;

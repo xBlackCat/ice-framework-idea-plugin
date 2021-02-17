@@ -11,7 +11,6 @@ import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 24.03.2016 15:12

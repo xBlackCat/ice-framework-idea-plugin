@@ -20,14 +20,14 @@ public class SliceBoolLiteralImpl extends SliceCompositeElementImpl implements S
     visitor.visitBoolLiteral(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);
   }
 
   @Override
-  @NotNull
-  public String getValue() {
+  public @NotNull String getValue() {
     return SlicePsiImplUtil.getValue(this);
   }
 

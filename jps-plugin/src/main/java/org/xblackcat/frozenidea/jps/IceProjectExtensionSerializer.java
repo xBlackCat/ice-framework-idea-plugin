@@ -23,9 +23,7 @@ public class IceProjectExtensionSerializer extends JpsProjectExtensionSerializer
     }
 
     @Override
-    public void loadExtension(
-            @NotNull JpsProject jpsProject, @NotNull Element componentTag
-    ) {
+    public void loadExtension(@NotNull JpsProject jpsProject, @NotNull Element componentTag) {
         String homeUrl = null;
         List<String> includes = new ArrayList<>();
         Element fwList = componentTag.getChild("ice-frameworks");
@@ -51,12 +49,5 @@ public class IceProjectExtensionSerializer extends JpsProjectExtensionSerializer
         }
 
         jpsProject.getContainer().setChild(IceConfig.ROLE, iceConfig);
-    }
-
-    @Override
-    public void saveExtension(
-            @NotNull JpsProject jpsProject, @NotNull Element componentTag
-    ) {
-
     }
 }

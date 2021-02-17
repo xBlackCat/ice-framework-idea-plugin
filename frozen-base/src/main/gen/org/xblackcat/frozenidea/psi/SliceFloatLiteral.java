@@ -10,7 +10,6 @@ public interface SliceFloatLiteral extends SliceCompositeElement {
   @NotNull
   PsiElement getFloatValue();
 
-  @NotNull
-  String getValue();
+  @NotNull String getValue();
 
 }

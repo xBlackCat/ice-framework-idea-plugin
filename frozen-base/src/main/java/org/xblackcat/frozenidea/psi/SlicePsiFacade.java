@@ -1,7 +1,6 @@
 package org.xblackcat.frozenidea.psi;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.NotNullLazyKey;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.xblackcat.frozenidea.util.FQN;
 

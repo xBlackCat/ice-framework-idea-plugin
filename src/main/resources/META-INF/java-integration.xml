@@ -9,7 +9,7 @@
                        serviceImplementation="org.xblackcat.frozenidea.integration.java.JavaModuleHelper$Impl"/>
         <codeInsight.lineMarkerProvider language="SLICE"
                                         implementationClass="org.xblackcat.frozenidea.link.java.Slice2JavaLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="JAVA"
+        <codeInsight.lineMarkerProvider language="JAVA" order="last"
                                         implementationClass="org.xblackcat.frozenidea.link.java.Java2SliceLineMarkerProvider"/>
 
     </extensions>

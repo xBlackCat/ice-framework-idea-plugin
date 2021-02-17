@@ -20,6 +20,7 @@ public class SliceSecondGenericTypeImpl extends SliceCompositeElementImpl implem
     visitor.visitSecondGenericType(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);

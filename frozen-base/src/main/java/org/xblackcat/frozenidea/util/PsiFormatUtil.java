@@ -1,7 +1,6 @@
 package org.xblackcat.frozenidea.util;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.*;
 import com.intellij.psi.util.PsiFormatUtilBase;
 import com.intellij.util.BitUtil;
 import com.intellij.util.ObjectUtils;

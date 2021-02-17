@@ -6,7 +6,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -55,26 +54,19 @@ public class SlicePsiUtil {
     }
 
     private static void searchThroughModule(SliceModule m, List<SliceNamedElement> result, Predicate<SliceNamedElement> matcher) {
-        // Search in current file and module
-        for (PsiElement c : m.getChildren()) {
-            if (c instanceof SliceDataTypeElement) {
-                final SliceDataTypeElement typeElement = (SliceDataTypeElement) c;
-                if (matcher.test(typeElement)) {
-                    if (typeElement.isClass() || typeElement.isInterface() || typeElement.isException()) {
-                        if ((typeElement).getBodyBlock() != null) {
-                            result.add(typeElement);
-                        }
-                    } else {
+        for (SliceDataTypeElement typeElement : m.getTypeDeclarations()) {
+            if (matcher.test(typeElement)) {
+                if (typeElement.isClass() || typeElement.isInterface() || typeElement.isException()) {
+                    if ((typeElement).getBodyBlock() != null) {
                         result.add(typeElement);
                     }
+                } else {
+                    result.add(typeElement);
                 }
             }
         }
-        final SliceModuleBody moduleBody = m.getModuleBody();
-        if (moduleBody != null) {
-            for (SliceModule mm : moduleBody.getModuleList()) {
-                searchThroughModule(mm, result, matcher);
-            }
+        for (SliceModule mm : m.getSubModules()) {
+            searchThroughModule(mm, result, matcher);
         }
     }
 

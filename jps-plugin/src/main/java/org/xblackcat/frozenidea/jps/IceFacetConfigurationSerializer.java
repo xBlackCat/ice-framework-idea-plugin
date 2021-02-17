@@ -9,10 +9,10 @@ import org.jetbrains.jps.model.serialization.facet.JpsFacetConfigurationSerializ
 import org.xblackcat.frozenidea.config.SliceCompilerSettings;
 
 /**
-* 11.07.2014 09:38
-*
-* @author xBlackCat
-*/
+ * 11.07.2014 09:38
+ *
+ * @author xBlackCat
+ */
 public class IceFacetConfigurationSerializer extends JpsFacetConfigurationSerializer<SliceCompilerSettings> {
     public IceFacetConfigurationSerializer() {
         super(SliceCompilerSettings.ROLE, "ice", "ZeroC ICE");
@@ -25,22 +25,6 @@ public class IceFacetConfigurationSerializer extends JpsFacetConfigurationSerial
             JpsElement parent,
             JpsModule module
     ) {
-        SliceCompilerSettings configuration = XmlSerializer.deserialize(
-                facetConfigurationElement,
-                SliceCompilerSettings.class
-        );
-
-        if (configuration == null) {
-            configuration = new SliceCompilerSettings();
-        }
-
-        return configuration;
-    }
-
-    @Override
-    protected void saveExtension(
-            SliceCompilerSettings extension, Element facetConfigurationTag, JpsModule module
-    ) {
-
+        return XmlSerializer.deserialize(facetConfigurationElement, SliceCompilerSettings.class);
     }
 }

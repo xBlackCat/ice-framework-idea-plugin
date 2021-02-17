@@ -20,6 +20,7 @@ public class SliceModifierImpl extends SliceCompositeElementImpl implements Slic
     visitor.visitModifier(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);

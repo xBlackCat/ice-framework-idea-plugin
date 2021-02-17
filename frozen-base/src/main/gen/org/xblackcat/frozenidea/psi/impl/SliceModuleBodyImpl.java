@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import org.xblackcat.frozenidea.psi.*;
 
-public class SliceParametersListImpl extends SliceCompositeElementImpl implements SliceParametersList {
+public class SliceModuleBodyImpl extends SliceCompositeElementImpl implements SliceModuleBody {
 
-  public SliceParametersListImpl(@NotNull ASTNode node) {
+  public SliceModuleBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SliceVisitor visitor) {
-    visitor.visitParametersList(this);
+    visitor.visitModuleBody(this);
   }
 
   @Override
@@ -28,8 +28,20 @@ public class SliceParametersListImpl extends SliceCompositeElementImpl implement
 
   @Override
   @NotNull
-  public List<SliceParameterDef> getParameterDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceParameterDef.class);
+  public List<SliceConstantDef> getConstantDefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceConstantDef.class);
+  }
+
+  @Override
+  @NotNull
+  public List<SliceDataTypeElement> getDataTypeElementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceDataTypeElement.class);
+  }
+
+  @Override
+  @NotNull
+  public List<SliceModule> getModuleList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceModule.class);
   }
 
 }

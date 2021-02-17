@@ -21,6 +21,7 @@ public class SliceDataTypeElementImpl extends SliceNamedElementImpl implements S
     visitor.visitDataTypeElement(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);

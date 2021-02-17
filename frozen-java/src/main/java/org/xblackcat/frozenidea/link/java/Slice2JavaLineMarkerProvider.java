@@ -14,6 +14,7 @@ import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.integration.java.JavaModuleHelper;
 import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.util.AbyssSet;
+import org.xblackcat.frozenidea.util.SliceBundle;
 import org.xblackcat.frozenidea.util.SliceIcons;
 
 import java.util.*;
@@ -24,6 +25,17 @@ import java.util.*;
  * @author xBlackCat
  */
 public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
+    private final Option myImplementingMethodOption = new Option(
+            "slice.java.translated.method",
+            SliceBundle.message("gutter.go.to.java.translated.method"),
+            SliceIcons.IMPLEMENTED_SLICE_METHOD
+    );
+    private final Option myImplementingInterfaceOption = new Option(
+            "slice.java.translated.interface",
+            SliceBundle.message("gutter.go.to.java.translated.interface"),
+            SliceIcons.IMPLEMENTED_SLICE_CLASS
+    );
+
     public static List<PsiClass> searchGeneratedJavaClasses(SliceDataTypeElement element) {
         if (element == null) {
             return Collections.emptyList();
@@ -69,26 +81,6 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
     }
 
-    @Override
-    public void collectNavigationMarkers(
-            @NotNull List<? extends PsiElement> elements,
-            @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result,
-            boolean forNavigation
-    ) {
-        Set<PsiElement> visited = forNavigation ? new THashSet<>() : new AbyssSet<>();
-
-        for (PsiElement element : elements) {
-            if (element instanceof SliceNamedElement) {
-                // The element is interface
-                if (element instanceof SliceDataTypeElement) {
-                    collectToJavaClassLinks(result, visited, (SliceDataTypeElement) element);
-                } else if (element instanceof SliceMethodDef) {
-                    collectToJavaMethodLinks(result, visited, (SliceMethodDef) element);
-                }
-            }
-        }
-    }
-
     private static void collectToJavaClassLinks(
             Collection<? super RelatedItemLineMarkerInfo<?>> result,
             Set<PsiElement> visited,
@@ -107,7 +99,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
         if (!items.isEmpty()) {
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.TRANSLATED_JAVA_CLASS).
-                    setTargets(items).setTooltipText("Used");
+                    setTargets(items).setTooltipText(SliceBundle.message("gutter.go.to.java.translated.interface"));
             result.add(builder.createLineMarkerInfo(element.getId()));
         }
     }
@@ -151,7 +143,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
                     .create(SliceIcons.TRANSLATED_JAVA_METHOD)
                     .setTargets(items)
-                    .setTooltipText("Used");
+                    .setTooltipText(SliceBundle.message("gutter.go.to.java.translated.method"));
             result.add(builder.createLineMarkerInfo(element.getId()));
         }
     }
@@ -201,9 +193,38 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         return items;
     }
 
+    @Override
+    public void collectNavigationMarkers(
+            @NotNull List<? extends PsiElement> elements,
+            @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result,
+            boolean forNavigation
+    ) {
+        Set<PsiElement> visited = forNavigation ? new THashSet<>() : new AbyssSet<>();
+
+        for (PsiElement element : elements) {
+            if (element instanceof SliceNamedElement) {
+                // The element is interface
+                if (element instanceof SliceDataTypeElement) {
+                    if (myImplementingInterfaceOption.isEnabled()) {
+                        collectToJavaClassLinks(result, visited, (SliceDataTypeElement) element);
+                    }
+                } else if (element instanceof SliceMethodDef) {
+                    if (myImplementingMethodOption.isEnabled()) {
+                        collectToJavaMethodLinks(result, visited, (SliceMethodDef) element);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public String getName() {
+        return SliceBundle.message("slice.to.java.line.markers");
+    }
+
     @NotNull
     @Override
     public Option[] getOptions() {
-        return super.getOptions();
+        return new Option[]{myImplementingMethodOption, myImplementingInterfaceOption};
     }
 }

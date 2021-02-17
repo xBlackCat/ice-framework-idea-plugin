@@ -3,7 +3,6 @@ package org.xblackcat.frozenidea.psi.impl;
 import com.intellij.openapi.progress.ProgressIndicatorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -12,7 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.integration.SliceHelper;
-import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
+import org.xblackcat.frozenidea.psi.SliceFile;
+import org.xblackcat.frozenidea.psi.SliceModule;
+import org.xblackcat.frozenidea.psi.SlicePsiFacade;
 import org.xblackcat.frozenidea.util.FQN;
 
 import java.util.ArrayList;
@@ -53,18 +55,8 @@ public class SlicePsiFacadeImpl extends SlicePsiFacade {
                     idx = path.length;
                 }
 
-                final String[] modules = className.getModules();
-                final PsiElement module = findModule(sliceFile, modules, idx);
-                if (module != null) {
-                    final SliceDataTypeElement[] types = PsiTreeUtil.getChildrenOfType(module, SliceDataTypeElement.class);
-                    if (types != null) {
-                        for (SliceDataTypeElement e : types) {
-                            if (className.getName().equals(e.getName())) {
-                                result.add(e);
-                            }
-                        }
-                    }
-                }
+                SliceModule[] modules = PsiTreeUtil.getChildrenOfType(sliceFile, SliceModule.class);
+                collectDataTypes(className, result, idx, modules);
             }
         }
 
@@ -78,20 +70,31 @@ public class SlicePsiFacadeImpl extends SlicePsiFacade {
         return null;
     }
 
-    private PsiElement findModule(PsiElement root, String[] parts, int idx) {
-        if (idx >= parts.length) {
-            return root;
-        }
-        String part = parts[idx];
-        final SliceModule[] types = PsiTreeUtil.getChildrenOfType(root, SliceModule.class);
-        if (types != null) {
-            for (SliceModule e : types) {
-                if (part.equals(e.getName())) {
-                    return findModule(e, parts, idx + 1);
+    private void collectDataTypes(FQN className, List<SliceDataTypeElement> result, int idx, SliceModule[] modules) {
+        final String[] fqnParts = className.getModules();
+        PathLoop:
+        while (idx < fqnParts.length) {
+            if (modules == null) {
+                return;
+            }
+            for (SliceModule module : modules) {
+                if (fqnParts[idx].equals(module.getName())) {
+                    idx++;
+                    if (idx == fqnParts.length) {
+                        for (SliceDataTypeElement e : module.getTypeDeclarations()) {
+                            if (className.getName().equals(e.getName())) {
+                                result.add(e);
+                            }
+                        }
+                        return;
+                    } else {
+                        modules = module.getSubModules().toArray(SliceModule[]::new);
+                        continue PathLoop;
+                    }
                 }
             }
+            break;
         }
-        return null;
     }
 
     @Override

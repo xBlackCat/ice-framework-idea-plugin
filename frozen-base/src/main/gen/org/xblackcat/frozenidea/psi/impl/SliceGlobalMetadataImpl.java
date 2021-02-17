@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 import org.xblackcat.frozenidea.psi.*;
 
-public class SliceParametersListImpl extends SliceCompositeElementImpl implements SliceParametersList {
+public class SliceGlobalMetadataImpl extends SliceCompositeElementImpl implements SliceGlobalMetadata {
 
-  public SliceParametersListImpl(@NotNull ASTNode node) {
+  public SliceGlobalMetadataImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SliceVisitor visitor) {
-    visitor.visitParametersList(this);
+    visitor.visitGlobalMetadata(this);
   }
 
   @Override
@@ -28,8 +28,8 @@ public class SliceParametersListImpl extends SliceCompositeElementImpl implement
 
   @Override
   @NotNull
-  public List<SliceParameterDef> getParameterDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceParameterDef.class);
+  public List<SliceGlobalMetadataStatement> getGlobalMetadataStatementList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SliceGlobalMetadataStatement.class);
   }
 
 }

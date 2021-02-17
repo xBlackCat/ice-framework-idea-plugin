@@ -24,13 +24,13 @@ import java.util.Set;
 
 public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
     private final Option myImplementingMethodOption = new Option(
-            "slice.java.implementing.method",
-            "Implementing method",
+            "slice.java.declared.method",
+            SliceBundle.message("gutter.go.to.slice.declaration.method"),
             SliceIcons.IMPLEMENTED_SLICE_METHOD
     );
     private final Option myImplementingInterfaceOption = new Option(
-            "slice.java.implementing.interface",
-            "Implementing interface",
+            "slice.java.declared.interface",
+            SliceBundle.message("gutter.go.to.slice.declaration.interface"),
             SliceIcons.IMPLEMENTED_SLICE_CLASS
     );
 
@@ -67,7 +67,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
             }
 
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.IMPLEMENTED_SLICE_METHOD).
-                    setTargets(targets).setTooltipText(SliceBundle.message("goto.ice.declaration.method"));
+                    setTargets(targets).setTooltipText(SliceBundle.message("gutter.go.to.slice.declaration.method"));
 
             return builder.createLineMarkerInfo(element);
         } else if (element instanceof PsiIdentifier && parent instanceof PsiClass) {
@@ -82,7 +82,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
             }
 
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.IMPLEMENTED_SLICE_CLASS).
-                    setTargets(targets).setTooltipText(SliceBundle.message("goto.ice.declaration.interface"));
+                    setTargets(targets).setTooltipText(SliceBundle.message("gutter.go.to.slice.declaration.interface"));
 
             return builder.createLineMarkerInfo(element);
         }
@@ -141,7 +141,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
 
     @Override
     public String getName() {
-        return "Java2Slice line markers";
+        return SliceBundle.message("java.to.slice.line.markers");
     }
 
     @NotNull

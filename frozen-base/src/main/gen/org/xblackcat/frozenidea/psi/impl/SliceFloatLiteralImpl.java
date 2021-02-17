@@ -20,6 +20,7 @@ public class SliceFloatLiteralImpl extends SliceCompositeElementImpl implements 
     visitor.visitFloatLiteral(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);
@@ -32,8 +33,7 @@ public class SliceFloatLiteralImpl extends SliceCompositeElementImpl implements 
   }
 
   @Override
-  @NotNull
-  public String getValue() {
+  public @NotNull String getValue() {
     return SlicePsiImplUtil.getValue(this);
   }
 

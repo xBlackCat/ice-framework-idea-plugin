@@ -11,10 +11,8 @@ public interface SliceEnumConstantReference extends SliceCompositeElement {
   @NotNull
   PsiElement getId();
 
-  @NotNull
-  PsiReference[] getReferences();
+  @NotNull PsiReference[] getReferences();
 
-  @NotNull
-  PsiReference getReference();
+  @NotNull PsiReference getReference();
 
 }

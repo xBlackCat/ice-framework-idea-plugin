@@ -16,4 +16,8 @@ public interface SliceModule extends SliceNamedElement {
   @Nullable
   PsiElement getId();
 
+  @NotNull List<SliceModule> getSubModules();
+
+  @NotNull List<SliceDataTypeElement> getTypeDeclarations();
+
 }

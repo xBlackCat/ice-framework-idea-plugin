@@ -5,11 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SliceIntegerLiteral extends SliceCompositeElement {
+public interface SliceMetadata extends SliceCompositeElement {
 
   @NotNull
-  PsiElement getIntegerValue();
-
-  @NotNull String getValue();
+  List<SliceMetadataStatement> getMetadataStatementList();
 
 }

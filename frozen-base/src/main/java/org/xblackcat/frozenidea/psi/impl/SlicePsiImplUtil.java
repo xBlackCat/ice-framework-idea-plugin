@@ -17,7 +17,8 @@ import org.xblackcat.frozenidea.util.FQN;
 import org.xblackcat.frozenidea.util.SlicePsiUtil;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -176,5 +177,23 @@ public class SlicePsiImplUtil {
 
     public static SliceModule getModule(SliceDataTypeElement element) {
         return PsiTreeUtil.getParentOfType(element, SliceModule.class);
+    }
+
+    @NotNull
+    public static List<SliceModule> getSubModules(SliceModule module) {
+        final SliceModuleBody moduleBody = module.getModuleBody();
+        if (moduleBody == null) {
+            return Collections.emptyList();
+        }
+        return moduleBody.getModuleList();
+    }
+
+    @NotNull
+    public static List<SliceDataTypeElement> getTypeDeclarations(SliceModule module) {
+        final SliceModuleBody moduleBody = module.getModuleBody();
+        if (moduleBody == null) {
+            return Collections.emptyList();
+        }
+        return moduleBody.getDataTypeElementList();
     }
 }

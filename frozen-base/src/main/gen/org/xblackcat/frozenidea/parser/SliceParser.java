@@ -45,7 +45,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, body_element_list(b, l + 1));
     r = p && consumeToken(b, ICE_RIGHT_BRACE) && r;
-    exit_section_(b, l, m, r, p, body_block_recovery_parser_);
+    exit_section_(b, l, m, r, p, SliceParser::body_block_recovery);
     return r || p;
   }
 
@@ -71,7 +71,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!r) r = method_def(b, l + 1);
     if (!r) r = field_def(b, l + 1);
     if (!r) r = enum_constant(b, l + 1);
-    exit_section_(b, l, m, r, false, body_element_recovery_parser_);
+    exit_section_(b, l, m, r, false, SliceParser::body_element_recovery);
     return r;
   }
 
@@ -85,7 +85,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
       if (!body_element(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "body_element_list", c)) break;
     }
-    exit_section_(b, l, m, true, false, body_element_list_recovery_parser_);
+    exit_section_(b, l, m, true, false, SliceParser::body_element_list_recovery);
     return true;
   }
 
@@ -144,7 +144,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _NONE_);
     r = integer_literal(b, l + 1);
-    exit_section_(b, l, m, r, false, compact_type_id_recovery_parser_);
+    exit_section_(b, l, m, r, false, SliceParser::compact_type_id_recovery);
     return r;
   }
 
@@ -477,7 +477,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = data_type(b, l + 1);
     r = r && generic_types_1(b, l + 1);
-    exit_section_(b, l, m, r, false, type_recovery_parser_);
+    exit_section_(b, l, m, r, false, SliceParser::type_recovery);
     return r;
   }
 
@@ -498,7 +498,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
       if (!global_metadata_statement(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "global_metadata", c)) break;
     }
-    exit_section_(b, l, m, true, false, global_metadata_recovery_parser_);
+    exit_section_(b, l, m, true, false, SliceParser::global_metadata_recovery);
     return true;
   }
 
@@ -510,7 +510,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = metadata_element(b, l + 1);
     r = r && global_metadata_body_1(b, l + 1);
-    exit_section_(b, l, m, r, false, global_metadata_element_recovery_parser_);
+    exit_section_(b, l, m, r, false, SliceParser::global_metadata_element_recovery);
     return r;
   }
 
@@ -647,7 +647,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = metadata_element(b, l + 1);
     r = r && metadata_body_1(b, l + 1);
-    exit_section_(b, l, m, r, false, metadata_element_recovery_parser_);
+    exit_section_(b, l, m, r, false, SliceParser::metadata_element_recovery);
     return r;
   }
 
@@ -841,7 +841,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     r = constant_def(b, l + 1);
     if (!r) r = data_type_element(b, l + 1);
     if (!r) r = module(b, l + 1);
-    exit_section_(b, l, m, r, false, element_recovery_parser_);
+    exit_section_(b, l, m, r, false, SliceParser::element_recovery);
     return r;
   }
 
@@ -855,7 +855,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
       if (!module_element_list_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "module_element_list", c)) break;
     }
-    exit_section_(b, l, m, true, false, body_element_list_recovery_parser_);
+    exit_section_(b, l, m, true, false, SliceParser::body_element_list_recovery);
     return true;
   }
 
@@ -880,7 +880,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
       if (!module_list_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "module_list", c)) break;
     }
-    exit_section_(b, l, m, true, false, element_recovery_parser_);
+    exit_section_(b, l, m, true, false, SliceParser::element_recovery);
     return true;
   }
 
@@ -976,7 +976,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "parameters_list")) return false;
     Marker m = enter_section_(b, l, _NONE_, ICE_PARAMETERS_LIST, "<parameters list>");
     parameters_list_0(b, l + 1);
-    exit_section_(b, l, m, true, false, parameter_list_recovery_parser_);
+    exit_section_(b, l, m, true, false, SliceParser::parameter_list_recovery);
     return true;
   }
 
@@ -1173,7 +1173,7 @@ public class SliceParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = type_reference(b, l + 1);
     r = r && type_reference_list_1(b, l + 1);
-    exit_section_(b, l, m, r, false, extends_list_recovery_parser_);
+    exit_section_(b, l, m, r, false, SliceParser::extends_list_recovery);
     return r;
   }
 
@@ -1216,59 +1216,4 @@ public class SliceParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  static final Parser body_block_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return body_block_recovery(b, l + 1);
-    }
-  };
-  static final Parser body_element_list_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return body_element_list_recovery(b, l + 1);
-    }
-  };
-  static final Parser body_element_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return body_element_recovery(b, l + 1);
-    }
-  };
-  static final Parser compact_type_id_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return compact_type_id_recovery(b, l + 1);
-    }
-  };
-  static final Parser element_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return element_recovery(b, l + 1);
-    }
-  };
-  static final Parser extends_list_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return extends_list_recovery(b, l + 1);
-    }
-  };
-  static final Parser global_metadata_element_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return global_metadata_element_recovery(b, l + 1);
-    }
-  };
-  static final Parser global_metadata_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return global_metadata_recovery(b, l + 1);
-    }
-  };
-  static final Parser metadata_element_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return metadata_element_recovery(b, l + 1);
-    }
-  };
-  static final Parser parameter_list_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return parameter_list_recovery(b, l + 1);
-    }
-  };
-  static final Parser type_recovery_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return type_recovery(b, l + 1);
-    }
-  };
 }

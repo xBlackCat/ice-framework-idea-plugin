@@ -1,11 +1,9 @@
 package org.xblackcat.frozenidea.util;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.SliceModule;

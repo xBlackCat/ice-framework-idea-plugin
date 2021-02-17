@@ -10,7 +10,6 @@ public interface SliceStringLiteral extends SliceCompositeElement {
   @NotNull
   PsiElement getStringValue();
 
-  @NotNull
-  String getValue();
+  @NotNull String getValue();
 
 }

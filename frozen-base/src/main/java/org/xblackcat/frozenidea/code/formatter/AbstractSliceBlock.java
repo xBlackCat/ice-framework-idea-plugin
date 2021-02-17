@@ -3,15 +3,8 @@ package org.xblackcat.frozenidea.code.formatter;
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.formatter.common.AbstractBlock;
-import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.psi.SliceTypes;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.xblackcat.frozenidea.psi.SliceTypes.*;
 
 /**
  *

@@ -20,6 +20,7 @@ public class SliceIntegerLiteralImpl extends SliceCompositeElementImpl implement
     visitor.visitIntegerLiteral(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);
@@ -32,8 +33,7 @@ public class SliceIntegerLiteralImpl extends SliceCompositeElementImpl implement
   }
 
   @Override
-  @NotNull
-  public String getValue() {
+  public @NotNull String getValue() {
     return SlicePsiImplUtil.getValue(this);
   }
 

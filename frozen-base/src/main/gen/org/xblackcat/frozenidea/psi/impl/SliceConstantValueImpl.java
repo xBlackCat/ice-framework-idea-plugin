@@ -20,6 +20,7 @@ public class SliceConstantValueImpl extends SliceCompositeElementImpl implements
     visitor.visitConstantValue(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);

@@ -20,6 +20,7 @@ public class SliceGenericTypeImpl extends SliceCompositeElementImpl implements S
     visitor.visitGenericType(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SliceVisitor) accept((SliceVisitor)visitor);
     else super.accept(visitor);

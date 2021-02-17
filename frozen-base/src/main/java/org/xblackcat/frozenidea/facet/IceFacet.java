@@ -5,23 +5,15 @@ import com.intellij.facet.FacetTypeId;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.roots.libraries.Library;
-import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.startup.StartupManager;
-import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.xblackcat.frozenidea.FrozenIdea;
-import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.config.IceConfig;
 import org.xblackcat.frozenidea.config.IceFrameworkConfigurable;
 import org.xblackcat.frozenidea.util.IceChecker;
@@ -29,7 +21,6 @@ import org.xblackcat.frozenidea.util.SliceBundle;
 
 import javax.swing.event.HyperlinkEvent;
 import java.io.File;
-import java.util.EnumSet;
 
 /**
  * 08.01.12 13:28
@@ -56,40 +47,6 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
         final Project project = getModule().getProject();
 
         StartupManager.getInstance(project).runWhenProjectIsInitialized(new IceSettingsChecker(project));
-    }
-
-    private class LibraryInstaller implements Computable<Boolean> {
-        private final File frameworkHome;
-
-        public LibraryInstaller(File frameworkHome) {
-            this.frameworkHome = frameworkHome;
-        }
-
-        public Boolean compute() {
-            EnumSet<IceComponent> iceComponents = IceChecker.getInstalledComponents(frameworkHome);
-
-            if (iceComponents.contains(IceComponent.Java)) {
-                final ModifiableRootModel rootModel = ModuleRootManager.getInstance(getModule()).getModifiableModel();
-
-                final LibraryTable.ModifiableModel modifiableModel = rootModel.getModuleLibraryTable().getModifiableModel();
-                final File libraryPath = IceComponent.Java.getLibraryPath(frameworkHome);
-                if (libraryPath != null) {
-                    String jarUrl = "jar://" + libraryPath.getPath() + "!/";
-
-                    Library iceLibrary = modifiableModel.createLibrary("Ice");
-                    Library.ModifiableModel libModel = iceLibrary.getModifiableModel();
-                    libModel.addRoot(jarUrl, OrderRootType.CLASSES);
-                    libModel.addRoot(jarUrl, OrderRootType.SOURCES);
-                    libModel.commit();
-                    modifiableModel.commit();
-                    rootModel.commit();
-
-                    return Boolean.TRUE;
-                }
-            }
-
-            return Boolean.FALSE;
-        }
     }
 
     private class IceSettingsChecker implements Runnable {
@@ -121,7 +78,7 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                     if (iceClass == null) {
                         // No class found!
                         final Notification notification = new Notification(
-                                "Ice Facet",
+                                "Ice Facet Notification",
                                 SliceBundle.message("ICE.library.not.added"),
                                 SliceBundle.message("ICE.library.not.added.message"),
                                 NotificationType.ERROR,
@@ -136,7 +93,7 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
             }
 
             final Notification notification = new Notification(
-                    "Ice Facet",
+                    "Ice Facet Notification",
                     SliceBundle.message("ICE.not.configured"),
                     SliceBundle.message("ICE.not.configured.message"),
                     NotificationType.ERROR,

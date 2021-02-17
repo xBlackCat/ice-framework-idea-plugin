@@ -5,10 +5,13 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageViewBundle;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.psi.*;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 14.06.12 16:23
@@ -31,10 +34,11 @@ public class SliceHelper {
         if (file == null) {
             return null;
         }
-        List<SliceGlobalMetadataStatement> globalMetadatas = PsiTreeUtil.getChildrenOfTypeAsList(
-                file,
-                SliceGlobalMetadataStatement.class
-        );
+        final @Nullable SliceGlobalMetadata globalMetadata = PsiTreeUtil.getChildOfType(file, SliceGlobalMetadata.class);
+        if (globalMetadata == null) {
+            return null;
+        }
+        List<SliceGlobalMetadataStatement> globalMetadatas = globalMetadata.getGlobalMetadataStatementList();
         for (SliceGlobalMetadataStatement md : globalMetadatas) {
             for (SliceMetadataElement el : md.getMetadataElementList()) {
                 final SliceStringLiteral literal = el.getStringLiteral();

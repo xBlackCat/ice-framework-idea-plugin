@@ -7,8 +7,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.psi.*;
 
-import java.util.Objects;
-
 /**
  * 08.01.14 14:08
  *

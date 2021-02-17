@@ -7,7 +7,6 @@ import com.intellij.psi.PsiElement;
 
 public interface SliceBoolLiteral extends SliceCompositeElement {
 
-  @NotNull
-  String getValue();
+  @NotNull String getValue();
 
 }

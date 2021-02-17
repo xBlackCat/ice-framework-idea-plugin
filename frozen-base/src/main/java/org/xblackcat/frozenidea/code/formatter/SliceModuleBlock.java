@@ -2,7 +2,6 @@ package org.xblackcat.frozenidea.code.formatter;
 
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.psi.SliceModule;
 import org.xblackcat.frozenidea.psi.SliceModuleBody;
@@ -10,8 +9,6 @@ import org.xblackcat.frozenidea.psi.SliceModuleBody;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.xblackcat.frozenidea.psi.SliceTypes.ICE_MODULE;
 
 /**
  *

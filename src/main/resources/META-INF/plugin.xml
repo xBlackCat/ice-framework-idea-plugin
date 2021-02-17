@@ -13,6 +13,8 @@
     <!--<depends config-file="python-integration.xml" optional="true">com.intellij.modules.python</depends>-->
 
     <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Ice Facet Notification" displayType="BALLOON"/>
+
         <fileType implementationClass="org.xblackcat.frozenidea.IceFileType"
                   language="SLICE"
                   name="SLICE"
@@ -38,7 +40,7 @@
         <lang.psiStructureViewFactory language="SLICE"
                                       implementationClass="org.xblackcat.frozenidea.code.structure.SliceStructureViewFactory"/>
 
-        <lang.formatter language="SLICE" implementationClass="org.xblackcat.frozenidea.code.formatter.SliceFormattingModelBuilder"/>
+<!--        <lang.formatter language="SLICE" implementationClass="org.xblackcat.frozenidea.code.formatter.SliceFormattingModelBuilder"/>-->
 
         <moduleService serviceInterface="org.xblackcat.frozenidea.integration.SliceModuleHelper"
                        serviceImplementation="org.xblackcat.frozenidea.integration.SliceModuleHelper$Impl"/>
