@@ -16,7 +16,6 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        jcenter()
         maven { url "https://www.jetbrains.com/intellij-repository/releases" }
         maven { url "https://www.jetbrains.com/intellij-repository/snapshots" }
     }
