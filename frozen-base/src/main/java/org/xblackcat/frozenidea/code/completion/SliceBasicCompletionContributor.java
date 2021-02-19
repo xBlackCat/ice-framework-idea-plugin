@@ -50,7 +50,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
     };
 
     public SliceBasicCompletionContributor() {
-        extend(CompletionType.BASIC, SlicePatterns.parameterList(), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SlicePatterns.parameterList(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
                     @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
@@ -67,7 +67,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                 }
             }
         });
-        extend(CompletionType.BASIC, SlicePatterns.classBody(), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SlicePatterns.classBody(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
                     @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
@@ -92,7 +92,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                 }
             }
         });
-        extend(CompletionType.BASIC, SlicePatterns.classBodyNotReference(), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SlicePatterns.classBodyNotReference(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
                     @NotNull CompletionParameters parameters,
@@ -117,7 +117,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                 )));
             }
         });
-        extend(CompletionType.BASIC, SlicePatterns.elementDef(), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SlicePatterns.elementDef(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
                     @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
@@ -140,7 +140,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                 );
             }
         });
-        extend(CompletionType.BASIC, SlicePatterns.moduleBody(), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SlicePatterns.moduleBody(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
                     @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
@@ -173,7 +173,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                 );
             }
         });
-        extend(CompletionType.BASIC, SlicePatterns.emptySliceFile(), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SlicePatterns.emptySliceFile(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
                     @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result

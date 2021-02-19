@@ -2,10 +2,9 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ZeroC ICE framework support - code generator and navigation</description>
-    <version>0.0.4.0</version>
+    <version>0.0.5.0</version>
     <vendor email="xblackcat@gmail.com" url="https://github.com/xBlackCat/ice-framework-idea-plugin">xBlackCat</vendor>
-    <idea-version since-build="201.2"/>
-
+    
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends config-file="java-integration.xml" optional="true">com.intellij.modules.java</depends>
@@ -23,9 +22,10 @@
 
         <projectService serviceImplementation="org.xblackcat.frozenidea.FrozenIdea"/>
         <projectConfigurable instance="org.xblackcat.frozenidea.config.IceFrameworkConfigurable"
+                             bundle="messages.IceMessages"
+                             key="plugin.title"
                              id="frozenidea"
-                             parentId="build.tools"
-                             displayName="ZeroC ICE"/>
+                             parentId="build.tools"/>
 
         <frameworkSupport implementation="org.xblackcat.frozenidea.facet.IceFacetSupportProvider"/>
         <facetType implementation="org.xblackcat.frozenidea.facet.IceFacetType"/>
