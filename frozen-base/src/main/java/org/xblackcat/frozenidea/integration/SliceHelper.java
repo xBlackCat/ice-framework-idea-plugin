@@ -3,11 +3,11 @@ package org.xblackcat.frozenidea.integration;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.usageView.UsageViewBundle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.util.SliceBundle;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Set;
  * @author xBlackCat
  */
 public class SliceHelper {
-    private static final String DEFAULT_FQN = UsageViewBundle.message("default.package.presentable.name");
+    private static final String DEFAULT_FQN = SliceBundle.message("default.package.presentable.name");
 
     public static String packageName(SliceModulePath path) {
         final PsiElement[] children = path.getChildren();

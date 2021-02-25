@@ -2,7 +2,6 @@ package org.xblackcat.frozenidea.jps;
 
 import com.intellij.execution.process.BaseOSProcessHandler;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.CharsetToolkit;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.ModuleChunk;
@@ -20,6 +19,7 @@ import org.xblackcat.frozenidea.config.Target;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -35,7 +35,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
     }
 
     @Override
-    public List<String> getCompilableFileExtensions() {
+    public @NotNull List<String> getCompilableFileExtensions() {
         return Arrays.asList("ice", "slice");
     }
 
@@ -55,7 +55,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
             includes.add(JpsPathUtil.urlToFile(include).getAbsolutePath());
         }
 
-        final Map<ModuleBuildTarget, List<File>> toCompile = collectChangedFiles(context, dirtyFilesHolder);
+        final Map<ModuleBuildTarget, List<File>> toCompile = collectChangedFiles(dirtyFilesHolder);
         if (toCompile.isEmpty()) {
             return ExitCode.NOTHING_DONE;
         }
@@ -89,7 +89,10 @@ public class SliceBuilder extends ModuleLevelBuilder {
                             new CompilerMessage(
                                     getPresentableName(),
                                     BuildMessage.Kind.ERROR,
-                                    "Failed to create output directory " + outputDir.getAbsolutePath() + " for file output in module " + module.getName()
+                                    "Failed to create output directory " +
+                                            outputDir.getAbsolutePath() +
+                                            " for file output in module " +
+                                            module.getName()
                             )
                     );
                     return ExitCode.ABORT;
@@ -161,7 +164,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
                     .start();
 
 
-            BaseOSProcessHandler handler = new BaseOSProcessHandler(process, StringUtil.join(command, " "), CharsetToolkit.UTF8_CHARSET);
+            BaseOSProcessHandler handler = new BaseOSProcessHandler(process, StringUtil.join(command, " "), StandardCharsets.UTF_8);
             final ATranslatorProcessAdapter processAdapter;
             if (target == IceComponent.Java) {
                 processAdapter = new JavaProcessAdapter(context, target, module, outputDirPath);
@@ -186,10 +189,7 @@ public class SliceBuilder extends ModuleLevelBuilder {
         }
     }
 
-    private Map<ModuleBuildTarget, List<File>> collectChangedFiles(
-            CompileContext context,
-            DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder
-    ) throws IOException {
+    private Map<ModuleBuildTarget, List<File>> collectChangedFiles(DirtyFilesHolder<JavaSourceRootDescriptor, ModuleBuildTarget> dirtyFilesHolder) throws IOException {
         final Map<ModuleBuildTarget, List<File>> toCompile = new HashMap<>();
         dirtyFilesHolder.processDirtyFiles(
                 (target, file, sourceRoot) -> {
