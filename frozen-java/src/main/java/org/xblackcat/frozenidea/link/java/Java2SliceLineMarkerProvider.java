@@ -3,16 +3,16 @@ package org.xblackcat.frozenidea.link.java;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiIdentifier;
-import com.intellij.psi.PsiMethod;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.integration.SliceModuleHelper;
+import org.xblackcat.frozenidea.index.GeneratedJavaNamesIndex;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
 import org.xblackcat.frozenidea.psi.SliceMethodDef;
-import org.xblackcat.frozenidea.util.FQN;
 import org.xblackcat.frozenidea.util.SliceBundle;
 import org.xblackcat.frozenidea.util.SliceIcons;
 import org.xblackcat.frozenidea.util.SliceUtil;
@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.Set;
 
 public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
+    private final Option myDeclaredMethodOption = new Option(
+            "slice.declared.method",
+            SliceBundle.message("gutter.go.to.ice.declared.method"),
+            SliceIcons.DECLARED_ICE_METHOD
+    );
     private final Option myImplementingMethodOption = new Option(
             "slice.java.declared.method",
             SliceBundle.message("gutter.go.to.slice.declaration.method"),
@@ -38,8 +43,47 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
     @Nullable
     public LineMarkerInfo<PsiElement> getLineMarkerInfo(@NotNull final PsiElement element) {
         PsiElement parent = element.getParent();
-        final SliceModuleHelper sliceHelper = SliceModuleHelper.getSliceHelper(element);
-        if (element instanceof PsiIdentifier && parent instanceof PsiMethod) {
+        if (element instanceof PsiIdentifier &&
+                parent instanceof PsiReferenceExpression &&
+                parent.getParent() instanceof PsiMethodCallExpression) {
+            if (!myDeclaredMethodOption.isEnabled()) {
+                return null;
+            }
+
+            PsiMethodCallExpression methodRef = (PsiMethodCallExpression) parent.getParent();
+            final PsiMethod method = methodRef.resolveMethod();
+            if (method == null) {
+                return null;
+            }
+
+            final int parametersCount = method.getParameterList().getParametersCount();
+
+            List<PsiElement> targets = new ArrayList<>();
+            List<SliceDataTypeElement> sliceClasses = searchSliceClasses(method.getContainingClass());
+
+            for (SliceDataTypeElement e : sliceClasses) {
+                final List<SliceMethodDef> methodDefs = SliceUtil.getMethodList(e);
+                if (methodDefs == null || methodDefs.isEmpty()) {
+                    continue;
+                }
+                for (SliceMethodDef sliceMethod : methodDefs) {
+                    if (method.getName().equals(sliceMethod.getName()) &&
+                            (parametersCount == sliceMethod.getParametersCount() ||
+                                    parametersCount - 1 == sliceMethod.getParametersCount())) {
+                        targets.add(sliceMethod);
+                    }
+                }
+            }
+
+            if (targets.isEmpty()) {
+                return null;
+            }
+
+            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.DECLARED_ICE_METHOD).
+                    setTargets(targets).setTooltipText(SliceBundle.message("gutter.go.to.slice.declaration.method"));
+
+            return builder.createLineMarkerInfo(element);
+        } else if (element instanceof PsiIdentifier && parent instanceof PsiMethod) {
             if (!myImplementingMethodOption.isEnabled()) {
                 return null;
             }
@@ -52,10 +96,14 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
             }
             List<PsiElement> targets = new ArrayList<>();
 
-            List<SliceDataTypeElement> sliceClasses = searchSliceClasses(method.getContainingClass(), sliceHelper);
+            List<SliceDataTypeElement> sliceClasses = searchSliceClasses(method.getContainingClass());
 
             for (SliceDataTypeElement e : sliceClasses) {
-                for (SliceMethodDef sliceMethod : SliceUtil.getMethodList(e)) {
+                final List<SliceMethodDef> methodDefs = SliceUtil.getMethodList(e);
+                if (methodDefs == null || methodDefs.isEmpty()) {
+                    continue;
+                }
+                for (SliceMethodDef sliceMethod : methodDefs) {
                     if (method.getName().equals(sliceMethod.getName()) && parametersCount == sliceMethod.getParametersCount()) {
                         targets.add(sliceMethod);
                     }
@@ -75,7 +123,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
                 return null;
             }
 
-            List<SliceDataTypeElement> targets = searchSliceClasses((PsiClass) parent, sliceHelper);
+            List<SliceDataTypeElement> targets = searchSliceClasses((PsiClass) parent);
 
             if (targets.isEmpty()) {
                 return null;
@@ -91,53 +139,70 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
     }
 
     @NotNull
-    private List<SliceDataTypeElement> searchSliceClasses(PsiClass parent, SliceModuleHelper sliceHelper) {
+    private List<SliceDataTypeElement> searchSliceClasses(PsiClass parent) {
         List<SliceDataTypeElement> targets = new ArrayList<>();
         Set<PsiElement> visited = new HashSet<>();
+
+        Module module = ModuleUtil.findModuleForPsiElement(parent);
 
         for (
                 PsiClass targetClass = parent;
                 targetClass != null;
                 targetClass = targetClass.getSuperClass()
         ) {
-            searchReferences(sliceHelper, targets, visited, targetClass);
+            searchReferences(targets, visited, targetClass, module);
         }
         return targets;
     }
 
     private void searchReferences(
-            SliceModuleHelper sliceHelper,
             List<SliceDataTypeElement> targets,
             Set<PsiElement> visited,
-            PsiClass targetClass
+            PsiClass targetClass,
+            Module module
     ) {
         if (!visited.add(targetClass)) {
             return;
         }
-        final FQN fqn = FQN.buildFQN(targetClass.getQualifiedName());
-        if (fqn != null) {
-            final SliceDataTypeElement sliceClass = sliceHelper.findClass(fqn);
-
-            if (sliceClass != null) {
-                targets.add(sliceClass);
-            }
-
-            final String name = fqn.getName();
-            if (name.endsWith("Disp")) {
-                final SliceDataTypeElement sliceClassDisp = sliceHelper.findClass(fqn.withNewName(name.substring(0, name.length() - 4)));
-
-                if (sliceClassDisp != null) {
-                    targets.add(sliceClassDisp);
-                }
-
-            }
-
+        final String name = targetClass.getQualifiedName();
+        if (name == null) {
+            return;
         }
+
+        final Project project = targetClass.getProject();
+        final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesScope(module);
+        final SliceDataTypeElement sliceClass = GeneratedJavaNamesIndex.findDeclaration(name, project, scope);
+        if (sliceClass != null) {
+            targets.add(sliceClass);
+        }
+
+        if (name.endsWith("Disp")) {
+            final SliceDataTypeElement sliceClassDisp = GeneratedJavaNamesIndex.findDeclaration(
+                    name.substring(0, name.length() - 4),
+                    project,
+                    scope
+            );
+
+            if (sliceClassDisp != null) {
+                targets.add(sliceClassDisp);
+            }
+
+        } else if (name.endsWith("Prx")) {
+            final SliceDataTypeElement sliceClassPrx = GeneratedJavaNamesIndex.findDeclaration(
+                    name.substring(0, name.length() - 3),
+                    project,
+                    scope
+            );
+
+            if (sliceClassPrx != null) {
+                targets.add(sliceClassPrx);
+            }
+        }
+
         for (PsiClass i : targetClass.getInterfaces()) {
-            searchReferences(sliceHelper, targets, visited, i);
+            searchReferences(targets, visited, i, module);
         }
     }
-
 
     @Override
     public String getName() {
@@ -146,7 +211,7 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
 
     @NotNull
     @Override
-    public Option[] getOptions() {
-        return new Option[]{myImplementingMethodOption, myImplementingInterfaceOption};
+    public Option @NotNull [] getOptions() {
+        return new Option[]{myDeclaredMethodOption, myImplementingMethodOption, myImplementingInterfaceOption};
     }
 }

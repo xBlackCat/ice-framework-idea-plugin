@@ -25,7 +25,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.psi.*;
-import org.xblackcat.frozenidea.util.FQN;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,23 +65,18 @@ public class JavaModuleHelper {
     }
 
     @Nullable
-    public NavigatablePsiElement findClass(String className) {
+    public PsiClass findClass(SliceDataTypeElement element) {
+        return null;
+    }
+
+    @Nullable
+    public PsiClass findClass(SliceModule element, String name) {
         return null;
     }
 
     @Nullable
     public NavigationItem findPackage(String packageName) {
         return null;
-    }
-
-    @Nullable
-    public NavigatablePsiElement findClassMethod(String className, String methodName, int paramCount) {
-        return null;
-    }
-
-    @NotNull
-    public List<NavigatablePsiElement> getClassMethods(String className, boolean staticMethods) {
-        return Collections.emptyList();
     }
 
     @NotNull
@@ -99,7 +93,7 @@ public class JavaModuleHelper {
         return null;
     }
 
-    public PsiElement findClassField(String className, String name) {
+    public PsiElement findClassField(SliceDataTypeElement className, String name) {
         return null;
     }
 
@@ -119,7 +113,24 @@ public class JavaModuleHelper {
         }
 
         @Override
-        public PsiClass findClass(String className) {
+        public @Nullable PsiClass findClass(SliceDataTypeElement element) {
+            final String packageName = JavaPsiUtil.getJavaPackageName(element.getModule());
+            if (packageName == null) {
+                return null;
+            }
+            return findClass(packageName + "." + element.getName());
+        }
+
+        @Override
+        public @Nullable PsiClass findClass(SliceModule element, String name) {
+            final String packageName = JavaPsiUtil.getJavaPackageName(element);
+            if (packageName == null) {
+                return null;
+            }
+            return findClass(packageName + "." + name);
+        }
+
+        public @Nullable PsiClass findClass(String className) {
             if (className == null) {
                 return null;
             }
@@ -132,7 +143,7 @@ public class JavaModuleHelper {
         }
 
         @Override
-        public PsiElement findClassField(String className, String name) {
+        public PsiElement findClassField(SliceDataTypeElement className, String name) {
             PsiClass aClass = findClass(className);
             if (aClass == null) {
                 return null;
@@ -151,14 +162,14 @@ public class JavaModuleHelper {
                 return null;
             }
 
-            final String className = FQN.buildFQN(methodDef.getContainingClass()).getJavaFQN();
             final List<PsiElement> result = new ArrayList<>();
-            PsiClass aClass = findClass(className);
+            final SliceDataTypeElement containingClass = methodDef.getContainingClass();
+            PsiClass aClass = findClass(containingClass);
             if (aClass != null) {
                 checkObjectMethods(methodDef, iceClass, result, aClass, "");
             }
 
-            PsiClass aClassPrx = findClass(className + "Prx");
+            PsiClass aClassPrx = findClass(containingClass.getModule(), containingClass.getName() + "Prx");
             if (aClassPrx != null) {
                 checkProxyMethods(methodDef, iceClass, result, aClassPrx, "");
                 checkProxyMethods(methodDef, iceClass, result, aClassPrx, "Async");
@@ -240,36 +251,6 @@ public class JavaModuleHelper {
                 }
             }
             return false;
-        }
-
-        @Override
-        public PsiMethod findClassMethod(String className, String methodName, int paramCount) {
-            PsiClass aClass = findClass(className);
-            PsiMethod[] methods = aClass == null ? PsiMethod.EMPTY_ARRAY : aClass.findMethodsByName(methodName, true);
-            for (PsiMethod method : methods) {
-                if (paramCount < 0 || paramCount + 2 == method.getParameterList().getParametersCount()) {
-                    return method;
-                }
-            }
-            return methods.length > 0 ? methods[0] : null;
-        }
-
-        @NotNull
-        @Override
-        public List<NavigatablePsiElement> getClassMethods(String className, boolean staticMethods) {
-            PsiClass aClass = findClass(className);
-            if (aClass == null) {
-                return Collections.emptyList();
-            }
-            final ArrayList<NavigatablePsiElement> result = new ArrayList<>();
-            for (PsiMethod method : aClass.getAllMethods()) {
-                PsiModifierList modifierList = method.getModifierList();
-                if (modifierList.hasExplicitModifier(PsiModifier.PUBLIC) &&
-                        staticMethods == modifierList.hasExplicitModifier(PsiModifier.STATIC)) {
-                    result.add(method);
-                }
-            }
-            return result;
         }
 
         @NotNull

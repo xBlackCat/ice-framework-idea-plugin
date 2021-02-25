@@ -3,7 +3,6 @@ package org.xblackcat.frozenidea.link.java;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
-import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
@@ -51,18 +50,20 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             return Collections.emptyList();
         }
 
-        SliceModule module = SliceHelper.getContainerSliceModule(element);
+        SliceModule module = element.getModule();
         if (module == null) {
             return Collections.emptyList();
         }
 
         List<PsiClass> result = new ArrayList<>();
-        final PsiClass javaClass = checkJavaClass(element, SliceHelper.buildFQN(name, module));
+        final JavaModuleHelper javaModuleHelper = JavaModuleHelper.getJavaHelper(element);
+
+        final PsiClass javaClass = javaModuleHelper.findClass(element.getModule(), name);
         if (javaClass != null) {
             result.add(javaClass);
         }
 
-        final PsiClass javaDispClass = checkJavaClass(element, SliceHelper.buildFQN(name + "Disp", module));
+        final PsiClass javaDispClass = javaModuleHelper.findClass(element.getModule(), name + "Disp");
         if (javaDispClass != null) {
             result.add(javaDispClass);
         }
@@ -70,22 +71,14 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         return result;
     }
 
-    private static PsiClass checkJavaClass(SliceDataTypeElement element, String implFQN) {
-        JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(element);
-        NavigatablePsiElement aClass = javaHelper.findClass(implFQN);
-
-        if ((aClass instanceof PsiClass)) {
-            return (PsiClass) aClass;
-        }
-        return null;
-
-    }
-
     private static void collectToJavaClassLinks(
             Collection<? super RelatedItemLineMarkerInfo<?>> result,
             Set<PsiElement> visited,
             SliceDataTypeElement element
     ) {
+        if (element.getId() == null) {
+            return;
+        }
         List<PsiClass> classes = searchGeneratedJavaClasses(element);
 
         List<PsiElement> items = new ArrayList<>(classes);
@@ -98,7 +91,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
         }
 
         if (!items.isEmpty()) {
-            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.TRANSLATED_JAVA_CLASS).
+            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.create(SliceIcons.TRANSLATED_CLASS).
                     setTargets(items).setTooltipText(SliceBundle.message("gutter.go.to.java.translated.interface"));
             result.add(builder.createLineMarkerInfo(element.getId()));
         }
@@ -141,7 +134,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
         if (!items.isEmpty()) {
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
-                    .create(SliceIcons.TRANSLATED_JAVA_METHOD)
+                    .create(SliceIcons.TRANSLATED_METHOD)
                     .setTargets(items)
                     .setTooltipText(SliceBundle.message("gutter.go.to.java.translated.method"));
             result.add(builder.createLineMarkerInfo(element.getId()));
@@ -170,13 +163,6 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
             if (clazzName == null) {
                 continue;
             }
-
-            //noinspection SimplifiableIfStatement
-            if (!(SliceHelper.buildFQN(clazzName, module)).equals(clazz.getQualifiedName())) {
-                // Packages are not equals - not generated class
-                continue;
-            }
-
 
             for (SliceDataTypeElement e : elements) {
                 final String name = e.getName();
@@ -224,7 +210,7 @@ public class Slice2JavaLineMarkerProvider extends RelatedItemLineMarkerProvider 
 
     @NotNull
     @Override
-    public Option[] getOptions() {
+    public Option @NotNull [] getOptions() {
         return new Option[]{myImplementingMethodOption, myImplementingInterfaceOption};
     }
 }

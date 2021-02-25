@@ -24,8 +24,10 @@ import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassRe
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.psi.*;
-import org.xblackcat.frozenidea.util.FQN;
+import org.xblackcat.frozenidea.psi.SliceDataType;
+import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
+import org.xblackcat.frozenidea.psi.SliceGenericType;
+import org.xblackcat.frozenidea.psi.SliceTypeReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -189,7 +191,7 @@ public class JavaHelper {
                     }
                     return toJavaParameter(genericType.getDataType()) + "[]";
                 }
-                return FQN.buildFQN((SliceNamedElement) element).getJavaFQN();
+                return JavaPsiUtil.getJavaFQN(typeElement);
             }
         }
     }

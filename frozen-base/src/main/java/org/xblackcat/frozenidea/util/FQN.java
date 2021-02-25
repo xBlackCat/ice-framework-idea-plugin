@@ -1,29 +1,25 @@
 package org.xblackcat.frozenidea.util;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.xblackcat.frozenidea.config.IceComponent;
-import org.xblackcat.frozenidea.integration.SliceHelper;
 import org.xblackcat.frozenidea.psi.SliceModule;
 import org.xblackcat.frozenidea.psi.SliceNamedElement;
 import org.xblackcat.frozenidea.psi.SliceTypeReference;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.StringJoiner;
+import java.util.*;
 
-/**
- * 02.08.2017 14:52
- *
- * @author xBlackCat
- */
 public class FQN {
+    public static final FQN EMPTY = new FQN();
+    private final String[] elements;
+
+    private FQN(String... elements) {
+        this.elements = elements;
+    }
+
     public static FQN buildFQN(String ref, @NotNull SliceModule module) {
         if (ref.contains("::")) {
-            return new FQN(module.getContainingFile(), ref.split("::"));
+            return new FQN(ref.split("::"));
         } else {
             Deque<String> fqn = new ArrayDeque<>(10);
             fqn.addFirst(ref);
@@ -34,7 +30,7 @@ public class FQN {
                 m = PsiTreeUtil.getParentOfType(m, SliceModule.class);
             } while (m != null);
 
-            return new FQN(module.getContainingFile(), fqn.toArray(new String[0]));
+            return new FQN(fqn.toArray(new String[0]));
         }
     }
 
@@ -44,10 +40,10 @@ public class FQN {
             final String[] elements = text.split("::");
             final String[] copy = Arrays.copyOf(elements, elements.length + 1);
             copy[copy.length - 1] = ref.getId().getText();
-            return new FQN(ref.getContainingFile(), copy);
+            return new FQN(copy);
         }
 
-        return new FQN(ref.getContainingFile(), ref.getId().getText());
+        return new FQN(ref.getId().getText());
     }
 
     public static FQN buildFQN(SliceNamedElement element) {
@@ -60,26 +56,22 @@ public class FQN {
             m = PsiTreeUtil.getParentOfType(m, SliceModule.class);
         }
 
-        return new FQN(element.getContainingFile(), fqn.toArray(new String[0]));
+        return new FQN(fqn.toArray(new String[0]));
     }
 
     public static FQN buildFQN(String qualifiedName) {
-        return buildFQN(qualifiedName, ".");
+        return buildFQN(qualifiedName, "::");
     }
 
     public static FQN buildFQN(String qualifiedName, String separator) {
         if (qualifiedName == null) {
             return null;
         }
-        return new FQN(null, StringUtil.split(qualifiedName, separator).toArray(new String[0]));
+        return new FQN(StringUtil.split(qualifiedName, separator).toArray(new String[0]));
     }
 
-    private final PsiFile psiFile;
-    private final String[] elements;
-
-    private FQN(PsiFile psiFile, String... elements) {
-        this.psiFile = psiFile;
-        this.elements = elements;
+    public static FQN of(Collection<String> parts) {
+        return new FQN(parts.toArray(new String[0]));
     }
 
     public String[] getModules() {
@@ -88,12 +80,6 @@ public class FQN {
 
     public String getName() {
         return elements[elements.length - 1];
-    }
-
-    public FQN withNewName(String newName) {
-        final FQN fqn = new FQN(psiFile, elements.clone());
-        fqn.elements[fqn.elements.length - 1] = newName;
-        return fqn;
     }
 
     public boolean startWith(FQN path) {
@@ -128,15 +114,6 @@ public class FQN {
         return String.join("::", elements);
     }
 
-    public String getJavaFQN() {
-        final String packageName = SliceHelper.getPackageName(psiFile, IceComponent.Java);
-        if (packageName != null && !packageName.isEmpty()) {
-            return packageName + "." + String.join(".", elements);
-        } else {
-            return String.join(".", elements);
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -163,7 +140,7 @@ public class FQN {
         if (elements.length == 1) {
             return null;
         }
-        return new FQN(psiFile, getModules());
+        return new FQN(getModules());
     }
 
     public String getPathString() {
@@ -176,5 +153,11 @@ public class FQN {
             i++;
         }
         return joiner.toString();
+    }
+
+    public FQN with(String name) {
+        final String[] parts = Arrays.copyOf(elements, elements.length + 1);
+        parts[elements.length] = name;
+        return new FQN(parts);
     }
 }

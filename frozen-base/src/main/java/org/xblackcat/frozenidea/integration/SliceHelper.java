@@ -7,11 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.util.FQN;
 import org.xblackcat.frozenidea.util.SliceBundle;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 14.06.12 16:23
@@ -40,20 +39,48 @@ public class SliceHelper {
         }
         List<SliceGlobalMetadataStatement> globalMetadatas = globalMetadata.getGlobalMetadataStatementList();
         for (SliceGlobalMetadataStatement md : globalMetadatas) {
-            for (SliceMetadataElement el : md.getMetadataElementList()) {
-                final SliceStringLiteral literal = el.getStringLiteral();
-                if (literal == null) {
-                    continue;
-                }
-                final String text = literal.getText();
-                String packageString = target.extractPackageName(text.substring(1, text.length() - 1));
-
-                if (packageString != null) {
-                    return packageString;
-                }
+            String packageString = findPackageStatement(target, md.getMetadataElementList());
+            if (packageString != null) {
+                return packageString;
             }
         }
 
+        return null;
+    }
+
+    public static String getPackageName(SliceModule module, IceComponent target) {
+        if (module == null) {
+            return null;
+        }
+        final @Nullable SliceMetadata metadata = PsiTreeUtil.getChildOfType(module, SliceMetadata.class);
+        if (metadata == null) {
+            return null;
+        }
+        @NotNull List<SliceMetadataStatement> metadataStatements = metadata.getMetadataStatementList();
+        for (SliceMetadataStatement md : metadataStatements) {
+            String packageString = findPackageStatement(target, md.getMetadataElementList());
+            if (packageString != null) {
+                return packageString;
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static String findPackageStatement(IceComponent target, @NotNull List<SliceMetadataElement> metadataElementList) {
+        for (SliceMetadataElement el : metadataElementList) {
+            final SliceStringLiteral literal = el.getStringLiteral();
+            if (literal == null) {
+                continue;
+            }
+            final String text = literal.getText();
+            String packageString = target.extractPackageName(text.substring(1, text.length() - 1));
+
+            if (packageString != null) {
+                return packageString;
+            }
+        }
         return null;
     }
 
@@ -72,28 +99,54 @@ public class SliceHelper {
         res.append(".");
     }
 
-    public static String getFQN(SliceNamedElement element) {
+    public static FQN getFQN(SliceDataTypeElement element) {
         final PsiElement id = element.getId();
         if (id == null) {
-            return DEFAULT_FQN;
+            return FQN.EMPTY;
         }
         String name = id.getText();
 
         if (name == null) {
-            return DEFAULT_FQN;
+            return FQN.EMPTY;
         }
 
-        SliceModule module = getContainerSliceModule(element);
+        FQN module = getFQN(element.getModule());
         if (module == null) {
-            return DEFAULT_FQN;
+            return FQN.EMPTY;
         }
-        return buildFQN(name, module);
+        return module.with(name);
     }
 
-    public static
+    public static FQN getFQN(SliceModule module) {
+        final PsiElement id = module.getId();
+        if (id == null) {
+            return null;
+        }
+        List<String> parts = new ArrayList<>();
+        while (module != null) {
+            String name = id.getText();
+
+            if (name == null) {
+                return null;
+            }
+
+            parts.add(name);
+            module = PsiTreeUtil.getParentOfType(module, SliceModule.class);
+        }
+
+        Collections.reverse(parts);
+        return FQN.of(parts);
+    }
+
     @NotNull
-    String buildFQN(String name, SliceModule module) {
-        String packageName = SliceHelper.getPackageName(module.getContainingFile(), IceComponent.Java);
+    public static String buildFQN(String name, SliceModule module) {
+        String packageName = SliceHelper.getPackageName(module, IceComponent.Java);
+        if (packageName != null) {
+
+        }
+        if (packageName == null) {
+            packageName = SliceHelper.getPackageName(module.getContainingFile(), IceComponent.Java);
+        }
 
         StringBuilder fqn = new StringBuilder();
         if (packageName != null) {

@@ -17,8 +17,9 @@ public interface SliceIcons {
     Icon PROPERTY_ICON = IconLoader.getIcon("/icons/property.svg", SliceIcons.class);
 
 
-    Icon TRANSLATED_JAVA_CLASS = IconLoader.getIcon("/icons/translateJavaClass.svg", SliceIcons.class);
-    Icon TRANSLATED_JAVA_METHOD = IconLoader.getIcon("/icons/translateJavaMethod.svg", SliceIcons.class);
+    Icon TRANSLATED_CLASS = IconLoader.getIcon("/icons/toTranslatedClass.svg", SliceIcons.class);
+    Icon TRANSLATED_METHOD = IconLoader.getIcon("/icons/toTranslatedMethod.svg", SliceIcons.class);
+    Icon DECLARED_ICE_METHOD = IconLoader.getIcon("/icons/toDeclaredMethod.svg", SliceIcons.class);
     Icon IMPLEMENTED_SLICE_METHOD = IconLoader.getIcon("/icons/implementedSliceMethod.svg", SliceIcons.class);
     Icon IMPLEMENTED_SLICE_CLASS = IconLoader.getIcon("/icons/implementedSliceClass.svg", SliceIcons.class);
     Icon IMPLEMENTED = IconLoader.getIcon("/gutter/implementedMethod.svg", SliceIcons.class);

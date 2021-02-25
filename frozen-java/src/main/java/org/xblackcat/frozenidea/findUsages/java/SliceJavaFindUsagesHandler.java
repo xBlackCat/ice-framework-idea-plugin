@@ -6,8 +6,10 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.findUsages.slice.FindSliceClassUsagesDialog;
 import org.xblackcat.frozenidea.integration.java.JavaModuleHelper;
-import org.xblackcat.frozenidea.psi.*;
-import org.xblackcat.frozenidea.util.FQN;
+import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
+import org.xblackcat.frozenidea.psi.SliceEnumConstant;
+import org.xblackcat.frozenidea.psi.SliceFieldDef;
+import org.xblackcat.frozenidea.psi.SliceMethodDef;
 
 /**
  * 06.07.12 15:07
@@ -56,7 +58,7 @@ public class SliceJavaFindUsagesHandler extends FindUsagesHandler {
 
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(classDef);
 
-            PsiElement javaClass = javaHelper.findClass(FQN.buildFQN(classDef).getJavaFQN());
+            PsiElement javaClass = javaHelper.findClass(classDef);
             if (javaClass != null) {
                 return new PsiElement[]{
                         javaClass
@@ -67,21 +69,21 @@ public class SliceJavaFindUsagesHandler extends FindUsagesHandler {
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(methodDef);
 
             return javaHelper.findClassMethod(methodDef);
-        }  else if (element instanceof SliceFieldDef) {
+        } else if (element instanceof SliceFieldDef) {
             SliceFieldDef fieldDef = (SliceFieldDef) element;
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(fieldDef);
 
-            PsiElement javaField = javaHelper.findClassField(FQN.buildFQN(fieldDef.getContainingClass()).getJavaFQN(), fieldDef.getName());
+            PsiElement javaField = javaHelper.findClassField(fieldDef.getContainingClass(), fieldDef.getName());
             if (javaField != null) {
                 return new PsiElement[]{
                         javaField
                 };
             }
-        }  else if (element instanceof SliceEnumConstant) {
+        } else if (element instanceof SliceEnumConstant) {
             SliceEnumConstant fieldDef = (SliceEnumConstant) element;
             JavaModuleHelper javaHelper = JavaModuleHelper.getJavaHelper(fieldDef);
 
-            PsiElement javaField = javaHelper.findClassField(FQN.buildFQN(fieldDef.getContainingClass()).getJavaFQN(), fieldDef.getName());
+            PsiElement javaField = javaHelper.findClassField(fieldDef.getContainingClass(), fieldDef.getName());
             if (javaField != null) {
                 return new PsiElement[]{
                         javaField
