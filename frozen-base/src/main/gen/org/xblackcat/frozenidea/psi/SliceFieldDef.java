@@ -16,6 +16,9 @@ public interface SliceFieldDef extends SliceInnerElement, SliceVariableElement, 
   @NotNull
   SliceMetadata getMetadata();
 
+  @Nullable
+  SliceOptionalDef getOptionalDef();
+
   @NotNull
   PsiElement getId();
 

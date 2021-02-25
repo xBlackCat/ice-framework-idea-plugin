@@ -45,6 +45,12 @@ public class SliceFieldDefImpl extends SliceInnerElementImpl implements SliceFie
   }
 
   @Override
+  @Nullable
+  public SliceOptionalDef getOptionalDef() {
+    return findChildByClass(SliceOptionalDef.class);
+  }
+
+  @Override
   @NotNull
   public PsiElement getId() {
     return findNotNullChildByType(ICE_ID);

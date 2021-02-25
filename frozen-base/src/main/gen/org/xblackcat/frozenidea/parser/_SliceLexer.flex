@@ -78,6 +78,7 @@ DIRECTIVE=#.+
   "out"                      { return ICE_KW_OUT; }
   "local"                    { return ICE_KW_LOCAL; }
   "idempotent"               { return ICE_KW_IDEMPOTENT; }
+  "optional"                 { return ICE_KW_OPTIONAL; }
   "module"                   { return ICE_KW_MODULE; }
   "const"                    { return ICE_KW_CONST; }
   "throws"                   { return ICE_KW_THROWS; }

@@ -13,6 +13,7 @@ import org.xblackcat.frozenidea.psi.SliceTypes;
 public interface ElementType {
     IFileElementType FILE_ELEMENT_TYPE = new IFileElementType("SLICE", SliceLanguage.INSTANCE);
     TokenSet KEYWORD_BIT_SET = TokenSet.create(
+            SliceTypes.ICE_KW_OPTIONAL,
             SliceTypes.ICE_KW_BOOL,
             SliceTypes.ICE_KW_BYTE,
             SliceTypes.ICE_KW_CLASS,

@@ -43,6 +43,9 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
 
     private static final String moduleKeyword = "module";
     private static final String constKeyword = "const";
+    private static final String extendsKeyword = "extends";
+    private static final String implementsKeyword = "implements";
+    private static final String optionalKeyword = "optional";
     private static final String[] typeDefineKeywords = new String[]{
             "class", "interface", "exception", "struct", "enum", "sequence", "dictionary"};
     private static final String[] primitiveTypeKeywords = new String[]{
@@ -53,7 +56,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, SlicePatterns.parameterList(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
-                    @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
+                    @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result
             ) {
                 for (String kw : primitiveTypeKeywords) {
                     result.addElement(
@@ -70,11 +73,19 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, SlicePatterns.classBody(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
-                    @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
+                    @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result
             ) {
                 result.addElement(
                         TailTypeDecorator.withTail(
                                 LookupElementBuilder.create("void")
+                                        .withBoldness(true)
+                                        .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
+                                TailType.SPACE
+                        )
+                );
+                result.addElement(
+                        TailTypeDecorator.withTail(
+                                LookupElementBuilder.create(optionalKeyword)
                                         .withBoldness(true)
                                         .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
                                 TailType.SPACE
@@ -96,7 +107,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
             @Override
             protected void addCompletions(
                     @NotNull CompletionParameters parameters,
-                    ProcessingContext context,
+                    @NotNull ProcessingContext context,
                     @NotNull CompletionResultSet result
             ) {
                 final PsiElement position = parameters.getPosition();
@@ -120,11 +131,11 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, SlicePatterns.elementDef(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
-                    @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
+                    @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result
             ) {
                 result.addElement(
                         TailTypeDecorator.withTail(
-                                LookupElementBuilder.create("extends")
+                                LookupElementBuilder.create(extendsKeyword)
                                         .withBoldness(true)
                                         .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
                                 TailType.SPACE
@@ -132,7 +143,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
                 );
                 result.addElement(
                         TailTypeDecorator.withTail(
-                                LookupElementBuilder.create("implements")
+                                LookupElementBuilder.create(implementsKeyword)
                                         .withBoldness(true)
                                         .withAutoCompletionPolicy(AutoCompletionPolicy.GIVE_CHANCE_TO_OVERWRITE),
                                 TailType.SPACE
@@ -143,7 +154,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, SlicePatterns.moduleBody(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
-                    @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
+                    @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result
             ) {
                 for (String kw : typeDefineKeywords) {
                     result.addElement(
@@ -176,7 +187,7 @@ public class SliceBasicCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, SlicePatterns.emptySliceFile(), new CompletionProvider<>() {
             @Override
             protected void addCompletions(
-                    @NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result
+                    @NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result
             ) {
                 result.addElement(
                         TailTypeDecorator.withTail(

@@ -88,6 +88,7 @@
         // Method modifier list
         KW_LOCAL="local"
         KW_IDEMPOTENT="idempotent"
+        KW_OPTIONAL="optional"
 
         // Other keywords
         KW_MODULE="module"
@@ -239,7 +240,9 @@ constant_value ::= (number_literal | bool_literal | string_literal | enum_consta
 
 field_initializer ::= '=' constant_value {pin=1}
 
-field_def ::= metadata data_type id (field_initializer )? ';' {pin=3}
+optional_def ::= 'optional' '(' integer_literal ')' { pin = 1 }
+
+field_def ::= metadata (optional_def)? data_type id (field_initializer )? ';' {pin=4}
 
 constant_def ::= metadata 'const' data_type id field_initializer ';' {pin=2}
 

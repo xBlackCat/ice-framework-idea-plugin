@@ -124,6 +124,10 @@ public class SliceVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
+  public void visitOptionalDef(@NotNull SliceOptionalDef o) {
+    visitNamedElement(o);
+  }
+
   public void visitParameterDef(@NotNull SliceParameterDef o) {
     visitVariableElement(o);
     // visitNamedElement(o);

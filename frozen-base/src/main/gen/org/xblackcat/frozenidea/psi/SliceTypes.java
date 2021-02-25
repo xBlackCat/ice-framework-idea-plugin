@@ -36,6 +36,7 @@ public interface SliceTypes {
   IElementType ICE_MODULE_BODY = new SliceCompositeElementType("ICE_MODULE_BODY");
   IElementType ICE_MODULE_PATH = new SliceCompositeElementType("ICE_MODULE_PATH");
   IElementType ICE_NUMBER_LITERAL = new SliceCompositeElementType("ICE_NUMBER_LITERAL");
+  IElementType ICE_OPTIONAL_DEF = new SliceCompositeElementType("ICE_OPTIONAL_DEF");
   IElementType ICE_PARAMETERS_LIST = new SliceCompositeElementType("ICE_PARAMETERS_LIST");
   IElementType ICE_PARAMETER_DEF = new SliceCompositeElementType("ICE_PARAMETER_DEF");
   IElementType ICE_PARAMETER_MODIFIER = new SliceCompositeElementType("ICE_PARAMETER_MODIFIER");
@@ -80,6 +81,7 @@ public interface SliceTypes {
   IElementType ICE_KW_LONG = new SliceTokenType("long");
   IElementType ICE_KW_MODULE = new SliceTokenType("module");
   IElementType ICE_KW_OBJECT = new SliceTokenType("Object");
+  IElementType ICE_KW_OPTIONAL = new SliceTokenType("optional");
   IElementType ICE_KW_OUT = new SliceTokenType("out");
   IElementType ICE_KW_SEQUENCE = new SliceTokenType("sequence");
   IElementType ICE_KW_SHORT = new SliceTokenType("short");
@@ -186,6 +188,9 @@ public interface SliceTypes {
       }
       else if (type == ICE_NUMBER_LITERAL) {
         return new SliceNumberLiteralImpl(node);
+      }
+      else if (type == ICE_OPTIONAL_DEF) {
+        return new SliceOptionalDefImpl(node);
       }
       else if (type == ICE_PARAMETERS_LIST) {
         return new SliceParametersListImpl(node);

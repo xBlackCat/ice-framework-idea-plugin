@@ -396,31 +396,49 @@ public class SliceParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // metadata data_type id (field_initializer )? ';'
+  // metadata (optional_def)? data_type id (field_initializer )? ';'
   public static boolean field_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "field_def")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, ICE_FIELD_DEF, "<field def>");
     r = metadata(b, l + 1);
+    r = r && field_def_1(b, l + 1);
     r = r && data_type(b, l + 1);
     r = r && consumeToken(b, ICE_ID);
-    p = r; // pin = 3
-    r = r && report_error_(b, field_def_3(b, l + 1));
+    p = r; // pin = 4
+    r = r && report_error_(b, field_def_4(b, l + 1));
     r = p && consumeToken(b, ICE_SEMICOLON) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
+  // (optional_def)?
+  private static boolean field_def_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "field_def_1")) return false;
+    field_def_1_0(b, l + 1);
+    return true;
+  }
+
+  // (optional_def)
+  private static boolean field_def_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "field_def_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = optional_def(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
   // (field_initializer )?
-  private static boolean field_def_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "field_def_3")) return false;
-    field_def_3_0(b, l + 1);
+  private static boolean field_def_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "field_def_4")) return false;
+    field_def_4_0(b, l + 1);
     return true;
   }
 
   // (field_initializer )
-  private static boolean field_def_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "field_def_3_0")) return false;
+  private static boolean field_def_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "field_def_4_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = field_initializer(b, l + 1);
@@ -919,6 +937,21 @@ public class SliceParser implements PsiParser, LightPsiParser {
     if (!r) r = float_literal(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  /* ********************************************************** */
+  // 'optional' '(' integer_literal ')'
+  public static boolean optional_def(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "optional_def")) return false;
+    if (!nextTokenIs(b, ICE_KW_OPTIONAL)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, ICE_OPTIONAL_DEF, null);
+    r = consumeTokens(b, 1, ICE_KW_OPTIONAL, ICE_LEFT_PARENTH);
+    p = r; // pin = 1
+    r = r && report_error_(b, integer_literal(b, l + 1));
+    r = p && consumeToken(b, ICE_RIGHT_PARENTH) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
