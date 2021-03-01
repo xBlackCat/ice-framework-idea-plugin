@@ -9,7 +9,7 @@
     <depends>com.intellij.modules.lang</depends>
     <depends config-file="java-integration.xml" optional="true">com.intellij.modules.java</depends>
     <!--<depends config-file="php-integration.xml" optional="true">com.jetbrains.php</depends>-->
-    <!--<depends config-file="python-integration.xml" optional="true">com.intellij.modules.python</depends>-->
+    <depends config-file="python-integration.xml" optional="true">com.intellij.modules.python</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="Ice Facet Notification" displayType="BALLOON"/>

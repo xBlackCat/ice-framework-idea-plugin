@@ -24,8 +24,8 @@ allprojects {
 
     intellij {
         version ideaVersion
-        type 'IU'
-        plugins = ['java'/*, 'com.jetbrains.php:201.7846.90', 'PythonCore:201.7846.85'*/]
+        type 'CE'
+        plugins = ['java'/*, 'com.jetbrains.php:201.7846.90'*/, 'PythonCore:203.5981.165', 'PsiViewer:203-SNAPSHOT']
     }
 
     apply plugin: 'idea'
@@ -41,6 +41,7 @@ dependencies {
     compile project('jps-plugin')
     compile project('frozen-base')
     compile project('frozen-java')
+    compile project('frozen-python')
 }
 
 

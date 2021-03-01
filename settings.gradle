@@ -1,2 +1,2 @@
 rootProject.name = 'frozen-idea'
-include('jps-plugin', 'frozen-base', 'frozen-java')
+include('jps-plugin', 'frozen-base', 'frozen-java', 'frozen-python')

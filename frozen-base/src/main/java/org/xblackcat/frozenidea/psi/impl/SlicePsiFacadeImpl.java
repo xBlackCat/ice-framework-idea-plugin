@@ -45,7 +45,7 @@ public class SlicePsiFacadeImpl extends SlicePsiFacade {
         for (VirtualFile virtualFile : virtualFiles) {
             SliceFile sliceFile = (SliceFile) PsiManager.getInstance(myProject).findFile(virtualFile);
             if (sliceFile != null) {
-                final String javaPackageName = SliceHelper.getPackageName(sliceFile, IceComponent.Java);
+                final String javaPackageName = SliceHelper.getPackageNameMetadata(sliceFile, IceComponent.Java);
                 int idx = 0;
                 if (javaPackageName != null) {
                     final String[] path = StringUtils.split(javaPackageName, ".");

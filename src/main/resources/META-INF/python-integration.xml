@@ -5,12 +5,11 @@
 <!--                                  order="last, before default"/>-->
 <!--        <projectService serviceInterface="org.xblackcat.frozenidea.integration.python.PythonHelper"-->
 <!--                        serviceImplementation="org.xblackcat.frozenidea.integration.python.PythonHelper$Impl"/>-->
-<!--        <moduleService serviceInterface="org.xblackcat.frozenidea.integration.python.PythonModuleHelper"-->
-<!--                       serviceImplementation="org.xblackcat.frozenidea.integration.python.PythonModuleHelper$Impl"/>-->
-<!--        <codeInsight.lineMarkerProvider language="SLICE"-->
-<!--                                        implementationClass="org.xblackcat.frozenidea.link.python.Slice2PythonLineMarkerProvider"/>-->
+        <moduleService serviceInterface="org.xblackcat.frozenidea.integration.python.PythonModuleHelper"
+                       serviceImplementation="org.xblackcat.frozenidea.integration.python.PythonModuleHelper$Impl"/>
         <codeInsight.lineMarkerProvider language="Python"
                                         implementationClass="org.xblackcat.frozenidea.link.python.Python2SliceLineMarkerProvider"/>
+        <fileBasedIndex implementation="org.xblackcat.frozenidea.index.python.GeneratedPythonNamesIndex"/>
 
     </extensions>
 </idea-plugin>

@@ -12,6 +12,6 @@
         <codeInsight.lineMarkerProvider language="JAVA" order="last"
                                         implementationClass="org.xblackcat.frozenidea.link.java.Java2SliceLineMarkerProvider"/>
 
-        <fileBasedIndex implementation="org.xblackcat.frozenidea.index.GeneratedJavaNamesIndex"/>
+        <fileBasedIndex implementation="org.xblackcat.frozenidea.index.java.GeneratedJavaNamesIndex"/>
     </extensions>
 </idea-plugin>

@@ -10,17 +10,14 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.xblackcat.frozenidea.index.GeneratedJavaNamesIndex;
+import org.xblackcat.frozenidea.index.java.GeneratedJavaNamesIndex;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
 import org.xblackcat.frozenidea.psi.SliceMethodDef;
 import org.xblackcat.frozenidea.util.SliceBundle;
 import org.xblackcat.frozenidea.util.SliceIcons;
 import org.xblackcat.frozenidea.util.SliceUtil;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
     private final Option myDeclaredMethodOption = new Option(
@@ -61,13 +58,21 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
             List<PsiElement> targets = new ArrayList<>();
             List<SliceDataTypeElement> sliceClasses = searchSliceClasses(method.getContainingClass());
 
+            final String methodName = method.getName();
+            final String secondName;
+            if (methodName.endsWith("Async")) {
+                secondName = methodName.substring(0, methodName.length() - 5);
+            } else {
+                secondName = "";
+            }
+
             for (SliceDataTypeElement e : sliceClasses) {
                 final List<SliceMethodDef> methodDefs = SliceUtil.getMethodList(e);
                 if (methodDefs == null || methodDefs.isEmpty()) {
                     continue;
                 }
                 for (SliceMethodDef sliceMethod : methodDefs) {
-                    if (method.getName().equals(sliceMethod.getName()) &&
+                    if ((methodName.equals(sliceMethod.getName()) || secondName.equals(sliceMethod.getName())) &&
                             (parametersCount == sliceMethod.getParametersCount() ||
                                     parametersCount - 1 == sliceMethod.getParametersCount())) {
                         targets.add(sliceMethod);
@@ -140,10 +145,14 @@ public class Java2SliceLineMarkerProvider extends LineMarkerProviderDescriptor {
 
     @NotNull
     private List<SliceDataTypeElement> searchSliceClasses(PsiClass parent) {
+        Module module = ModuleUtil.findModuleForPsiElement(parent);
+        if (module == null) {
+            return Collections.emptyList();
+        }
+
         List<SliceDataTypeElement> targets = new ArrayList<>();
         Set<PsiElement> visited = new HashSet<>();
 
-        Module module = ModuleUtil.findModuleForPsiElement(parent);
 
         for (
                 PsiClass targetClass = parent;

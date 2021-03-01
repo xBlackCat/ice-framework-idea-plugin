@@ -1,4 +1,4 @@
-package org.xblackcat.frozenidea.index;
+package org.xblackcat.frozenidea.index.python;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -13,7 +13,7 @@ import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.IceFileType;
 import org.xblackcat.frozenidea.integration.SliceHelper;
-import org.xblackcat.frozenidea.integration.java.JavaPsiUtil;
+import org.xblackcat.frozenidea.integration.python.PythonPsiUtil;
 import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
 import org.xblackcat.frozenidea.psi.SliceFile;
 import org.xblackcat.frozenidea.psi.SliceModule;
@@ -24,25 +24,25 @@ import java.util.*;
 /**
  *
  */
-public class GeneratedJavaNamesIndex extends FileBasedIndexExtension<String, String> {
-    public static final ID<String, String> GENERATED_JAVA_CLASSES_INDEX = ID.create("SliceGeneratedJavaNamesIndex");
+public class GeneratedPythonNamesIndex extends FileBasedIndexExtension<String, String> {
+    public static final ID<String, String> GENERATED_PYTHON_CLASSES_INDEX = ID.create("SliceGeneratedPythonNamesIndex");
     private static final DataIndexer<String, String, FileContent> INDEXER = new MyIndexer();
     private final DefaultFileTypeSpecificInputFilter myInputFilter = new DefaultFileTypeSpecificInputFilter(IceFileType.INSTANCE);
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
-    public static SliceDataTypeElement findDeclaration(String javaClassName, Project project, GlobalSearchScope scope) {
+    public static SliceDataTypeElement findDeclaration(String pythonClassName, Project project, GlobalSearchScope scope) {
         List<SliceDataTypeElement> result = new ArrayList<>();
         final PsiManager manager = PsiManager.getInstance(project);
 
         final FileBasedIndex fileBasedIndex = FileBasedIndex.getInstance();
-        final List<String> values = fileBasedIndex.getValues(GENERATED_JAVA_CLASSES_INDEX, javaClassName, scope);
+        final List<String> values = fileBasedIndex.getValues(GENERATED_PYTHON_CLASSES_INDEX, pythonClassName, scope);
         if (values.isEmpty()) {
             return null;
         }
         final FQN fqn = FQN.buildFQN(values.get(0));
         fileBasedIndex.getFilesWithKey(
-                GENERATED_JAVA_CLASSES_INDEX,
-                Collections.singleton(javaClassName),
+                GENERATED_PYTHON_CLASSES_INDEX,
+                Collections.singleton(pythonClassName),
                 file -> {
                     PsiFile psiFile = manager.findFile(file);
                     if (psiFile != null) {
@@ -72,7 +72,7 @@ public class GeneratedJavaNamesIndex extends FileBasedIndexExtension<String, Str
 
     @Override
     public @NotNull ID<String, String> getName() {
-        return GENERATED_JAVA_CLASSES_INDEX;
+        return GENERATED_PYTHON_CLASSES_INDEX;
     }
 
     @Override
@@ -112,8 +112,10 @@ public class GeneratedJavaNamesIndex extends FileBasedIndexExtension<String, Str
             if (inputData.getPsiFile() instanceof SliceFile) {
                 final Collection<SliceModule> modules = PsiTreeUtil.findChildrenOfType(inputData.getPsiFile(), SliceModule.class);
 
+                final String fileName = inputData.getPsiFile().getName().replaceAll("\\.", "_");
+
                 for (SliceModule module : modules) {
-                    final String javaPackageName = JavaPsiUtil.getJavaPackageName(module);
+                    final String pythonPackageName = PythonPsiUtil.getPythonPackageName(module);
                     final FQN fqn = SliceHelper.getFQN(module);
                     if (fqn == null) {
                         continue;
@@ -123,7 +125,8 @@ public class GeneratedJavaNamesIndex extends FileBasedIndexExtension<String, Str
                     for (SliceDataTypeElement e : module.getTypeDeclarations()) {
                         if (!e.isDictionary() && !e.isSequence()) {
                             final String name = e.getName();
-                            result.put(javaPackageName + "." + name, moduleFQN + "::" + name);
+                            result.put(pythonPackageName + "." + name, moduleFQN + "::" + name);
+                            result.put(fileName + "." + name, moduleFQN + "::" + name);
                         }
                     }
                 }

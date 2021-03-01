@@ -18,8 +18,6 @@ import java.util.*;
  * @author xBlackCat
  */
 public class SliceHelper {
-    private static final String DEFAULT_FQN = SliceBundle.message("default.package.presentable.name");
-
     public static String packageName(SliceModulePath path) {
         final PsiElement[] children = path.getChildren();
         if (children.length == 0) {
@@ -29,7 +27,7 @@ public class SliceHelper {
         return "";
     }
 
-    public static String getPackageName(PsiFile file, IceComponent target) {
+    public static String getPackageNameMetadata(PsiFile file, IceComponent target) {
         if (file == null) {
             return null;
         }
@@ -48,7 +46,7 @@ public class SliceHelper {
         return null;
     }
 
-    public static String getPackageName(SliceModule module, IceComponent target) {
+    public static String getPackageNameMetadata(SliceModule module, IceComponent target) {
         if (module == null) {
             return null;
         }
@@ -140,12 +138,12 @@ public class SliceHelper {
 
     @NotNull
     public static String buildFQN(String name, SliceModule module) {
-        String packageName = SliceHelper.getPackageName(module, IceComponent.Java);
+        String packageName = SliceHelper.getPackageNameMetadata(module, IceComponent.Java);
         if (packageName != null) {
 
         }
         if (packageName == null) {
-            packageName = SliceHelper.getPackageName(module.getContainingFile(), IceComponent.Java);
+            packageName = SliceHelper.getPackageNameMetadata(module.getContainingFile(), IceComponent.Java);
         }
 
         StringBuilder fqn = new StringBuilder();
