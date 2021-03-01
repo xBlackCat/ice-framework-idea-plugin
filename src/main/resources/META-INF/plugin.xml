@@ -2,7 +2,7 @@
     <id>FrozenIdea</id>
     <name>Frozen Idea</name>
     <description>ZeroC ICE framework support - code generator and navigation</description>
-    <version>0.0.5.0</version>
+    <version>0.0.5.1</version>
     <vendor email="xblackcat@gmail.com" url="https://github.com/xBlackCat/ice-framework-idea-plugin">xBlackCat</vendor>
     
     <depends>com.intellij.modules.platform</depends>

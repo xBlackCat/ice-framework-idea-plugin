@@ -25,7 +25,7 @@ allprojects {
     intellij {
         version ideaVersion
         type 'CE'
-        plugins = ['java'/*, 'com.jetbrains.php:201.7846.90'*/, 'PythonCore:203.5981.165', 'PsiViewer:203-SNAPSHOT']
+        plugins = ['java'/*, 'com.jetbrains.php:201.7846.90'*/, 'PythonCore:203.5981.165'/*, 'PsiViewer:203-SNAPSHOT'*/]
     }
 
     apply plugin: 'idea'
@@ -70,5 +70,6 @@ patchPluginXml {
             <li><b>0.0.3.2</b> - Java-to-slice gutter icons were added. Use vector icons.
             <li><b>0.0.4.0</b> - Support IDEA 2020.1.2+. Added structure view and folding code. Gutter icons added to navigate to/from java code. 
             <li><b>0.0.5.0</b> - Support IDEA 2020.3+. Fix deprecation warnings. Configure facets via settings. Fix issue #4 
+            <li><b>0.0.5.1</b> - Fix warnings. Fix issue #5. Add navigation gutter icons from *Prx method usage to ICE declaration (Java, Python code) 
 </ul>"""
 }
