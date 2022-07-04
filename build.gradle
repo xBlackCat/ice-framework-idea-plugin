@@ -51,7 +51,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 
 patchPluginXml {
-    untilBuild.set(null)
+    untilBuild.set(provider { null })
     changeNotes.set(provider {
         """
 <ul>
