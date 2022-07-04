@@ -30,7 +30,7 @@ public class SliceUtil {
                 SliceDataTypeElement[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, SliceDataTypeElement.class);
                 if (properties != null) {
                     for (SliceDataTypeElement dataTypeElement : properties) {
-                        if (fqn.equals(SliceHelper.getFQN(dataTypeElement))) {
+                        if (fqn.equals(SliceHelper.getFQN(dataTypeElement).getFQN())) {
                             if (result == null) {
                                 result = new ArrayList<>();
                             }

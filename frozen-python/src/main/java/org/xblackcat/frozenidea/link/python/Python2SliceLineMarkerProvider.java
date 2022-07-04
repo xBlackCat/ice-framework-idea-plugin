@@ -45,7 +45,8 @@ public class Python2SliceLineMarkerProvider extends LineMarkerProviderDescriptor
 
             PyCallExpression methodRef = (PyCallExpression) parent.getParent();
 
-            final List<@NotNull PyCallableType> calleeList = methodRef.multiResolveCallee(PyResolveContext.implicitContext());
+            final PyResolveContext resolveContext = PyResolveContext.implicitContext(TypeEvalContext.codeInsightFallback(null));
+            final List<@NotNull PyCallableType> calleeList = methodRef.multiResolveCallee(resolveContext);
             List<PsiElement> targets = new ArrayList<>();
 
             for (PyCallableType callee : calleeList) {

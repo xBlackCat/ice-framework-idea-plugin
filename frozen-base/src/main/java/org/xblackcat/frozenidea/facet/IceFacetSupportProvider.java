@@ -41,12 +41,10 @@ public class IceFacetSupportProvider extends FacetBasedFrameworkSupportProvider<
         if (iceClass == null) {
             // No class found!
             final Notification notification = new Notification(
-                    "Ice Facet",
+                    "Ice Facet Notification",
                     SliceBundle.message("ICE.library.not.added"),
                     SliceBundle.message("ICE.library.not.added.message"),
-                    NotificationType.ERROR,
-                    (notification1, event) -> {
-                    }
+                    NotificationType.ERROR
             );
             Notifications.Bus.notify(notification, project);
         }

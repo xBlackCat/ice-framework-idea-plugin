@@ -19,7 +19,7 @@ class TranslatorItemConfig extends JPanel {
     private final JCheckBox compilationEnabled;
 
     private VirtualFile selectedFolder = null;
-    private FixedSizeButton browseDirectoryButton;
+    private final FixedSizeButton browseDirectoryButton;
 
     TranslatorItemConfig(String name) {
         super(new BorderLayout(5, 5));

@@ -29,7 +29,7 @@
 
         id="regexp:\\?\p{Alpha}\w*"
         float_value="regexp:(((\.\d+)|(\d+\.\d*))([Ee][+-]?\d+)?[FfDd]?)|(\d+([Ee][+-]?\d+)[FfDd]?)|(\d+[FfDd])"
-        integer_value="regexp:((0|([1-9]\d*))|(0x[0-9A-Fa-f]+)|(0[0-7]+))(L|l)?"
+        integer_value="regexp:((0|([1-9]\d*))|(0x[0-9A-Fa-f]+)|(0[0-7]+))([Ll])?"
 
         directive="regexp:#.+"
 

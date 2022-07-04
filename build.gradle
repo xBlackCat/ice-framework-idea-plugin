@@ -1,13 +1,16 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.21'
+    id 'java'
+    id 'java-library'
+    id 'idea'
+    id 'org.jetbrains.intellij' version '1.6.0'
 }
 
 group 'org.xblackcat'
 version pluginVersion
 
-
 allprojects {
     apply plugin: 'java'
+    apply plugin: 'java-library'
 
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
@@ -16,16 +19,16 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        maven { url "https://www.jetbrains.com/intellij-repository/releases" }
-        maven { url "https://www.jetbrains.com/intellij-repository/snapshots" }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        gradlePluginPortal()
     }
 
     apply plugin: 'org.jetbrains.intellij'
 
     intellij {
-        version ideaVersion
-        type 'CE'
-        plugins = ['java'/*, 'com.jetbrains.php:201.7846.90'*/, 'PythonCore:203.5981.165'/*, 'PsiViewer:203-SNAPSHOT'*/]
+        version = ideaVersion
+        type = 'IC'
+        plugins = ['java'/*, 'com.jetbrains.php:201.7846.90'*/, 'PythonCore:221.5080.216'/*, 'PsiViewer:203-SNAPSHOT'*/]
     }
 
     apply plugin: 'idea'
@@ -38,18 +41,19 @@ allprojects {
 
 
 dependencies {
-    compile project('jps-plugin')
-    compile project('frozen-base')
-    compile project('frozen-java')
-    compile project('frozen-python')
+    implementation project('jps-plugin')
+    implementation project('frozen-base')
+    implementation project('frozen-java')
+    implementation project('frozen-python')
 }
 
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 
 patchPluginXml {
-    untilBuild null
-    changeNotes """
+    untilBuild.set(null)
+    changeNotes.set(provider {
+        """
 <ul>
             <li><b>0.0.0.1</b> - First revision: Only syntax highlighting</li>
             <li><b>0.0.0.2</b> - Slice2Java translation was added.</li>
@@ -71,5 +75,7 @@ patchPluginXml {
             <li><b>0.0.4.0</b> - Support IDEA 2020.1.2+. Added structure view and folding code. Gutter icons added to navigate to/from java code. 
             <li><b>0.0.5.0</b> - Support IDEA 2020.3+. Fix deprecation warnings. Configure facets via settings. Fix issue #4 
             <li><b>0.0.5.1</b> - Fix warnings. Fix issue #5. Add navigation gutter icons from *Prx method usage to ICE declaration (Java, Python code) 
+            <li><b>0.0.6.0</b> - Fix warnings. Set minimum support version to 2022.1 
 </ul>"""
+    })
 }

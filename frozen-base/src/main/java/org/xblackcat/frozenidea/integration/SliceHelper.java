@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 import org.xblackcat.frozenidea.config.IceComponent;
 import org.xblackcat.frozenidea.psi.*;
 import org.xblackcat.frozenidea.util.FQN;
-import org.xblackcat.frozenidea.util.SliceBundle;
 
 import java.util.*;
 
@@ -139,9 +138,6 @@ public class SliceHelper {
     @NotNull
     public static String buildFQN(String name, SliceModule module) {
         String packageName = SliceHelper.getPackageNameMetadata(module, IceComponent.Java);
-        if (packageName != null) {
-
-        }
         if (packageName == null) {
             packageName = SliceHelper.getPackageNameMetadata(module.getContainingFile(), IceComponent.Java);
         }

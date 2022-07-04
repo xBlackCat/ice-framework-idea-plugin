@@ -1,13 +1,15 @@
 package org.xblackcat.frozenidea.findUsages.slice;
 
+import com.intellij.find.FindBundle;
 import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.find.findUsages.FindUsagesOptions;
-import com.intellij.java.JavaBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.StateRestoringCheckBox;
-import org.xblackcat.frozenidea.psi.*;
+import org.xblackcat.frozenidea.psi.SliceDataTypeElement;
+import org.xblackcat.frozenidea.psi.SliceNamedElement;
+import org.xblackcat.frozenidea.util.SliceBundle;
 
 import javax.swing.*;
 
@@ -71,11 +73,11 @@ public class FindSliceClassUsagesDialog extends SliceFindUsagesDialog<SliceClass
     protected JPanel createFindWhatPanel() {
         JPanel findWhatPanel = new JPanel();
 
-        findWhatPanel.setBorder(IdeBorderFactory.createTitledBorder(JavaBundle.message("find.what.group")));
+        findWhatPanel.setBorder(IdeBorderFactory.createTitledBorder(FindBundle.message("find.what.group")));
         findWhatPanel.setLayout(new BoxLayout(findWhatPanel, BoxLayout.Y_AXIS));
 
         myCbUsages = addCheckboxToPanel(
-                JavaBundle.message("find.what.usages.checkbox"),
+                FindBundle.message("find.what.usages.checkbox"),
                 getFindUsagesOptions().isUsages,
                 findWhatPanel,
                 true
@@ -83,7 +85,7 @@ public class FindSliceClassUsagesDialog extends SliceFindUsagesDialog<SliceClass
 
         SliceNamedElement psiClass = getPsiElement();
         myCbMethodsUsages = addCheckboxToPanel(
-                JavaBundle.message("find.what.methods.usages.checkbox"),
+                SliceBundle.message("find.what.methods.usages.checkbox"),
                 getFindUsagesOptions().isMethodsUsages,
                 findWhatPanel,
                 true
@@ -93,7 +95,7 @@ public class FindSliceClassUsagesDialog extends SliceFindUsagesDialog<SliceClass
             SliceDataTypeElement type = (SliceDataTypeElement) psiClass;
             if (type.isClass() || type.isInterface() || type.isStruct() || type.isException()) {
                 myCbFieldsUsages = addCheckboxToPanel(
-                        JavaBundle.message("find.what.fields.usages.checkbox"),
+                        SliceBundle.message("find.what.fields.usages.checkbox"),
                         getFindUsagesOptions().isFieldsUsages,
                         findWhatPanel,
                         true
@@ -102,13 +104,13 @@ public class FindSliceClassUsagesDialog extends SliceFindUsagesDialog<SliceClass
 
             if (type.isInterface()) {
                 myCbImplementingClasses = addCheckboxToPanel(
-                        JavaBundle.message("find.what.implementing.classes.checkbox"),
+                        SliceBundle.message("find.what.implementing.classes.checkbox"),
                         getFindUsagesOptions().isImplementingClasses,
                         findWhatPanel,
                         true
                 );
                 myCbDerivedInterfaces = addCheckboxToPanel(
-                        JavaBundle.message("find.what.derived.interfaces.checkbox"),
+                        SliceBundle.message("find.what.derived.interfaces.checkbox"),
                         getFindUsagesOptions().isDerivedInterfaces,
                         findWhatPanel,
                         true
@@ -116,7 +118,7 @@ public class FindSliceClassUsagesDialog extends SliceFindUsagesDialog<SliceClass
             }
             if (type.isClass() || type.isException())
                 myCbDerivedClasses = addCheckboxToPanel(
-                        JavaBundle.message("find.what.derived.classes.checkbox"),
+                        SliceBundle.message("find.what.derived.classes.checkbox"),
                         getFindUsagesOptions().isDerivedClasses,
                         findWhatPanel,
                         true

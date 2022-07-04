@@ -85,10 +85,6 @@ public enum IceComponent {
         return new File(new File(home, "bin"), getTranslatorName());
     }
 
-    public File getLibraryPath(File home) {
-        return null;
-    }
-
     public String getFileExtension() {
         return translatorName.substring(6);
     }

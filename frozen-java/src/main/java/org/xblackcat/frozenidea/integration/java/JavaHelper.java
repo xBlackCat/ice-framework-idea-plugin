@@ -17,7 +17,6 @@
 package org.xblackcat.frozenidea.integration.java;
 
 import com.intellij.navigation.NavigationItem;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassReferenceProvider;
@@ -38,7 +37,7 @@ import java.util.List;
  */
 public class JavaHelper {
     public static JavaHelper getJavaHelper(Project project) {
-        JavaHelper service = ServiceManager.getService(project, JavaHelper.class);
+        JavaHelper service = project.getService(JavaHelper.class);
         return service == null ? new JavaHelper() : service;
     }
 

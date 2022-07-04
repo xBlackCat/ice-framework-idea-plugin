@@ -65,7 +65,10 @@ public class SliceDataTypeIndex extends ScalarIndexExtension<String> {
         final List<String> result = new ArrayList<>();
         FileBasedIndex.getInstance().processAllKeys(
                 NAME,
-                name -> result.add(name) || true,
+                name -> {
+                    result.add(name);
+                    return true;
+                },
                 scope,
                 null
         );

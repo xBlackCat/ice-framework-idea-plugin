@@ -41,4 +41,13 @@ public class Target implements Serializable, Cloneable {
     public File getOutputFile() {
         return JpsPathUtil.urlToFile(outputDir);
     }
+
+    @Override
+    public Target clone() {
+        try {
+            return (Target) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

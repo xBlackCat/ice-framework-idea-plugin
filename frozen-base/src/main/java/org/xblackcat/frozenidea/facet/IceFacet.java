@@ -3,8 +3,10 @@ package org.xblackcat.frozenidea.facet;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetTypeId;
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
@@ -13,13 +15,13 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
+import org.jetbrains.annotations.NotNull;
 import org.xblackcat.frozenidea.FrozenIdea;
 import org.xblackcat.frozenidea.config.IceConfig;
 import org.xblackcat.frozenidea.config.IceFrameworkConfigurable;
 import org.xblackcat.frozenidea.util.IceChecker;
 import org.xblackcat.frozenidea.util.SliceBundle;
 
-import javax.swing.event.HyperlinkEvent;
 import java.io.File;
 
 /**
@@ -81,9 +83,7 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                                 "Ice Facet Notification",
                                 SliceBundle.message("ICE.library.not.added"),
                                 SliceBundle.message("ICE.library.not.added.message"),
-                                NotificationType.ERROR,
-                                (notification1, event) -> {
-                                }
+                                NotificationType.ERROR
                         );
                         Notifications.Bus.notify(notification, project);
                     }
@@ -96,16 +96,17 @@ public class IceFacet extends Facet<IceFacetConfiguration> {
                     "Ice Facet Notification",
                     SliceBundle.message("ICE.not.configured"),
                     SliceBundle.message("ICE.not.configured.message"),
-                    NotificationType.ERROR,
-                    (notification1, event) -> {
-                        if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                            notification1.expire();
-
-                            IceFrameworkConfigurable configurable = new IceFrameworkConfigurable(project);
-                            ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
-                        }
-                    }
+                    NotificationType.ERROR
             );
+            notification.addAction(new NotificationAction(SliceBundle.message("ICE.not.configured.action")) {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
+                    notification.expire();
+
+                    IceFrameworkConfigurable configurable = new IceFrameworkConfigurable(project);
+                    ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
+                }
+            });
             Notifications.Bus.notify(notification, project);
         }
     }

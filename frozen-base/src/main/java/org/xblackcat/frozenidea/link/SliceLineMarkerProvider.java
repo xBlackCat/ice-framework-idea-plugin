@@ -124,7 +124,7 @@ public class SliceLineMarkerProvider extends RelatedItemLineMarkerProvider {
         for (PsiElement element : elements) {
             if (element instanceof SliceDataTypeElement) {
                 final SliceDataTypeElement typeDef = (SliceDataTypeElement) element;
-                // The element is interface
+                // The element is Interface
                 if (typeDef.isInterface()) {
                     if (myImplementedOption.isEnabled()) {
                         collectImplementations(result, forNavigation, visited, typeDef);

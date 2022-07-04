@@ -26,6 +26,6 @@ public class SliceGotoSymbolContributor implements ChooseByNameContributor {
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
         final List<SliceNamedElement> items = SliceUtil.findNamedItems(project, name);
-        return items.stream().toArray(NavigationItem[]::new);
+        return items.toArray(NavigationItem[]::new);
     }
 }

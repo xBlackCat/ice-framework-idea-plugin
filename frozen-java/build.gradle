@@ -1,8 +1,6 @@
 group 'org.xblackcat'
 version pluginVersion
-apply plugin: 'java'
-
 
 dependencies {
-    compile project(':frozen-base')
+    implementation project(':frozen-base')
 }
